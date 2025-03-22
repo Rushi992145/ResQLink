@@ -21,6 +21,7 @@ function App() {
   const token = useSelector((state)=>state.auth.token);
   const role = useSelector((state)=>state.auth.role);
   
+  console.log(token,role);
   return (
     <>
       <BrowserRouter>
@@ -47,21 +48,19 @@ function App() {
             element={<NotificationDetail />}
           />
 
-          <Route path="/ngo" element={<NgoDashboard />} />
-
           {/* Volunteer - Private Route */}
           {role && role === "volunteer" && (
-            <Route path="/volunteer-dashboard" element={<Register />} />
+            <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
           )}
 
           {/* Ngo - Private Route */}
           {role && role === "ngo" && (
-            <Route path="/ngo-dashboard" element={<Register />} />
+            <Route path="/ngo-dashboard" element={<NgoDashboard />} />
           )}
 
           {/* Admin - Private Route */}
           {role && role === "admin" && (
-            <Route path="/admin-dashboard" element={<Register />} />
+            <Route path="/admin-dashboard" element={<Admin />} />
           )}
 
           <Route path="*" element={<Login />} />

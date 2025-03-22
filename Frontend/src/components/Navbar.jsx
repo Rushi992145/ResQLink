@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Menu,
+  X,
+  Home,
+  Phone,
+  Shield,
+  Building,
+  HeartHandshake,
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
 
 import { setToken } from "../Redux/authslice";
 import { setEmail } from "../Redux/authslice";
@@ -16,27 +25,44 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
   const token = useSelector((state)=>state.auth.token);
-  
+
+  // Add scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navItems = [
+    { path: "/", label: "Home", icon: Home },
+    { path: "/about", label: "About", icon: HeartHandshake },
+    // { path: '/ngo', label: 'NGO', icon: Building },
+    { path: "/contact", label: "Contact", icon: Phone },
+  ];
+
   function logoutclickhandler()
-  {
-    
-    dispatch(setName(null));
-    dispatch(setEmail(null));
-    dispatch(setRole(null));
-    dispatch(setId(null));
-    dispatch(setToken(null));
-    
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('email');
-    localStorage.removeItem('name');
-    localStorage.removeItem('id');
-    navigate('/login');
-  }
+    {
+      
+      dispatch(setName(null));
+      dispatch(setEmail(null));
+      dispatch(setRole(null));
+      dispatch(setId(null));
+      dispatch(setToken(null));
+      
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('email');
+      localStorage.removeItem('name');
+      localStorage.removeItem('id');
+      navigate('/login');
+    }
 
-
-  console.log("token is :",token);
+    console.log("token is :",token);
 
   return (
     <div className="fixed w-full top-0 z-50">
@@ -106,6 +132,7 @@ const Navbar = () => {
             </div>
 
             {/* Auth Buttons */}
+            { !token ? 
             <div className="hidden md:block">
               <div className="ml-4 flex items-center md:ml-6 space-x-3">
                 <Link to="/login">
@@ -137,8 +164,20 @@ const Navbar = () => {
                   </motion.button>
                 </Link>
               </div>
-            </div>
-
+            </div> : <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
+                      ${
+                        scrolled
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "bg-white text-green-700 hover:bg-green-50"
+                      }`}
+                      onClick={logoutclickhandler}
+                  >
+                    Logout
+                  </motion.button>
+}
 
             {/* Mobile menu button */}
             <div className="md:hidden">
