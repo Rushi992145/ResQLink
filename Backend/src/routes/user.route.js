@@ -18,7 +18,6 @@ router.post("/logout", logoutUser);     // Logout user
 
 // Protected Routes (Require Authentication)
 router.get("/me", verifyJWT, getCurrentUser);  // Get logged-in user data
-router.put("/change-password", verifyJWT, changePassword); // Change password
 router.put("/update-profile", verifyJWT, updateProfile);   // Update profile
 
 export default router;
