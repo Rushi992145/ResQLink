@@ -7,7 +7,7 @@ const ngoData = [
   { id: 1, name: "Red Cross", category: "Medical Aid", location: "Global" },
   {
     id: 2,
-    name: "Doctors Without Borders",
+    name: "World Food Programme",
     category: "Medical Aid",
     location: "Global",
   },
@@ -276,13 +276,15 @@ const LandingPage = () => {
                   information can save lives and direct resources where they're
                   needed most.
                 </p>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-green-500 font-bold py-2 px-6 rounded-lg"
-                >
-                  Report Now
-                </motion.button>
+                <Link to="/report-disaster">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-white text-green-500 font-bold py-2 px-6 rounded-lg"
+                  >
+                    Report Now
+                  </motion.button>
+                </Link>
               </div>
             </motion.div>
 
@@ -300,13 +302,15 @@ const LandingPage = () => {
                   Need help during a disaster? Request essential resources like
                   food, water, medical aid, or shelter through our platform.
                 </p>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-green-600 font-bold py-2 px-6 rounded-lg"
-                >
-                  Request Aid
-                </motion.button>
+                <Link to="/request-assistance">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-white text-green-600 font-bold py-2 px-6 rounded-lg"
+                  >
+                    Request Aid
+                  </motion.button>
+                </Link>
               </div>
             </motion.div>
           </div>
@@ -371,25 +375,7 @@ const LandingPage = () => {
 
           {/* Improved Filters */}
           <div className="mb-12 max-w-3xl mx-auto bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-md border border-green-100">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Filter by Location
-                </label>
-                <select
-                  className="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition-colors"
-                  value={locationFilter}
-                  onChange={(e) => setLocationFilter(e.target.value)}
-                >
-                  <option value="">All Locations</option>
-                  {uniqueLocations.map((location) => (
-                    <option key={location} value={location}>
-                      {location}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+            <div className="flex justify-center items-center md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Filter by Category
@@ -447,28 +433,7 @@ const LandingPage = () => {
                         {ngo.category}
                       </span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <svg
-                        className="w-4 h-4 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      {ngo.location}
-                    </div>
+                    <div className="flex items-center text-sm text-gray-600"></div>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
