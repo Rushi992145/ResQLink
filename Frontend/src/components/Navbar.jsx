@@ -1,10 +1,43 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { setToken } from "../Redux/authslice";
+import { setEmail } from "../Redux/authslice";
+import { setRole } from "../Redux/authslice";
+import { setName } from "../Redux/authslice";
+import { setId } from "../Redux/authslice";
+
 const Navbar = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
+  const token = useSelector((state)=>state.auth.token);
+  
+  function logoutclickhandler()
+  {
+    
+    dispatch(setName(null));
+    dispatch(setEmail(null));
+    dispatch(setRole(null));
+    dispatch(setId(null));
+    dispatch(setToken(null));
+    
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('email');
+    localStorage.removeItem('name');
+    localStorage.removeItem('id');
+    navigate('/login');
+  }
+
+
+  console.log("token is :",token);
+
   return (
     <div>
       <nav className="bg-green-700 text-white shadow-lg fixed w-full top-0 z-50">
@@ -46,21 +79,34 @@ const Navbar = () => {
 
             {/* Auth Buttons */}
             <div className="hidden md:block">
-              <div className="ml-4 flex items-center md:ml-6">
-                <Link
-                  to="/login"
-                  className="bg-white text-green-700 px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-gray-200 transition-colors duration-200"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-green-500 text-white px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-green-600 transition-colors duration-200"
-                >
-                  Register
-                </Link>
-              </div>
+              {
+                !token ? 
+                <div className="ml-4 flex items-center md:ml-6">
+                  <Link
+                    to="/login"
+                    className="bg-white text-green-700 px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-gray-200 transition-colors duration-200 shadow-md"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-green-500 text-white px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-green-600 transition-colors duration-200 shadow-md"
+                  >
+                    Register
+                  </Link>
+                </div> 
+                : 
+                <div className="ml-4 flex items-center md:ml-6">
+                  <button
+                    className="bg-blue-500 text-white px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-blue-600 transition-colors duration-200 shadow-md"
+                    onClick={logoutclickhandler}
+                  >
+                    logout
+                  </button>
+                </div>
+              }
             </div>
+
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center">

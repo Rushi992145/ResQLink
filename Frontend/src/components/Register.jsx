@@ -2,18 +2,40 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 
+
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
-    userType: "volunteer", // Default value
+    role: "volunteer", // Default value
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle registration logic here
+    console.log(formData,typeof(formData));
+
+    try 
+    {
+      const response = await fetch('http://localhost:3000/api/users/register',{
+        method : 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body : JSON.stringify(formData)
+      })
+
+      const value = await response.json();
+      console.log("value is : ",value.data.user);
+    
+      navigate('/login')
+    }
+    catch(error)
+    {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -41,21 +63,21 @@ const Register = () => {
           <div className="rounded-md shadow-sm space-y-4">
             <motion.div whileTap={{ scale: 0.99 }}>
               <label
-                htmlFor="username"
+                htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
               >
-                Username
+                name
               </label>
               <input
-                id="username"
-                name="username"
+                id="name"
+                name="name"
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                placeholder="Choose a username"
-                value={formData.username}
+                placeholder="Choose a name"
+                value={formData.name}
                 onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
+                  setFormData({ ...formData, name: e.target.value })
                 }
               />
             </motion.div>
@@ -104,19 +126,19 @@ const Register = () => {
 
             <motion.div whileTap={{ scale: 0.99 }}>
               <label
-                htmlFor="userType"
+                htmlFor="role"
                 className="block text-sm font-medium text-gray-700"
               >
                 I am a
               </label>
               <select
-                id="userType"
-                name="userType"
+                id="role"
+                name="role"
                 required
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-lg"
-                value={formData.userType}
+                value={formData.role}
                 onChange={(e) =>
-                  setFormData({ ...formData, userType: e.target.value })
+                  setFormData({ ...formData, role: e.target.value })
                 }
               >
                 <option value="volunteer">Volunteer</option>

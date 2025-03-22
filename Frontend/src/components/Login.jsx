@@ -1,17 +1,67 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+import { setToken } from "../Redux/authslice";
+import { setEmail } from "../Redux/authslice";
+import { setRole } from "../Redux/authslice";
+import { setName } from "../Redux/authslice";
+import { setId } from "../Redux/authslice";
+
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle login logic here
+
+    console.log(formData,typeof(formData));
+
+    const response = await fetch('http://localhost:3000/api/users/login',{
+      method : 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body : JSON.stringify(formData)
+    })
+
+    const value = await response.json();
+    console.log("value is : ",value.data);
+
+    localStorage.setItem('token',value.data.token);
+    localStorage.setItem('role',value.data.user.role);
+    localStorage.setItem('email',value.data.user.email);
+    localStorage.setItem('name',value.data.user.name);
+    localStorage.setItem('id',value.data.user._id);
+
+    dispatch(setToken(value.data.token));
+    dispatch(setName(value.data.user.name));
+    dispatch(setEmail(value.data.user.email));
+    dispatch(setRole(value.data.user.role));
+    dispatch(setId(value.data.user._id));
+
+    if(value.data.user.role=='volunteer')
+    {
+      navigate('/volunteer-dashboard');
+    }
+    else if(value.data.user.role=='ngo')
+    {
+      console.log("role is :",value.data.user.role);
+      navigate('/ngo-dashboard');
+    }
+    else
+    {
+      navigate('/admin-dashboard');
+    }
+
   };
 
   return (
@@ -39,21 +89,21 @@ const Login = () => {
           <div className="rounded-md shadow-sm space-y-4">
             <motion.div whileTap={{ scale: 0.99 }}>
               <label
-                htmlFor="username"
+                htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
-                Username
+                email
               </label>
               <input
-                id="username"
-                name="username"
+                id="email"
+                name="email"
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your username"
-                value={formData.username}
+                placeholder="Enter your email"
+                value={formData.email}
                 onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
+                  setFormData({ ...formData, email: e.target.value })
                 }
               />
             </motion.div>

@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 // Register a new admin
 const registerAdmin = asyncHandler(async (req, res) => {
-    const { userId, contactNumber, role } = req.body;
+    const { userId, contactNumber, role } = req.body;   
 
     if (!userId) {
         throw new ApiError(400, "User ID is required");
@@ -18,7 +18,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    if (!user) {
+    if (!user) { 
         throw new ApiError(404, "User not found");
     }
 
