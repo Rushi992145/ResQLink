@@ -1,16 +1,18 @@
 import { useState } from 'react'
-
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import './App.css'
-
+import Navbar from './components/Navbar'
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-    <div className='font-extrabold flex justify-center '>
-
-      Hello World
-    </div>
+    <Router>
+    <Routes>
+       <Route path="/" element={<Navbar />} />
+        
+      </Routes>
+    </Router>
     </>
   )
 }
