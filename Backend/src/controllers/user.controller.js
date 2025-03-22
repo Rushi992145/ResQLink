@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 // Generate JWT Token
 const generateToken = (userId) => {
-    return jwt.sign({ _id: userId }, process.env.JWT_SECRET, {
+    return jwt.sign({ _id: userId }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "7d",
     });
 };
@@ -38,6 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
+    console.log(password);
     if (!email || !password) {
         throw new ApiError(400, "Email and password are required");
     }
@@ -68,6 +69,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const changePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
+    console.log(oldPassword,newPassword)
     if (!oldPassword || !newPassword) {
         throw new ApiError(400, "Old and new passwords are required");
     }
@@ -78,6 +80,7 @@ const changePassword = asyncHandler(async (req, res) => {
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
+    console.log(user.password);
     await user.save();
 
     return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"));

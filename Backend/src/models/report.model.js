@@ -13,6 +13,10 @@ const DisasterRequestSchema = new mongoose.Schema({
   },
   location: String,
   image: String,
+  description: String,
+  assistanceRequired: {
+    type: String,
+  },
   severity: {
     type: String,
     enum: ["low", "moderate", "high", "severe"],
