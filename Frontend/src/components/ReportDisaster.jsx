@@ -1,5 +1,3 @@
-
-
 const ReportDisaster = () => {
   return (
     <div>ReportDisaster</div>
