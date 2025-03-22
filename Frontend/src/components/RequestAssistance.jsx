@@ -25,17 +25,17 @@ const RequestAssistance = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100">
-      <div className="container mx-auto px-6 py-12">
+    <div className="h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100 overflow-hidden">
+      <div className="container mx-auto h-[calc(100vh-4rem)] px-6 py-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl mx-auto"
+          className="max-w-3xl mx-auto h-full"
         >
-          <h1 className="text-4xl font-bold text-green-800 mb-6 text-center">
+          <h1 className="text-3xl font-bold text-green-800 mb-2 text-center">
             Request Assistance
           </h1>
-          <p className="text-gray-600 text-center mb-8">
+          <p className="text-gray-600 text-center mb-4 text-sm">
             Please provide details about the assistance you need. We'll connect
             you with the right resources.
           </p>
@@ -44,12 +44,14 @@ const RequestAssistance = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl shadow-lg p-8"
+            className="bg-white rounded-xl shadow-lg p-6 h-[calc(100%-6rem)] overflow-y-auto"
           >
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 mb-2">Full Name</label>
+                  <label className="block text-gray-700 mb-1 text-sm">
+                    Full Name
+                  </label>
                   <input
                     type="text"
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
@@ -63,7 +65,7 @@ const RequestAssistance = () => {
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-2">
+                  <label className="block text-gray-700 mb-1 text-sm">
                     Phone Number
                   </label>
                   <input
@@ -80,7 +82,9 @@ const RequestAssistance = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">Location</label>
+                <label className="block text-gray-700 mb-1 text-sm">
+                  Location
+                </label>
                 <input
                   type="text"
                   className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
@@ -94,10 +98,10 @@ const RequestAssistance = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-4">
+                <label className="block text-gray-700 mb-2 text-sm">
                   Type of Assistance Needed
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {[
                     "Medical",
                     "Food",
@@ -136,7 +140,7 @@ const RequestAssistance = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-gray-700 mb-1 text-sm">
                   Urgency Level
                 </label>
                 <select
@@ -155,12 +159,12 @@ const RequestAssistance = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-gray-700 mb-1 text-sm">
                   Additional Details
                 </label>
                 <textarea
                   className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
-                  rows="4"
+                  rows="3"
                   placeholder="Please provide any additional information that might help us assist you better"
                   value={formData.description}
                   onChange={(e) =>
@@ -173,7 +177,7 @@ const RequestAssistance = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
               >
                 Submit Request
               </motion.button>

@@ -17,14 +17,14 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="h-[calc(100vh-0rem)] flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg"
+        className="max-w-md w-full bg-white p-6 rounded-xl shadow-lg"
       >
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="text-center text-2xl font-extrabold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -37,8 +37,8 @@ const Register = () => {
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-3">
             <motion.div whileTap={{ scale: 0.99 }}>
               <label
                 htmlFor="username"
@@ -130,7 +130,7 @@ const Register = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="mt-6 group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             Create Account
           </motion.button>
