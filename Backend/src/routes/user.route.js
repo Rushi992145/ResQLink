@@ -6,7 +6,7 @@ import {
     getCurrentUser,
     changePassword,
     updateProfile,
-} from "../controllers/auth.controller.js";
+} from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();

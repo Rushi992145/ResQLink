@@ -7,7 +7,7 @@ import {
     assignVolunteerToDisaster,
     removeVolunteerAssignment
 } from "../controllers/volunteer.controller.js";
-import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
+import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -15,18 +15,18 @@ const router = express.Router();
 router.post("/", verifyJWT, registerVolunteer);
 
 // Get all volunteers (Admin only)
-router.get("/", verifyJWT, verifyAdmin, getAllVolunteers);
+router.get("/", verifyJWT, authorizeRoles("admin"), getAllVolunteers);
 
 // Get volunteers by status (Admin only)
-router.get("/status/:status", verifyJWT, verifyAdmin, getVolunteersByStatus);
+router.get("/status/:status", verifyJWT, authorizeRoles("admin"), getVolunteersByStatus);
 
 // Update volunteer status (Admin only)
-router.put("/:volunteerId", verifyJWT, verifyAdmin, updateVolunteerStatus);
+router.put("/:volunteerId", verifyJWT, authorizeRoles("admin"), updateVolunteerStatus);
 
 // Assign a volunteer to a disaster (Admin only)
-router.post("/assign", verifyJWT, verifyAdmin, assignVolunteerToDisaster);
+router.post("/assign", verifyJWT, authorizeRoles("admin"), assignVolunteerToDisaster);
 
 // Remove a volunteer assignment (Admin only)
-router.put("/remove/:volunteerId", verifyJWT, verifyAdmin, removeVolunteerAssignment);
+router.put("/remove/:volunteerId", verifyJWT, authorizeRoles("admin"), removeVolunteerAssignment);
 
 export default router;

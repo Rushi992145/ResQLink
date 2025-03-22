@@ -5,8 +5,8 @@ import {
     getDisasterRequestsByStatus,
     updateDisasterRequestStatus,
     deleteDisasterRequest
-} from "../controllers/disaster.controller.js";
-import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
+} from "../controllers/report.controller.js";
+import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -14,15 +14,15 @@ const router = express.Router();
 router.post("/", verifyJWT, createDisasterRequest);
 
 // Get all disaster requests (Admin only)
-router.get("/", verifyJWT, verifyAdmin, getAllDisasterRequests);
+router.get("/", verifyJWT, authorizeRoles("admin"), getAllDisasterRequests);
 
 // Get disaster requests by status (Admin only)
-router.get("/status/:status", verifyJWT, verifyAdmin, getDisasterRequestsByStatus);
+router.get("/status/:status", verifyJWT, authorizeRoles("admin"), getDisasterRequestsByStatus);
 
 // Update disaster request status (Admin only)
-router.put("/:requestId", verifyJWT, verifyAdmin, updateDisasterRequestStatus);
+router.put("/:requestId", verifyJWT, authorizeRoles("admin"), updateDisasterRequestStatus);
 
 // Delete a disaster request (Admin only)
-router.delete("/:requestId", verifyJWT, verifyAdmin, deleteDisasterRequest);
+router.delete("/:requestId", verifyJWT, authorizeRoles("admin"), deleteDisasterRequest);
 
 export default router;

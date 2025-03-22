@@ -1,22 +1,28 @@
 import express from "express";
 import {
     createDisaster,
-    getAllDisasters,
-    getDisasterById,
+    getDisasterDetails,
     updateDisasterStatus,
-    assignVolunteer,
-    assignNGO
+    assignVolunteersAndNGOs,
+    deleteDisaster
 } from "../controllers/disaster.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-// Protected Routes (Require Authentication)
-router.post("/", verifyJWT, createDisaster); // Create a new disaster entry
-router.get("/", verifyJWT, getAllDisasters); // Get all disasters
-router.get("/:id", verifyJWT, getDisasterById); // Get disaster by ID
-router.put("/:id/status", verifyJWT, updateDisasterStatus); // Update disaster status
-router.post("/:id/assign-volunteer", verifyJWT, assignVolunteer); // Assign volunteer
-router.post("/:id/assign-ngo", verifyJWT, assignNGO); // Assign NGO
+// Create a new disaster (Admin only)
+router.post("/", verifyJWT, authorizeRoles("admin"), createDisaster);
+
+// Get details of a specific disaster
+router.get("/:disasterId", verifyJWT, getDisasterDetails);
+
+// Update disaster status (Admin only)
+router.put("/:disasterId/status", verifyJWT, authorizeRoles("admin"), updateDisasterStatus);
+
+// Assign volunteers & NGOs to a disaster (Admin only)
+router.put("/:disasterId/assign", verifyJWT, authorizeRoles("admin"), assignVolunteersAndNGOs);
+
+// Delete a disaster (Admin only)
+router.delete("/:disasterId", verifyJWT, authorizeRoles("admin"), deleteDisaster);
 
 export default router;

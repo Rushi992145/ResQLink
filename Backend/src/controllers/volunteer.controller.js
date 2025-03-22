@@ -1,4 +1,4 @@
-import asyncHandler from "../utils/asyncHandler.js";
+import {asyncHandler} from "../utils/asyncHandler.js";
 import Volunteer from "../models/volunteer.model.js";
 import User from "../models/user.model.js";
 import Disaster from "../models/disaster.model.js";
