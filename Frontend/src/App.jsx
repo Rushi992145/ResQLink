@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
@@ -10,9 +9,12 @@ import Register from "./components/Register";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import Admin from "./components/Admin";
-function App() {
-  const [count, setCount] = useState(0);
+import Footer from "./components/Footer";
+import NotificationDetail from "./components/NotificationDetail";
+import VolunteerDashboard from "./components/VolunteerDashboard";
+import NgoDashboard from "./components/NgoDashboard";
 
+function App() {
   return (
     <>
       <BrowserRouter>
@@ -26,7 +28,16 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/volunteer" element={<VolunteerDashboard />} />
+
+          <Route
+            path="/volunteer/notifications/:id"
+            element={<NotificationDetail />}
+          />
+
+          <Route path="/ngo" element={<NgoDashboard />} />
         </Routes>
+        <Footer></Footer>
       </BrowserRouter>
     </>
   );
