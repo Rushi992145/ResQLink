@@ -39,127 +39,210 @@ const Navbar = () => {
   console.log("token is :",token);
 
   return (
-    <div>
-      <nav className="bg-green-700 text-white shadow-lg fixed w-full top-0 z-50">
+    <div className="fixed w-full top-0 z-50">
+      <motion.nav
+        className={`${
+          scrolled ? "bg-white shadow-xl" : "bg-green-700"
+        } transition-all duration-500`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             {/* Logo and Name */}
-            <motion.div
-              className="flex-shrink-0 flex items-center cursor-pointer"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <span className="text-xl font-bold">ResQLink</span>
-            </motion.div>
+            <Link to="/">
+              <motion.div
+                className="flex items-center space-x-3 cursor-pointer"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <div
+                  className={`${
+                    scrolled ? "bg-green-700" : "bg-white"
+                  } p-2 rounded-full transition-colors duration-500`}
+                >
+                  <Shield
+                    className={`h-8 w-8 ${
+                      scrolled ? "text-white" : "text-green-700"
+                    }`}
+                  />
+                </div>
+                <span
+                  className={`text-2xl font-extrabold tracking-tight ${
+                    scrolled ? "text-green-700" : "text-white"
+                  }`}
+                >
+                  Res<span className="text-yellow-500">Q</span>Link
+                </span>
+              </motion.div>
+            </Link>
 
             {/* Desktop Menu */}
             <div className="hidden md:block">
-              <div className="ml-10 flex items-center space-x-4">
-                <Link
-                  to="/"
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 transition-colors duration-200"
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/about"
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 transition-colors duration-200"
-                >
-                  About
-                </Link>
-                <Link
-                  to="/contact"
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-green-600 transition-colors duration-200"
-                >
-                  Contact Us
-                </Link>
+              <div className="ml-10 flex items-center space-x-2">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+                                            ${
+                                              location.pathname === item.path
+                                                ? scrolled
+                                                  ? "bg-green-600 text-white shadow-md"
+                                                  : "bg-white text-green-700 shadow-md"
+                                                : scrolled
+                                                ? "text-green-700 hover:bg-green-50"
+                                                : "text-white hover:bg-green-600"
+                                            }`}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
               </div>
             </div>
 
             {/* Auth Buttons */}
             <div className="hidden md:block">
-              {
-                !token ? 
-                <div className="ml-4 flex items-center md:ml-6">
-                  <Link
-                    to="/login"
-                    className="bg-white text-green-700 px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-gray-200 transition-colors duration-200 shadow-md"
+              <div className="ml-4 flex items-center md:ml-6 space-x-3">
+                <Link to="/login">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 border-2
+                      ${
+                        scrolled
+                          ? "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                          : "border-white text-white hover:bg-white hover:text-green-700"
+                      }`}
                   >
                     Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="bg-green-500 text-white px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-green-600 transition-colors duration-200 shadow-md"
+                  </motion.button>
+                </Link>
+                <Link to="/register">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
+                      ${
+                        scrolled
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "bg-white text-green-700 hover:bg-green-50"
+                      }`}
                   >
                     Register
-                  </Link>
-                </div> 
-                : 
-                <div className="ml-4 flex items-center md:ml-6">
-                  <button
-                    className="bg-blue-500 text-white px-4 py-1 rounded-md ml-3 text-sm font-medium cursor-pointer hover:bg-blue-600 transition-colors duration-200 shadow-md"
-                    onClick={logoutclickhandler}
-                  >
-                    logout
-                  </button>
-                </div>
-              }
+                  </motion.button>
+                </Link>
+              </div>
             </div>
 
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
-              <button
-                className="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-600 focus:outline-none"
+            <div className="md:hidden">
+              <motion.button
+                className={`inline-flex items-center justify-center p-2 rounded-full focus:outline-none
+                                    ${
+                                      scrolled
+                                        ? "bg-green-600 text-white hover:bg-green-700"
+                                        : "bg-white text-green-700 hover:bg-green-50"
+                                    }`}
                 onClick={() => setIsOpen(!isOpen)}
+                whileTap={{ scale: 0.95 }}
               >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
 
-        {/* Mobile menu - Improved */}
-        <div
-          className={`${isOpen ? "block" : "hidden"} md:hidden bg-green-700`}
-        >
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              to="/"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-green-600 transition-colors duration-200"
+        {/* Mobile menu */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              className={`md:hidden ${
+                scrolled ? "bg-white" : "bg-green-800"
+              } shadow-xl rounded-b-2xl`}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              Home
-            </Link>
-            <Link
-              to="/about"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-green-600 transition-colors duration-200"
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-green-600 transition-colors duration-200"
-            >
-              Contact Us
-            </Link>
-            <div className="flex flex-col space-y-2 pt-4 pb-3 border-t border-green-600">
-              <Link
-                to="/login"
-                className="w-full px-3 py-2 text-center rounded-md text-base font-medium bg-white text-green-700 hover:bg-gray-100 transition-colors duration-200"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="w-full px-3 py-2 text-center rounded-md text-base font-medium bg-green-500 text-white hover:bg-green-600 transition-colors duration-200"
-              >
-                Register
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+              <div className="px-4 pt-3 pb-4 space-y-1">
+                {navItems.map((item) => (
+                  <motion.div
+                    key={item.path}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: navItems.indexOf(item) * 0.1,
+                    }}
+                  >
+                    <Link
+                      to={item.path}
+                      className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200
+                                                ${
+                                                  location.pathname ===
+                                                  item.path
+                                                    ? scrolled
+                                                      ? "bg-green-50 text-green-700 border-l-4 border-green-600"
+                                                      : "bg-green-600 text-white border-l-4 border-white"
+                                                    : scrolled
+                                                    ? "text-gray-700 hover:bg-green-50 hover:text-green-700"
+                                                    : "text-white hover:bg-green-600"
+                                                }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </motion.div>
+                ))}
+                <div
+                  className={`flex flex-col space-y-3 pt-5 pb-3 border-t ${
+                    scrolled ? "border-gray-200" : "border-green-600"
+                  }`}
+                >
+                  <Link to="/login" className="w-full">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      className={`w-full px-4 py-3 text-center rounded-xl text-base font-medium transition-colors duration-300
+                        ${
+                          scrolled
+                            ? "bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                            : "bg-white text-green-700 hover:bg-green-50"
+                        }`}
+                    >
+                      Login
+                    </motion.button>
+                  </Link>
+                  <Link to="/register" className="w-full">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      className={`w-full px-4 py-3 text-center rounded-xl text-base font-medium shadow-md transition-colors duration-300
+                        ${
+                          scrolled
+                            ? "bg-green-600 text-white hover:bg-green-700"
+                            : "bg-white text-green-700 hover:bg-green-50"
+                        }`}
+                    >
+                      Register
+                    </motion.button>
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+
+      {/* Semi-transparent overlay for navbar on the homepage */}
+      {!scrolled && location.pathname === "/" && (
+        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black to-transparent opacity-40 z-[-1]"></div>
+      )}
     </div>
   );
 };

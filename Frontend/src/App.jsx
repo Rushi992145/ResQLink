@@ -10,6 +10,11 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import About from "./components/About";
 import Contact from "./components/Contact";
+import Admin from "./components/Admin";
+import Footer from "./components/Footer";
+import NotificationDetail from "./components/NotificationDetail";
+import VolunteerDashboard from "./components/VolunteerDashboard";
+import NgoDashboard from "./components/NgoDashboard";
 
 function App() {
   
@@ -32,6 +37,17 @@ function App() {
           {/* User - Open Route */}
           <Route path="/report-disaster" element={<ReportDisaster />} />
           <Route path="/request-assistance" element={<RequestAssistance />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/volunteer" element={<VolunteerDashboard />} />
+
+          <Route
+            path="/volunteer/notifications/:id"
+            element={<NotificationDetail />}
+          />
+
+          <Route path="/ngo" element={<NgoDashboard />} />
 
           {/* Volunteer - Private Route */}
           {role && role === "volunteer" && (
@@ -50,6 +66,7 @@ function App() {
 
           <Route path="*" element={<Login />} />
         </Routes>
+        <Footer></Footer>
       </BrowserRouter>
     </>
   );
