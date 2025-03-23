@@ -65,13 +65,28 @@ const getId = ()=>{
   }
 }
 
+const getFcmToken = ()=>{
+  const fcm_token = localStorage.getItem("fcm_token");
+  try 
+  {
+    return fcm_token ? fcm_token : null;
+  }
+  catch(error)
+  {
+    console.log("error is parsing or getting fcm_token from local storage",error.message);
+    return null;
+  }
+}
+
+
 
 const initialState = {
     token : getToken(),
     role : getRole(),
     email : getEmail(),
     name : getName(),
-    id : getId()
+    id : getId(),
+    fcm_token : getFcmToken()
 }
 
 
@@ -93,9 +108,12 @@ const authSlice = createSlice({
     },
     setId(state,value){
         state.id = value.payload;
-    }
+    },
+    setFcmToken(state,value){
+      state.fcm_token = value.payload;
+  }
    }
 })
 
-export const {setToken,setRole,setEmail,setName,setId} = authSlice.actions;
+export const {setToken,setRole,setEmail,setName,setId,setFcmToken} = authSlice.actions;
 export const authReducer = authSlice.reducer;

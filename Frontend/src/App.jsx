@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import "./App.css";
 import Navbar from "./components/Navbar";
@@ -19,10 +20,59 @@ import Navigation from "./components/Navigation";
 import Learning from "./components/Learning";
 import CourseDetail from "./components/CourseDetail";
 
+
+import { generateToken } from './Notification/firebase'
+import { messaging } from './Notification/firebase'
+import { onMessage } from 'firebase/messaging'
+
+import { setFcmToken } from "./Redux/authslice";
+
 function App() {
-  
+  const dispatch = useDispatch();
   const token = useSelector((state)=>state.auth.token);
   const role = useSelector((state)=>state.auth.role);
+  const fcm_token = useSelector((state)=>state.auth.fcm_token);
+
+  useEffect(() => {
+    async function getToken() {
+      const fcmToken = await generateToken();
+      console.log("fcm_token is:", fcmToken);
+      localStorage.setItem('fcm_token',fcmToken)
+      dispatch(setFcmToken(fcmToken));
+
+      try 
+      {
+          if(fcm_token)
+          {
+            const response = await fetch('http://localhost:3000/api/notification/saveUser',{
+              method : 'POST',
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body : JSON.stringify({fcm_token})
+            })
+
+            const value = await response.json();
+            console.log(value);
+          }
+          else
+          {
+            console.log("no fcm_token received",fcm_token );
+          } 
+      }
+      catch(error)
+      {
+        console.log(error.message)
+      }
+
+      onMessage(messaging, (payload) => {
+        console.log("payload is:", payload);
+        toast(payload.notification.body);
+      });
+    }
+
+    getToken();
+  }, []);
   
   console.log(token,role);
   return (

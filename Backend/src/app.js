@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import notificationRouter from "./routes/notification.js"
 const app = express();
  
 app.use(cors({
@@ -13,7 +13,7 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
-
+ 
 //routes import
 
 import userRouter from "./routes/user.route.js"
@@ -34,6 +34,7 @@ app.use("/api/ngos", ngoRoutes);
 app.use("/api/assignments", disasterAssignmentRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/notification',notificationRouter);
 
 
 app.get('/api/health', (req, res) => {
