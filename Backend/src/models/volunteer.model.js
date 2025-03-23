@@ -14,10 +14,10 @@ const VolunteerSchema = new mongoose.Schema(
       required: true,
     },
     location: {
-      city: { type: String, required: true },
+      city: { type: String },
       district: { type: String },
       state: { type: String },
-      country: { type: String, required: true },
+      country: { type: String },
     },
     assignedDisaster: { 
         type: mongoose.Schema.Types.ObjectId, 

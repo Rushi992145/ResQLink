@@ -65,6 +65,7 @@ const getVolunteersByStatus = asyncHandler(async (req, res) => {
 const updateVolunteerStatus = asyncHandler(async (req, res) => {
     const { volunteerId } = req.params;
     const { status } = req.body;
+    console.log(req.body);
 
     if (!["Available", "Assigned", "Inactive"].includes(status)) {
         throw new ApiError(400, "Invalid status");
