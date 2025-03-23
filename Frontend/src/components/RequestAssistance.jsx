@@ -25,17 +25,17 @@ const RequestAssistance = () => {
   };
 
   return (
-    <div className="h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100 overflow-hidden">
-      <div className="container mx-auto h-[calc(100vh-4rem)] px-6 py-4">
+    <div className="min-h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100">
+      <div className="container mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl mx-auto h-full"
+          className="max-w-3xl mx-auto"
         >
           <h1 className="text-3xl font-bold text-green-800 mb-2 text-center">
             Request Assistance
           </h1>
-          <p className="text-gray-600 text-center mb-4 text-sm">
+          <p className="text-gray-600 text-center mb-8 text-sm">
             Please provide details about the assistance you need. We'll connect
             you with the right resources.
           </p>
@@ -44,7 +44,7 @@ const RequestAssistance = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl shadow-lg p-6 h-[calc(100%-6rem)] overflow-y-auto"
+            className="bg-white rounded-xl shadow-lg p-8"
           >
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
