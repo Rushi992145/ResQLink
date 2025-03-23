@@ -19,52 +19,49 @@ import NgoDashboard from "./components/NgoDashboard";
 import Navigation from "./components/Navigation";
 import Learning from "./components/Learning";
 import CourseDetail from "./components/CourseDetail";
+import NgoList from "./components/Ngolist";
+import NgoDetail from "./components/Ngodetail";
+import DisasterDetailsPage from "./components/DisasterDetailsPage";
 
-
-import { generateToken } from './Notification/firebase'
-import { messaging } from './Notification/firebase'
-import { onMessage } from 'firebase/messaging'
+import { generateToken } from "./Notification/firebase";
+import { messaging } from "./Notification/firebase";
+import { onMessage } from "firebase/messaging";
 
 import { setFcmToken } from "./Redux/authslice";
 
 function App() {
   const dispatch = useDispatch();
-  const token = useSelector((state)=>state.auth.token);
-  const role = useSelector((state)=>state.auth.role);
-  const fcm_token = useSelector((state)=>state.auth.fcm_token);
+  const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.role);
+  const fcm_token = useSelector((state) => state.auth.fcm_token);
 
   useEffect(() => {
     async function getToken() {
-      
       const fcmToken = await generateToken();
       console.log("fcm_token is:", fcmToken);
-      localStorage.setItem('fcm_token',fcmToken)
+      localStorage.setItem("fcm_token", fcmToken);
       dispatch(setFcmToken(fcmToken));
 
-      try 
-      {
-          console.log("here")
-          if(fcm_token)
-          {
-            const response = await fetch('http://localhost:3000/api/notification/saveUser',{
-              method : 'POST',
+      try {
+        if (fcm_token) {
+          const response = await fetch(
+            "http://localhost:3000/api/notification/saveUser",
+            {
+              method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body : JSON.stringify({fcm_token})
-            })
+              body: JSON.stringify({ fcm_token }),
+            }
+          );
 
-            const value = await response.json();
-            console.log(value);
-          }
-          else
-          {
-            console.log("no fcm_token received",fcm_token );
-          } 
-      }
-      catch(error)
-      {
-        console.log(error.message)
+          const value = await response.json();
+          console.log(value);
+        } else {
+          console.log("no fcm_token received", fcm_token);
+        }
+      } catch (error) {
+        console.log(error.message);
       }
 
       onMessage(messaging, (payload) => {
@@ -75,8 +72,8 @@ function App() {
 
     getToken();
   }, []);
-  
-  console.log(token,role);
+
+  console.log(token, role);
   return (
     <>
       <BrowserRouter>
@@ -97,9 +94,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/volunteer" element={<VolunteerDashboard />} />
-          
-          <Route path='/navigation' element={<Navigation />} />
-          
+
           <Route
             path="/volunteer/notifications/:id"
             element={<NotificationDetail />}
@@ -107,10 +102,10 @@ function App() {
 
           {/* Volunteer - Private Route */}
           {role && role === "volunteer" && (
-            <>
-               <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} /> 
-               <Route path="/volunteer/learning/course/:id" element={<CourseDetail />} /> 
-            </>
+            <Route
+              path="/volunteer-dashboard"
+              element={<VolunteerDashboard />}
+            />
           )}
 
           {/* Ngo - Private Route */}
@@ -120,8 +115,17 @@ function App() {
 
           {/* Admin - Private Route */}
           {role && role === "admin" && (
-            <Route path="/admin-dashboard" element={<Admin />} />
+            <>
+              <Route path="/admin-dashboard" element={<Admin />} />
+              <Route
+                path="/admin-dashboard/disaster/:id"
+                element={<DisasterDetailsPage />}
+              />
+            </>
           )}
+
+          <Route path="/ngolist" element={<NgoList />} />
+          <Route path="/ngo/:id" element={<NgoDetail />} />
 
           <Route path="*" element={<Login />} />
         </Routes>

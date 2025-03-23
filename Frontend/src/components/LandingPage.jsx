@@ -1,21 +1,102 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Mock data for NGOs
 const ngoData = [
-  { id: 1, name: "Red Cross", category: "Medical Aid", location: "Global" },
+  {
+    id: 1,
+    name: "Red Cross",
+    category: "Medical Aid",
+    location: "Global",
+    description:
+      "International humanitarian organization providing emergency assistance.",
+    longDescription:
+      "The Red Cross is one of the world's largest humanitarian organizations, providing emergency assistance, disaster relief, and disaster preparedness education worldwide. We work in communities around the globe to save lives and promote human dignity.",
+    volunteers: 5000,
+    rating: 4.8,
+    image: "https://example.com/redcross.jpg", // Replace with actual image URL
+    contact: {
+      phone: "+1 234-567-8900",
+      email: "contact@redcross.org",
+      website: "www.redcross.org",
+      address: "123 Humanitarian Ave, Global HQ",
+    },
+    stats: {
+      peopleHelped: "100K+",
+      disastersResponded: "500+",
+      yearsActive: "50+",
+    },
+    recentWork: [
+      {
+        title: "Flood Relief Operation",
+        date: "2024-01-15",
+        location: "Downtown Area",
+        impact: "Helped 1000+ families",
+      },
+    ],
+  },
   {
     id: 2,
     name: "World Food Programme",
-    category: "Medical Aid",
+    category: "Food Aid",
     location: "Global",
+    description: "Leading humanitarian organization fighting hunger worldwide.",
+    longDescription:
+      "The World Food Programme is the world's largest humanitarian organization addressing hunger and promoting food security. We provide food assistance to millions of people worldwide.",
+    volunteers: 3000,
+    rating: 4.7,
+    image: "https://example.com/wfp.jpg", // Replace with actual image URL
+    contact: {
+      phone: "+1 345-678-9012",
+      email: "contact@wfp.org",
+      website: "www.wfp.org",
+      address: "456 Food Security Ave, Global HQ",
+    },
+    stats: {
+      peopleHelped: "80K+",
+      disastersResponded: "300+",
+      yearsActive: "40+",
+    },
+    recentWork: [
+      {
+        title: "Emergency Food Distribution",
+        date: "2024-02-01",
+        location: "Rural Communities",
+        impact: "Fed 5000+ families",
+      },
+    ],
   },
   {
     id: 3,
     name: "World Food Programme",
     category: "Food Aid",
     location: "Global",
+    description: "Leading humanitarian organization fighting hunger worldwide.",
+    longDescription:
+      "The World Food Programme is the world's largest humanitarian organization addressing hunger and promoting food security. We provide food assistance to millions of people worldwide.",
+    volunteers: 3000,
+    rating: 4.7,
+    image: "https://example.com/wfp.jpg", // Replace with actual image URL
+    contact: {
+      phone: "+1 345-678-9012",
+      email: "contact@wfp.org",
+      website: "www.wfp.org",
+      address: "456 Food Security Ave, Global HQ",
+    },
+    stats: {
+      peopleHelped: "80K+",
+      disastersResponded: "300+",
+      yearsActive: "40+",
+    },
+    recentWork: [
+      {
+        title: "Emergency Food Distribution",
+        date: "2024-02-01",
+        location: "Rural Communities",
+        impact: "Fed 5000+ families",
+      },
+    ],
   },
   { id: 4, name: "UNICEF", category: "Child Welfare", location: "Global" },
   {
@@ -42,6 +123,7 @@ const ngoData = [
 const LandingPage = () => {
   const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const navigate = useNavigate();
 
   const filteredNGOs = ngoData.filter((ngo) => {
     return (
@@ -52,6 +134,34 @@ const LandingPage = () => {
 
   const uniqueLocations = [...new Set(ngoData.map((ngo) => ngo.location))];
   const uniqueCategories = [...new Set(ngoData.map((ngo) => ngo.category))];
+
+  const handleNgoClick = (ngo) => {
+    if (ngo && ngo.id) {
+      navigate(`/ngo/${ngo.id}`, {
+        state: {
+          ngoData: {
+            ...ngo,
+            image: ngo.image || "https://example.com/default-ngo.jpg",
+            longDescription: ngo.longDescription || ngo.description,
+            contact: ngo.contact || {
+              phone: "Contact Not Available",
+              email: "Not Available",
+              website: "Not Available",
+              address: "Address Not Available",
+            },
+            stats: ngo.stats || {
+              peopleHelped: "N/A",
+              disastersResponded: "N/A",
+              yearsActive: "N/A",
+            },
+            recentWork: ngo.recentWork || [],
+          },
+        },
+      });
+    } else {
+      console.error("Invalid NGO data");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
@@ -499,9 +609,10 @@ const LandingPage = () => {
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
+                        onClick={() => handleNgoClick(ngo)}
                         className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
                       >
-                        <span>View Profile</span>
+                        <span>View Details</span>
                         <svg
                           className="w-4 h-4"
                           fill="none"
