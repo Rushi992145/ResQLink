@@ -130,7 +130,7 @@ npm run dev
 
 
 ---
-## 🔑 **Credential**
+## 🔑 **Credentials**
 Email & Password
 - Admin - rushi@gmail.com,12345
 - Ngo - brij@gmail.com , 123456
