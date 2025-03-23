@@ -28,50 +28,226 @@ import { messaging } from "./Notification/firebase";
 import { onMessage } from "firebase/messaging";
 
 import { setFcmToken } from "./Redux/authslice";
+import { setLongitude } from "./Redux/authslice";
+import { setLattitude } from "./Redux/authslice";
 
 function App() {
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
-  const role = useSelector((state) => state.auth.role);
-  const fcm_token = useSelector((state) => state.auth.fcm_token);
+  const token = useSelector((state)=>state.auth.token);
+  const role = useSelector((state)=>state.auth.role);
+  const fcm_token = useSelector((state)=>state.auth.fcm_token);
+  const longitude = useSelector((state)=>state.auth.longitude);
+  const lattitude = useSelector((state)=>state.auth.lattitude);
+
+  //   console.log("here",longitude,lattitude);
+  //   const getCurrentLocation = async () => {
+  //       navigator.geolocation.getCurrentPosition(
+  //         (position) => {
+  //           const location = {
+  //             lati: position.coords.latitude,
+  //             long: position.coords.longitude,
+  //           };
+
+  //           localStorage.setItem('longitude',location.long);
+  //           localStorage.setItem('lattitude',location.lati);
+            
+  //           dispatch(setLongitude(location.long));
+  //           dispatch(setLattitude(location.lati));
+  //           console.log("Retrieved location:", location);
+  //         },
+  //         (error) => reject(error)
+  //       );
+  //   };
+
+  //   async function getToken() {
+  //     const fcmToken = await generateToken();
+  //     console.log("fcm_token is:", fcmToken);
+  //     localStorage.setItem("fcm_token", fcmToken);
+  //     dispatch(setFcmToken(fcmToken));
+
+  //     try 
+  //     {
+  //         if(fcm_token)
+  //         {
+  //           const response = await fetch('http://localhost:3000/api/notification/updateuserlocation',{
+  //             method : 'POST',
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //             body : JSON.stringify({fcm_token,longitude,lattitude})
+  //           })
+
+  //           const value = await response.json();
+  //           console.log(value);
+
+  //           getCurrentLocation();
+  //         }
+  //         else
+  //         {
+  //           console.log("no fcm_token received",fcm_token );
+  //         } 
+  //     }
+  //     catch(error)
+  //     {
+  //       console.log(error.message)
+  //     }
+
+  //     onMessage(messaging, (payload) => {
+  //       console.log("payload is:", payload);
+  //       toast(payload.notification.body);
+  //     });
+  //   }
+
+  //   async function updateToken()
+  //   {
+  //     try 
+  //     {
+  //         if(fcm_token)
+  //         {
+  //           const response = await fetch('http://localhost:3000/api/notification/saveUser',{
+  //             method : 'POST',
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //             body : JSON.stringify({fcm_token})
+  //           })
+
+  //           const value = await response.json();
+  //           console.log(value);
+  //         }
+  //         else
+  //         {
+  //           console.log("no fcm_token received",fcm_token );
+  //         } 
+  //     }
+  //     catch(error)
+  //     {
+  //       console.log(error.message);
+  //     }
+  //   }
+
+  //   async function updateToken()
+  //   {
+  //     try 
+  //     {
+  //         if(fcm_token)
+  //         {
+  //           const response = await fetch('http://localhost:3000/api/notification/saveUser',{
+  //             method : 'POST',
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //             body: JSON.stringify({ fcm_token }),
+  //           }
+  //         );
+
+  //           const value = await response.json();
+  //           console.log(value);
+  //         }
+  //         else
+  //         {
+  //           console.log("no fcm_token received",fcm_token );
+  //         } 
+  //     }
+  //     catch(error)
+  //     {
+  //       console.log(error.message);
+  //     }
+  //   }
+
+  //   getToken();
+  //   updateToken();
+  // }, []);
 
   useEffect(() => {
-    async function getToken() {
-      const fcmToken = await generateToken();
-      console.log("fcm_token is:", fcmToken);
-      localStorage.setItem("fcm_token", fcmToken);
-      dispatch(setFcmToken(fcmToken));
+    console.log("State values:", { longitude, lattitude, fcm_token });
 
-      try {
-        if (fcm_token) {
-          const response = await fetch(
-            "http://localhost:3000/api/notification/saveUser",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ fcm_token }),
-            }
-          );
+    const getCurrentLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lati: position.coords.latitude,
+            long: position.coords.longitude,
+          };
 
-          const value = await response.json();
-          console.log(value);
-        } else {
-          console.log("no fcm_token received", fcm_token);
-        }
-      } catch (error) {
-        console.log(error.message);
+          localStorage.setItem("longitude", location.long);
+          localStorage.setItem("lattitude", location.lati);
+
+          // Update longitude and latitude in Redux store
+          dispatch(setLongitude(location.long));
+          dispatch(setLattitude(location.lati));
+
+          console.log("Retrieved location:", location);
+
+          // Call updateUserLocation after longitude and latitude are set
+          updateUserLocation(location.long, location.lati);
+        },
+        (error) => console.log("Error retrieving location:", error.message)
+      );
+    };
+
+    const updateUserLocation = async (longitude, lattitude) => {
+      // Generate FCM token if not already set
+      const fcmToken = fcm_token || (await generateToken());
+
+      if (!fcm_token) {
+        console.log("Generated fcm_token:", fcmToken);
+        localStorage.setItem("fcm_token", fcmToken);
+        dispatch(setFcmToken(fcmToken));
       }
 
-      onMessage(messaging, (payload) => {
-        console.log("payload is:", payload);
-        toast(payload.notification.body);
-      });
-    }
+      try {
+        if (fcmToken && longitude && lattitude) {
+          const response = await fetch("http://localhost:3000/api/notification/updateuserlocation", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ fcm_token: fcmToken, longitude, lattitude }),
+          });
 
-    getToken();
-  }, []);
+          const value = await response.json();
+          console.log("Update User Location Response:", value);
+        } else {
+          console.log("Missing required data for API call:", { fcm_token, longitude, lattitude });
+        }
+      } catch (error) {
+        console.log("Error updating user location:", error.message);
+      }
+    };
+
+    const updateToken = async () => {
+      try {
+        if (fcm_token) {
+          const response = await fetch("http://localhost:3000/api/notification/saveUser", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ fcm_token }),
+          });
+
+          const value = await response.json();
+          console.log("Save User Response:", value);
+        } else {
+          console.log("No fcm_token found for saving:", fcm_token);
+        }
+      } catch (error) {
+        console.log("Error saving user token:", error.message);
+      }
+    };
+
+    // Get current location and update the token
+    getCurrentLocation();
+    updateToken();
+
+    onMessage(messaging, (payload) => {
+      console.log("Received payload:", payload);
+      toast(payload.notification.body);
+    });
+  }, [dispatch, fcm_token, longitude, lattitude]);
+
+
 
   console.log(token, role);
   return (

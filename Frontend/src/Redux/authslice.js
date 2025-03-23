@@ -78,6 +78,33 @@ const getFcmToken = ()=>{
   }
 }
 
+const getLongitude = ()=>{
+  const longitude = localStorage.getItem("longitude");
+  try 
+  {
+    return longitude ? longitude : null;
+  }
+  catch(error)
+  {
+    console.log("error is parsing or getting longitude from local storage",error.message);
+    return null;
+  }
+}
+
+const getLattitude = ()=>{
+  const lattitude = localStorage.getItem("lattitude");
+  try 
+  {
+    return lattitude ? lattitude : null;
+  }
+  catch(error)
+  {
+    console.log("error is parsing or getting lattitude from local storage",error.message);
+    return null;
+  }
+}
+
+
 
 
 const initialState = {
@@ -86,7 +113,9 @@ const initialState = {
     email : getEmail(),
     name : getName(),
     id : getId(),
-    fcm_token : getFcmToken()
+    fcm_token : getFcmToken(),
+    longitude : getLongitude(),
+    lattitude : getLattitude()
 }
 
 
@@ -111,9 +140,15 @@ const authSlice = createSlice({
     },
     setFcmToken(state,value){
       state.fcm_token = value.payload;
-  }
+    },
+    setLongitude(state,value){
+      state.longitude = value.payload;
+    },
+    setLattitude(state,value){
+      state.lattitude = value.payload;
+    },
    }
 })
 
-export const {setToken,setRole,setEmail,setName,setId,setFcmToken} = authSlice.actions;
+export const {setToken,setRole,setEmail,setName,setId,setFcmToken,setLongitude,setLattitude} = authSlice.actions;
 export const authReducer = authSlice.reducer;

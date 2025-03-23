@@ -2,6 +2,7 @@ import {asyncHandler} from "../utils/asyncHandler.js";
 import Admin from "../models/admin.model.js";
 import User from "../models/user.model.js";
 import Disaster from "../models/disaster.model.js";
+import Volunteer from "../models/volunteer.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
  
@@ -120,6 +121,30 @@ const updateAdminStatus = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new ApiResponse(200, admin, `Admin status updated to ${status}`));
 });
+
+const deleteUser = async (req,res) => {
+    try 
+    {
+        const {id} = req.id;
+
+        const deleteUser = await Volunteer.findByIdAndDelete(id);
+
+        console.log(deleteUser.userId);
+
+        return res.status(200).json({
+            success : true,
+            message : "User deleted successfully"
+        })
+    }
+    catch(error)
+    {
+        console.log(error.message);
+        return res.status(500).json({
+            success : false,
+            message : "Internal server error"
+        })
+    }
+}
 
 export {
     registerAdmin,
