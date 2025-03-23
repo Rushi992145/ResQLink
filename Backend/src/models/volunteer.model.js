@@ -7,21 +7,20 @@ const VolunteerSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    skills: [String],
+    skills: String,
     availability: {
       type: String,
       enum: ["Full-time", "Part-time", "On-call"],
       required: true,
     },
-    location: {
-      city: { type: String },
-      district: { type: String },
-      state: { type: String },
-      country: { type: String },
-    },
-    assignedDisaster: { 
+    address: { type: String },
+    bloodGroup: { type: String },
+    aadharNumber: { type: String },
+    familyContact: { type: String },
+    emergencyContact: { type: String },
+    assignedDisaster: {
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "Disaster" 
+        ref: "Disaster"
     },
     status: {
       type: String,

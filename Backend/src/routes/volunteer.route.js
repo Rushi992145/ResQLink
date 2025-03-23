@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    registerVolunteer,
+    updateVolunteer,
     getAllVolunteers,
     getVolunteersByStatus,
     updateVolunteerStatus,
@@ -12,7 +12,7 @@ import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 
 // Register a new volunteer (User must be authenticated)
-router.post("/", verifyJWT, registerVolunteer);
+router.post("/", verifyJWT, updateVolunteer);
 
 // Get all volunteers (Admin only)
 router.get("/", verifyJWT, authorizeRoles("admin"), getAllVolunteers);
