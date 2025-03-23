@@ -56,8 +56,8 @@ function App() {
           {/* Volunteer - Private Route */}
           {role && role === "volunteer" && (
             <>
-              {/* <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} /> */}
-              {/* <Route path="/volunteer/learning/course/:id" element={<CourseDetail />} /> */}
+               <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} /> 
+               <Route path="/volunteer/learning/course/:id" element={<CourseDetail />} /> 
             </>
           )}
 

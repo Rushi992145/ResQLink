@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 const Profile = () => {
   const [formData, setFormData] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1234567890",
-    address: "123 Main St",
-    city: "New York",
-    bloodGroup: "O+",
-    aadharNumber: "1234-5678-9012",
-    familyContact: "+1987654321",
-    emergencyContact: "+1122334455",
-    skills: "First Aid, Search and Rescue",
-    availability: "Weekends",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    bloodGroup: "",
+    aadharNumber: "",
+    familyContact: "",
+    emergencyContact: "",
+    skills: "",
+    availability: "",
   });
 
+  const token = useSelector((state) => state.auth.token);
+  const id = useSelector((state) => state.auth.id);
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,11 +27,33 @@ const Profile = () => {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "https://localhost:3000/api/volunteer", // Change to your actual API endpoint
+        { userId: id, ...formData }, // Include userId in the payload
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert("Profile updated successfully!"); // You can replace this with toast notifications
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
+
   return (
     <motion.div className="p-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <h2 className="text-2xl font-bold mb-8 text-gray-900">Profile Information</h2>
-      
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+
+      <form className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto" onSubmit={handleSubmit}>
         {/* Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
