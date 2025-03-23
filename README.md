@@ -118,7 +118,7 @@ Through **geolocation**, **notifications**, and **role-specific dashboards**, Re
 
 ---
 
-## 🤝 **Team X-Force **
+## 🤝 **Team X-Force**
 
 > *“In times of crisis, coordination saves lives.”*  
 > Built with ❤️ for those who need help, by those who want to help.
