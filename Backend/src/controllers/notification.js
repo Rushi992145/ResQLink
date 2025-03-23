@@ -59,7 +59,7 @@ const sendNotification = async (req, res) => {
 
             console.log(`Distance to (${longitude}, ${lattitude}):`, distance);
 
-            return distance <= 1; 
+            return distance <= 50; 
         });
 
         console.log("Filtered tokens within range:........................................................................................", tokensWithinRange);

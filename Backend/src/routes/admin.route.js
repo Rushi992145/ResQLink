@@ -5,7 +5,8 @@ import {
     updateAdminRole,
     assignAdminToDisaster,
     removeAdminFromDisaster,
-    updateAdminStatus
+    updateAdminStatus,
+    deleteUser
 } from "../controllers/admin.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -17,5 +18,6 @@ router.put("/:adminId/role", verifyJWT, updateAdminRole);
 router.post("/assign-disaster", verifyJWT, assignAdminToDisaster);
 router.post("/remove-disaster", verifyJWT, removeAdminFromDisaster);
 router.put("/:adminId/status", verifyJWT, updateAdminStatus);
+router.delete('/deleteuser',deleteUser);
 
 export default router;

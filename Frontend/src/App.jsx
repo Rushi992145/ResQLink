@@ -249,7 +249,7 @@ function App() {
 
 
 
-  console.log(token, role);
+  // console.log(token, role);
   return (
     <>
       <BrowserRouter>
