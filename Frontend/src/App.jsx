@@ -16,6 +16,8 @@ import NotificationDetail from "./components/NotificationDetail";
 import VolunteerDashboard from "./components/VolunteerDashboard";
 import NgoDashboard from "./components/NgoDashboard";
 import Navigation from "./components/Navigation";
+import Learning from "./components/Learning";
+import CourseDetail from "./components/CourseDetail";
 
 function App() {
   
@@ -53,7 +55,10 @@ function App() {
 
           {/* Volunteer - Private Route */}
           {role && role === "volunteer" && (
-            <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
+            <>
+              {/* <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} /> */}
+              {/* <Route path="/volunteer/learning/course/:id" element={<CourseDetail />} /> */}
+            </>
           )}
 
           {/* Ngo - Private Route */}
