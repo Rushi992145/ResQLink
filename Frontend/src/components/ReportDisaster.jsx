@@ -1,21 +1,77 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const ReportDisaster = () => {
   const [formData, setFormData] = useState({
     disasterType: "",
-    location: "",
+    location: {
+      lati: "",
+      long: "",
+    },
     description: "",
     severity: "moderate",
     peopleAffected: "",
-    contactName: "",
-    contactPhone: "",
-    images: null,
+    name: "",
+    contactNumber: "",
+    images: [],
   });
 
-  const handleSubmit = (e) => {
+  const getCurrentLocation = () => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const clocation = {
+            lati: position.coords.latitude,
+            long: position.coords.longitude,
+          };
+          console.log("Retrieved location:", clocation);
+          setFormData((prevData) => ({
+            ...prevData,
+            location: clocation,
+          }));
+          resolve(clocation);
+        },
+        (error) => reject(error)
+      );
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
+
+    try {
+      const location = await getCurrentLocation(); // Ensure location is updated before submission
+
+      console.log("Submitting with location:", location);
+
+      const response = await fetch("http://localhost:3000/api/report/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, location }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      console.log("Disaster report submitted successfully!");
+
+      // Reset the form
+      setFormData({
+        disasterType: "",
+        location: { lati: "", long: "" },
+        description: "",
+        severity: "moderate",
+        peopleAffected: "",
+        name: "",
+        contactNumber: "",
+        images: [],
+      });
+    } catch (error) {
+      console.error("Error submitting disaster report:", error);
+    }
   };
 
   return (
@@ -47,7 +103,7 @@ const ReportDisaster = () => {
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                     value={formData.disasterType}
                     onChange={(e) =>
-                      setFormData({ ...formData, disasterType: e.target.value })
+                      setFormData((prev) => ({ ...prev, disasterType: e.target.value }))
                     }
                     required
                   >
@@ -67,7 +123,7 @@ const ReportDisaster = () => {
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                     value={formData.severity}
                     onChange={(e) =>
-                      setFormData({ ...formData, severity: e.target.value })
+                      setFormData((prev) => ({ ...prev, severity: e.target.value }))
                     }
                     required
                   >
@@ -80,27 +136,13 @@ const ReportDisaster = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-1 text-sm">Location</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
-                  placeholder="Enter location details"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
-              <div>
                 <label className="block text-gray-700 mb-1 text-sm">Description</label>
                 <textarea
                   className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                   rows="3"
                   placeholder="Describe the situation in detail"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                   required
                 ></textarea>
               </div>
@@ -112,9 +154,9 @@ const ReportDisaster = () => {
                     type="text"
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                     placeholder="Your name"
-                    value={formData.contactName}
+                    value={formData.name}
                     onChange={(e) =>
-                      setFormData({ ...formData, contactName: e.target.value })
+                      setFormData((prev) => ({ ...prev, name: e.target.value }))
                     }
                     required
                   />
@@ -126,9 +168,9 @@ const ReportDisaster = () => {
                     type="tel"
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                     placeholder="Your phone number"
-                    value={formData.contactPhone}
+                    value={formData.contactNumber}
                     onChange={(e) =>
-                      setFormData({ ...formData, contactPhone: e.target.value })
+                      setFormData((prev) => ({ ...prev, contactNumber: e.target.value }))
                     }
                     required
                   />
@@ -143,7 +185,10 @@ const ReportDisaster = () => {
                   multiple
                   className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                   onChange={(e) =>
-                    setFormData({ ...formData, images: e.target.files })
+                    setFormData((prev) => ({
+                      ...prev,
+                      images: Array.from(e.target.files),
+                    }))
                   }
                 />
               </div>

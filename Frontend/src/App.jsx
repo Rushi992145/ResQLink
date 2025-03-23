@@ -15,6 +15,7 @@ import Footer from "./components/Footer";
 import NotificationDetail from "./components/NotificationDetail";
 import VolunteerDashboard from "./components/VolunteerDashboard";
 import NgoDashboard from "./components/NgoDashboard";
+import Navigation from "./components/Navigation";
 
 function App() {
   
@@ -42,7 +43,9 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/volunteer" element={<VolunteerDashboard />} />
-
+          
+          <Route path='/navigation' element={<Navigation />} />
+          
           <Route
             path="/volunteer/notifications/:id"
             element={<NotificationDetail />}
