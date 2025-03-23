@@ -89,6 +89,14 @@ const saveUser = async (req,res) =>{
     {
         const { fcm_token,longitude,lattitude} = req.body;
         
+        if(!fcm_token)
+        {
+            return res.status(400).json({
+                success : false,
+                message : "No valid fcm token"
+            })
+        }
+
         console.log("here",fcm_token,longitude,lattitude)
         const fcm_token_exist = await Fcm_Token.find({fcm_token});
 
@@ -121,6 +129,14 @@ const updateUserFcmToken = async (req,res) =>{
         const {fcm_token,longitude,lattitude} = req.body;
         
         console.log(fcm_token,longitude,lattitude);
+
+        if(!longitude || !lattitude)
+        {
+            return res.status(400).json({
+                success : false,
+                message : "invalid longitude and lattitude"
+            })
+        }
 
         const response = await Fcm_Token.findOneAndUpdate({fcm_token : fcm_token},{longitude : longitude,lattitude : lattitude});
         
