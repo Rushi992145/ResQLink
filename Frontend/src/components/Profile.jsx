@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
 const Profile = () => {
+  const accesstoken = useSelector((state) => state.auth.token);
+  const id = useSelector((state) => state.auth.id);
+  const name = useSelector((state) => state.auth.name);
+  const email = useSelector((state) => state.auth.email);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,8 +23,15 @@ const Profile = () => {
     availability: "",
   });
 
-  const token = useSelector((state) => state.auth.token);
-  const id = useSelector((state) => state.auth.id);
+  // Use useEffect to set initial values from Redux state
+  useEffect(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      name,
+      email,
+    }));
+  }, [name, email]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -32,11 +44,11 @@ const Profile = () => {
 
     try {
       const response = await axios.post(
-        "https://localhost:3000/api/volunteer", // Change to your actual API endpoint
-        { userId: id, ...formData }, // Include userId in the payload
+        "https://localhost:3000/api/volunteer/", // Change to your actual API endpoint
+        { userId: id, ...formData, accesstoken }, // Include userId in the payload
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accesstoken}`,
             "Content-Type": "application/json",
           },
         }
