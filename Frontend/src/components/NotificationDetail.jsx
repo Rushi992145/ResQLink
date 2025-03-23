@@ -7,6 +7,10 @@ import Navigation from '../components/Navigation'
 const NotificationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const destination = {
+    latitude: 18.6517,
+    longitude: 73.7616
+  };
 
   // Mock data - In a real app, you would fetch this based on the ID
   const notification = {
@@ -132,7 +136,7 @@ const NotificationDetail = () => {
           </div>
 
           <div>
-              <Navigation />
+              <Navigation destination={destination}/>
           </div>
 
           {/* Action Buttons */}
