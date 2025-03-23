@@ -8,28 +8,56 @@ import {
   Shield,
   Building,
   HeartHandshake,
+  User,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-
-import { setToken } from "../Redux/authslice";
-import { setEmail } from "../Redux/authslice";
-import { setRole } from "../Redux/authslice";
-import { setName } from "../Redux/authslice";
-import { setId } from "../Redux/authslice";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setToken,
+  setEmail,
+  setRole,
+  setName,
+  setId,
+} from "../Redux/authslice";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const location = useLocation();
-  const token = useSelector((state) => state.auth.token);
 
-  // Add scroll effect
+  const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.role);
+  const name = useSelector((state) => state.auth.name);
+
+  // Get initials from name
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
+  // Get dashboard route based on role
+  const getDashboardRoute = () => {
+    switch (role) {
+      case "admin":
+        return "/admin-dashboard";
+      case "volunteer":
+        return "/volunteer-dashboard";
+      case "ngo":
+        return "/ngo-dashboard";
+      default:
+        return "/";
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -57,10 +85,10 @@ const Navbar = () => {
     localStorage.removeItem("email");
     localStorage.removeItem("name");
     localStorage.removeItem("id");
+
+    setShowProfileMenu(false);
     navigate("/login");
   }
-
-  console.log("token is :", token);
 
   return (
     <div className="fixed w-full top-0 z-50">
@@ -105,89 +133,124 @@ const Navbar = () => {
             </Link>
 
             {/* Desktop Menu */}
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-center space-x-2">
+            <div className="hidden md:flex items-center justify-between flex-1 px-8">
+              <div className="flex-1"></div>
+              <div className="flex items-center space-x-2">
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
-                                            ${
-                                              location.pathname === item.path
-                                                ? scrolled
-                                                  ? "bg-green-600 text-white shadow-md"
-                                                  : "bg-white text-green-700 shadow-md"
-                                                : scrolled
-                                                ? "text-green-700 hover:bg-green-50"
-                                                : "text-white hover:bg-green-600"
-                                            }`}
+                      ${
+                        location.pathname === item.path
+                          ? scrolled
+                            ? "bg-green-600 text-white shadow-md"
+                            : "bg-white text-green-700 shadow-md"
+                          : scrolled
+                          ? "text-green-700 hover:bg-green-50"
+                          : "text-white hover:bg-green-600"
+                      }`}
                   >
                     <item.icon className="w-4 h-4" />
                     <span>{item.label}</span>
                   </Link>
                 ))}
               </div>
-            </div>
 
-            {/* Auth Buttons */}
-            {!token ? (
-              <div className="hidden md:block">
-                <div className="ml-4 flex items-center md:ml-6 space-x-3">
-                  <Link to="/login">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 border-2
-                      ${
-                        scrolled
-                          ? "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                          : "border-white text-white hover:bg-white hover:text-green-700"
-                      }`}
+              {/* Auth/Profile Section */}
+              <div className="flex-1 flex justify-end">
+                {!token ? (
+                  <div className="flex items-center space-x-3">
+                    <Link to="/login">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 border-2
+                          ${
+                            scrolled
+                              ? "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                              : "border-white text-white hover:bg-white hover:text-green-700"
+                          }`}
+                      >
+                        Login
+                      </motion.button>
+                    </Link>
+                    <Link to="/register">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
+                          ${
+                            scrolled
+                              ? "bg-green-600 text-white hover:bg-green-700"
+                              : "bg-white text-green-700 hover:bg-green-50"
+                          }`}
+                      >
+                        Register
+                      </motion.button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <motion.div
+                      className="flex items-center space-x-3 cursor-pointer"
+                      onClick={() => setShowProfileMenu(!showProfileMenu)}
                     >
-                      Login
-                    </motion.button>
-                  </Link>
-                  <Link to="/register">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
-                      ${
-                        scrolled
-                          ? "bg-green-600 text-white hover:bg-green-700"
-                          : "bg-white text-green-700 hover:bg-green-50"
-                      }`}
-                    >
-                      Register
-                    </motion.button>
-                  </Link>
-                </div>
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${
+                          scrolled ? "bg-green-600" : "bg-white text-green-700"
+                        }`}
+                      >
+                        {getInitials(name)}
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 ${
+                          scrolled ? "text-green-700" : "text-white"
+                        }`}
+                      />
+                    </motion.div>
+
+                    {/* Profile Dropdown */}
+                    <AnimatePresence>
+                      {showProfileMenu && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute right-0 mt-2 w-48 rounded-xl bg-white shadow-lg py-1"
+                        >
+                          <Link
+                            to={getDashboardRoute()}
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-green-50"
+                            onClick={() => setShowProfileMenu(false)}
+                          >
+                            <User className="w-4 h-4" />
+                            <span>Dashboard</span>
+                          </Link>
+                          <button
+                            onClick={logoutclickhandler}
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <span>Logout</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
               </div>
-            ) : (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
-                      ${
-                        scrolled
-                          ? "bg-green-600 text-white hover:bg-green-700"
-                          : "bg-white text-green-700 hover:bg-green-50"
-                      }`}
-                onClick={logoutclickhandler}
-              >
-                Logout
-              </motion.button>
-            )}
+            </div>
 
             {/* Mobile menu button */}
             <div className="md:hidden">
               <motion.button
                 className={`inline-flex items-center justify-center p-2 rounded-full focus:outline-none
-                                    ${
-                                      scrolled
-                                        ? "bg-green-600 text-white hover:bg-green-700"
-                                        : "bg-white text-green-700 hover:bg-green-50"
-                                    }`}
+                  ${
+                    scrolled
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "bg-white text-green-700 hover:bg-green-50"
+                  }`}
                 onClick={() => setIsOpen(!isOpen)}
                 whileTap={{ scale: 0.95 }}
               >
