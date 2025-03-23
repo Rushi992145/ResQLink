@@ -27,7 +27,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const token = useSelector((state)=>state.auth.token);
+  const token = useSelector((state) => state.auth.token);
 
   // Add scroll effect
   useEffect(() => {
@@ -45,24 +45,22 @@ const Navbar = () => {
     { path: "/contact", label: "Contact", icon: Phone },
   ];
 
-  function logoutclickhandler()
-    {
-      
-      dispatch(setName(null));
-      dispatch(setEmail(null));
-      dispatch(setRole(null));
-      dispatch(setId(null));
-      dispatch(setToken(null));
-      
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      localStorage.removeItem('email');
-      localStorage.removeItem('name');
-      localStorage.removeItem('id');
-      navigate('/login');
-    }
+  function logoutclickhandler() {
+    dispatch(setName(null));
+    dispatch(setEmail(null));
+    dispatch(setRole(null));
+    dispatch(setId(null));
+    dispatch(setToken(null));
 
-    console.log("token is :",token);
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("email");
+    localStorage.removeItem("name");
+    localStorage.removeItem("id");
+    navigate("/login");
+  }
+
+  console.log("token is :", token);
 
   return (
     <div className="fixed w-full top-0 z-50">
@@ -113,18 +111,18 @@ const Navbar = () => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
-                                            ${
-                                              location.pathname === item.path
-                                                ? scrolled
-                                                  ? "bg-green-600 text-white shadow-md"
-                                                  : "bg-white text-green-700 shadow-md"
-                                                : scrolled
-                                                ? "text-green-700 hover:bg-green-50"
-                                                : "text-white hover:bg-green-600"
-                                            }`}
+                    className={`flex items-center space-x-2 px-5 py-2.5 rounded-full text-base font-medium transition-all duration-300
+                      ${
+                        location.pathname === item.path
+                          ? scrolled
+                            ? "bg-green-600 text-white shadow-md"
+                            : "bg-white text-green-700 shadow-md"
+                          : scrolled
+                          ? "text-green-700 hover:bg-green-50"
+                          : "text-white hover:bg-green-600"
+                      }`}
                   >
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className="w-5 h-5" />
                     <span>{item.label}</span>
                   </Link>
                 ))}
@@ -132,52 +130,54 @@ const Navbar = () => {
             </div>
 
             {/* Auth Buttons */}
-            { !token ? 
-            <div className="hidden md:block">
-              <div className="ml-4 flex items-center md:ml-6 space-x-3">
-                <Link to="/login">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 border-2
+            {!token ? (
+              <div className="hidden md:block">
+                <div className="ml-4 flex items-center md:ml-6 space-x-3">
+                  <Link to="/login">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 border-2
                       ${
                         scrolled
                           ? "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                           : "border-white text-white hover:bg-white hover:text-green-700"
                       }`}
-                  >
-                    Login
-                  </motion.button>
-                </Link>
-                <Link to="/register">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
+                    >
+                      Login
+                    </motion.button>
+                  </Link>
+                  <Link to="/register">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
                       ${
                         scrolled
                           ? "bg-green-600 text-white hover:bg-green-700"
                           : "bg-white text-green-700 hover:bg-green-50"
                       }`}
-                  >
-                    Register
-                  </motion.button>
-                </Link>
+                    >
+                      Register
+                    </motion.button>
+                  </Link>
+                </div>
               </div>
-            </div> : <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
                       ${
                         scrolled
                           ? "bg-green-600 text-white hover:bg-green-700"
                           : "bg-white text-green-700 hover:bg-green-50"
                       }`}
-                      onClick={logoutclickhandler}
-                  >
-                    Logout
-                  </motion.button>
-}
+                onClick={logoutclickhandler}
+              >
+                Logout
+              </motion.button>
+            )}
 
             {/* Mobile menu button */}
             <div className="md:hidden">

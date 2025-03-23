@@ -15,13 +15,13 @@ import Footer from "./components/Footer";
 import NotificationDetail from "./components/NotificationDetail";
 import VolunteerDashboard from "./components/VolunteerDashboard";
 import NgoDashboard from "./components/NgoDashboard";
+import DisasterDetailsPage from "./components/DisasterDetailsPage";
 
 function App() {
-  
-  const token = useSelector((state)=>state.auth.token);
-  const role = useSelector((state)=>state.auth.role);
-  
-  console.log(token,role);
+  const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.role);
+
+  console.log(token, role);
   return (
     <>
       <BrowserRouter>
@@ -40,8 +40,8 @@ function App() {
           <Route path="/request-assistance" element={<RequestAssistance />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/volunteer" element={<VolunteerDashboard />} />
+          {/* <Route path="/admin" element={<Admin />} /> */}
+          {/* <Route path="/volunteer" element={<VolunteerDashboard />} /> */}
 
           <Route
             path="/volunteer/notifications/:id"
@@ -50,7 +50,10 @@ function App() {
 
           {/* Volunteer - Private Route */}
           {role && role === "volunteer" && (
-            <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
+            <Route
+              path="/volunteer-dashboard"
+              element={<VolunteerDashboard />}
+            />
           )}
 
           {/* Ngo - Private Route */}
@@ -60,7 +63,13 @@ function App() {
 
           {/* Admin - Private Route */}
           {role && role === "admin" && (
-            <Route path="/admin-dashboard" element={<Admin />} />
+            <>
+              <Route path="/admin-dashboard" element={<Admin />} />
+              <Route
+                path="/admin-dashboard/disaster/:id"
+                element={<DisasterDetailsPage />}
+              />
+            </>
           )}
 
           <Route path="*" element={<Login />} />
