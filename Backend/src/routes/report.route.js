@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/",createDisasterRequest);
 
 // Get all disaster requests (Admin only)
-router.get("/getreport", getAllDisasterRequests);
+router.get("/getreport", verifyJWT, authorizeRoles("admin"), getAllDisasterRequests);
 
 // Get disaster requests by status (Admin only)
 router.get("/status/:status", verifyJWT, authorizeRoles("admin"), getDisasterRequestsByStatus);

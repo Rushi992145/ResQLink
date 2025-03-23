@@ -212,8 +212,8 @@ const Navbar = () => {
                       onClick={() => setShowProfileMenu(!showProfileMenu)}
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${
-                          scrolled ? "bg-green-600" : "bg-white text-green-700"
+                        className={`w-10 h-10 rounded-full flex items-center justify-center  font-medium ${
+                          scrolled ? "bg-green-600 text-white" : "bg-white text-green-700"
                         }`}
                       >
                         {getInitials(name)}

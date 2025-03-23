@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DisasterDetailsPage from "./DisasterDetailsPage";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +14,47 @@ const Admin = () => {
     pendingNGOs: 12,
     ongoingEfforts: 78,
   });
+
+  // Add state for disaster reports
+  const [disasterReports, setDisasterReports] = useState({
+    pending: [],
+    active: [],
+    resolved: [],
+  });
+
+  // Update the useEffect to properly store fetched data
+  useEffect(() => {
+    async function getAllDisasterReport() {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/report/getreport",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // Add token for authentication
+            },
+          }
+        );
+
+        const data = await response.json();
+        console.log(data);
+        // Categorize disasters based on status
+        const categorizedReports = {
+          pending: data.data.filter((report) => report.status === "pending"),
+          active: data.data.filter((report) => report.status === "approved"),
+          resolved: data.data.filter((report) => report.status === "rejected"),
+        };
+
+        setDisasterReports(categorizedReports);
+        console.log("Categorized Disaster Reports:", categorizedReports);
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    getAllDisasterReport();
+  }, []);
 
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -92,6 +132,41 @@ const Admin = () => {
     },
   ];
 
+  // Static volunteer assignments
+  const activeDisasters = [
+    {
+      id: 1,
+      type: "Hurricane",
+      location: "Miami, FL",
+      volunteersNeeded: 15,
+      assigned: 8,
+    },
+    {
+      id: 2,
+      type: "Wildfire",
+      location: "California",
+      volunteersNeeded: 25,
+      assigned: 12,
+    },
+  ];
+
+  const availableVolunteers = [
+    {
+      id: 1,
+      name: "Emma Wilson",
+      skills: "Medical",
+      availability: "Immediate",
+      rating: "4.8",
+    },
+    {
+      id: 2,
+      name: "James Brown",
+      skills: "Rescue",
+      availability: "Next Week",
+      rating: "4.5",
+    },
+  ];
+
   // Modify the tabs array
   const tabs = [
     { id: "overview", label: "Overview", icon: "📊" },
@@ -99,67 +174,6 @@ const Admin = () => {
     { id: "reported", label: "Reported Disasters", icon: "🚨" },
     { id: "aid", label: "Aid Requirements", icon: "🆘" },
   ];
-
-  // Add new static data for reported disasters
-  const reportedDisasters = {
-    pending: [
-      {
-        id: 1,
-        type: "Earthquake",
-        location: "San Francisco, CA",
-        severity: "High",
-        reportedAt: "2024-03-16",
-        affectedPeople: "Unknown",
-        description: "Magnitude 6.2 earthquake reported in downtown area",
-        status: "Pending",
-      },
-      {
-        id: 2,
-        type: "Tsunami Warning",
-        location: "Hawaii",
-        severity: "Critical",
-        reportedAt: "2024-03-16",
-        affectedPeople: "Potentially 10,000+",
-        description: "Tsunami warning issued after offshore earthquake",
-        status: "Pending",
-      },
-    ],
-    active: [
-      {
-        id: 3,
-        type: "Hurricane",
-        location: "Miami, FL",
-        severity: "Critical",
-        reportedAt: "2024-03-15",
-        affectedPeople: "5,000+",
-        description: "Category 4 hurricane causing severe flooding",
-        status: "Active",
-      },
-      {
-        id: 4,
-        type: "Wildfire",
-        location: "California",
-        severity: "High",
-        reportedAt: "2024-03-14",
-        affectedPeople: "2,000+",
-        description: "Rapidly spreading wildfire threatening residential areas",
-        status: "Active",
-      },
-    ],
-    resolved: [
-      {
-        id: 5,
-        type: "Flood",
-        location: "Texas",
-        severity: "Medium",
-        reportedAt: "2024-03-10",
-        resolvedAt: "2024-03-13",
-        affectedPeople: "1,000+",
-        description: "Flash flooding in urban areas",
-        status: "Resolved",
-      },
-    ],
-  };
 
   const aidRequirements = [
     {
@@ -362,6 +376,15 @@ const Admin = () => {
       },
     ];
 
+    // Helper function to format date
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    };
+
     return (
       <div className="space-y-6">
         <div className="flex space-x-4 mb-6">
@@ -386,39 +409,39 @@ const Admin = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           {activeSection === "pending" && (
             <div className="space-y-4">
-              {reportedDisasters.pending.map((disaster) => (
+              {disasterReports.pending.map((disaster) => (
                 <motion.div
-                  key={disaster.id}
+                  key={disaster._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="border border-yellow-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-yellow-50"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold text-lg text-yellow-700">
-                      {disaster.type}
+                      {disaster.disasterType}
                     </h4>
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                       {disaster.severity}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">
-                    📍 {disaster.location}
+                    📍 {disaster.location?.lati}, {disaster.location?.long}
                   </p>
                   <p className="text-sm text-gray-600 mb-2">
-                    👥 Affected: {disaster.affectedPeople}
+                    👤 Reporter: {disaster.name || "Anonymous"}
                   </p>
                   <p className="text-sm text-gray-600 mb-3">
                     {disaster.description}
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-500">
-                      Reported: {disaster.reportedAt}
+                      Reported: {formatDate(disaster.reportedAt)}
                     </span>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => {
-                        navigate(`/admin-dashboard/disaster/${disaster.id}`, {
+                        navigate(`/admin-dashboard/disaster/${disaster._id}`, {
                           state: { disaster, status: "pending" },
                         });
                       }}
@@ -429,44 +452,49 @@ const Admin = () => {
                   </div>
                 </motion.div>
               ))}
+              {disasterReports.pending.length === 0 && (
+                <p className="text-center text-gray-500">
+                  No pending disaster reports
+                </p>
+              )}
             </div>
           )}
 
           {activeSection === "active" && (
             <div className="space-y-4">
-              {reportedDisasters.active.map((disaster) => (
+              {disasterReports.active.map((disaster) => (
                 <motion.div
-                  key={disaster.id}
+                  key={disaster._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="border border-red-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-red-50"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold text-lg text-red-700">
-                      {disaster.type}
+                      {disaster.disasterType}
                     </h4>
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                       {disaster.severity}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">
-                    📍 {disaster.location}
+                    📍 {disaster.location?.lati}, {disaster.location?.long}
                   </p>
                   <p className="text-sm text-gray-600 mb-2">
-                    👥 Affected: {disaster.affectedPeople}
+                    👤 Reporter: {disaster.name || "Anonymous"}
                   </p>
                   <p className="text-sm text-gray-600 mb-3">
                     {disaster.description}
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-500">
-                      Active since: {disaster.reportedAt}
+                      Active since: {formatDate(disaster.reportedAt)}
                     </span>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => {
-                        navigate(`/admin-dashboard/disaster/${disaster.id}`, {
+                        navigate(`/admin-dashboard/disaster/${disaster._id}`, {
                           state: { disaster, status: "active" },
                         });
                       }}
@@ -477,44 +505,47 @@ const Admin = () => {
                   </div>
                 </motion.div>
               ))}
+              {disasterReports.active.length === 0 && (
+                <p className="text-center text-gray-500">No active disasters</p>
+              )}
             </div>
           )}
 
           {activeSection === "resolved" && (
             <div className="space-y-4">
-              {reportedDisasters.resolved.map((disaster) => (
+              {disasterReports.resolved.map((disaster) => (
                 <motion.div
-                  key={disaster.id}
+                  key={disaster._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="border border-green-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-green-50"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold text-lg text-green-700">
-                      {disaster.type}
+                      {disaster.disasterType}
                     </h4>
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       Resolved
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">
-                    📍 {disaster.location}
+                    📍 {disaster.location?.lati}, {disaster.location?.long}
                   </p>
                   <p className="text-sm text-gray-600 mb-2">
-                    👥 Affected: {disaster.affectedPeople}
+                    👤 Reporter: {disaster.name || "Anonymous"}
                   </p>
                   <p className="text-sm text-gray-600 mb-3">
                     {disaster.description}
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-500">
-                      Resolved: {disaster.resolvedAt}
+                      Resolved: {formatDate(disaster.resolvedAt)}
                     </span>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => {
-                        navigate(`/admin-dashboard/disaster/${disaster.id}`, {
+                        navigate(`/admin-dashboard/disaster/${disaster._id}`, {
                           state: { disaster, status: "resolved" },
                         });
                       }}
@@ -525,6 +556,11 @@ const Admin = () => {
                   </div>
                 </motion.div>
               ))}
+              {disasterReports.resolved.length === 0 && (
+                <p className="text-center text-gray-500">
+                  No resolved disasters
+                </p>
+              )}
             </div>
           )}
         </div>
