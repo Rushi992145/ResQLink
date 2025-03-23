@@ -41,8 +41,8 @@ const Navbar = () => {
   const navItems = [
     { path: "/", label: "Home", icon: Home },
     { path: "/about", label: "About", icon: HeartHandshake },
-    // { path: '/ngo', label: 'NGO', icon: Building },
     { path: "/contact", label: "Contact", icon: Phone },
+    { path: "/ngolist", label: "NGO", icon: Building },
   ];
 
   function logoutclickhandler() {
@@ -111,18 +111,18 @@ const Navbar = () => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-2 px-5 py-2.5 rounded-full text-base font-medium transition-all duration-300
-                      ${
-                        location.pathname === item.path
-                          ? scrolled
-                            ? "bg-green-600 text-white shadow-md"
-                            : "bg-white text-green-700 shadow-md"
-                          : scrolled
-                          ? "text-green-700 hover:bg-green-50"
-                          : "text-white hover:bg-green-600"
-                      }`}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+                                            ${
+                                              location.pathname === item.path
+                                                ? scrolled
+                                                  ? "bg-green-600 text-white shadow-md"
+                                                  : "bg-white text-green-700 shadow-md"
+                                                : scrolled
+                                                ? "text-green-700 hover:bg-green-50"
+                                                : "text-white hover:bg-green-600"
+                                            }`}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className="w-4 h-4" />
                     <span>{item.label}</span>
                   </Link>
                 ))}

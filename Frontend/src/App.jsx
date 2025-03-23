@@ -19,8 +19,8 @@ import NgoDashboard from "./components/NgoDashboard";
 import Navigation from "./components/Navigation";
 import Learning from "./components/Learning";
 import CourseDetail from "./components/CourseDetail";
-import NgoList from "./components/ngolist";
-import NgoDetail from "./components/ngodetail";
+import NgoList from "./components/Ngolist";
+import NgoDetail from "./components/Ngodetail";
 import DisasterDetailsPage from "./components/DisasterDetailsPage";
 
 import { generateToken } from "./Notification/firebase";
@@ -123,7 +123,9 @@ function App() {
               />
             </>
           )}
-          
+
+          <Route path="/ngolist" element={<NgoList />} />
+          <Route path="/ngo/:id" element={<NgoDetail />} />
 
           <Route path="*" element={<Login />} />
         </Routes>
