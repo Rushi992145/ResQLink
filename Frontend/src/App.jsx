@@ -47,24 +47,6 @@ function App() {
       dispatch(setFcmToken(fcmToken));
 
       console.log("here",longitude,lattitude);
-      const getCurrentLocation = async () => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const location = {
-                lati: position.coords.latitude,
-                long: position.coords.longitude,
-              };
-
-              localStorage.setItem('longitude',location.long);
-              localStorage.setItem('lattitude',location.lati);
-              
-              dispatch(setLongitude(location.long));
-              dispatch(setLattitude(location.lati));
-              console.log("Retrieved location:", location);
-            },
-            (error) => reject(error)
-          );
-      };
 
       console.log("here",longitude,lattitude);
       const getCurrentLocation = async () => {
