@@ -27,7 +27,7 @@ const sendNotification = async (req, res) => {
         const { title, body } = req.body;
         const fcm_token_array = await Fcm_Token.find({}, { fcm_token: 1, _id: 0 });
         
-        console.log(fcm_token_array)
+        console.log("fcm_token is ",fcm_token_array)
 
         for (const fcm_token_obj of fcm_token_array) {
             await notify(title, body, fcm_token_obj.fcm_token);
@@ -57,7 +57,7 @@ const saveUser = async (req,res) =>{
         
         const fcm_token_exist = await Fcm_Token.find({fcm_token});
 
-        if(fcm_token_exist)
+        if(fcm_token_exist.length>0)
         {
             return res.status(400).json({
                 success : false,

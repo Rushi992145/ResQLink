@@ -43,6 +43,7 @@ function App() {
 
       try 
       {
+          console.log("here")
           if(fcm_token)
           {
             const response = await fetch('http://localhost:3000/api/notification/saveUser',{

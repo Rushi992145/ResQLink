@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useState , useEffect, use} from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -8,6 +8,33 @@ const Profile = () => {
   const id = useSelector((state) => state.auth.id);
   const name = useSelector((state) => state.auth.name);
   const email = useSelector((state) => state.auth.email);
+
+  useEffect(() => {
+    const fetchVolunteerDetails = async () => {
+      try {
+        console.log("temp",id)
+        const response = await axios.post(
+          "http://localhost:3000/api/volunteers/getvoldetails", // Use POST instead of GET
+          { id },  // Pass `id` inside the request body
+          {
+            headers: {
+              Authorization: `Bearer ${accesstoken}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        console.log(response.data);
+        setFormData(response.data);  
+      } catch (error) {
+        console.error("Error fetching volunteer details:", error);
+      }
+    };
+  
+    if (id) {
+      fetchVolunteerDetails();
+    }
+  }, [id, accesstoken]);
+  
 
   const [formData, setFormData] = useState({
     name: "",
@@ -22,6 +49,8 @@ const Profile = () => {
     skills: "",
     availability: "",
   });
+
+
 
   // Use useEffect to set initial values from Redux state
   useEffect(() => {
@@ -44,8 +73,8 @@ const Profile = () => {
 
     try {
       const response = await axios.post(
-        "https://localhost:3000/api/volunteer/", // Change to your actual API endpoint
-        { userId: id, ...formData, accesstoken }, // Include userId in the payload
+        "http://localhost:3000/api/volunteers/", 
+        { userId: id, ...formData, accesstoken },
         {
           headers: {
             Authorization: `Bearer ${accesstoken}`,
@@ -54,7 +83,7 @@ const Profile = () => {
         }
       );
 
-      alert("Profile updated successfully!"); // You can replace this with toast notifications
+      alert("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile. Please try again.");
