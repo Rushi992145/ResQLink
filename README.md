@@ -114,12 +114,33 @@ Through **geolocation**, **notifications**, and **role-specific dashboards**, Re
 📹 [Watch Our Demo](https://your-demo-link-here.com)
 
 ---
+
+## 🔧 **Installation Steps**
+
+```sh
+# Clone the repository
+git clone https://github.com/Rushi992145/X-Force.git
+cd X-Force
+
+# Set up Frontend
+cd Frontend
+npm install
+npm run dev
+
+# Set up Backend
+cd ../Backend
+npm install
+npm run dev
+```
+
+
+---
 ## 🔑 **Credential**
 Email & Password
 - Admin - rushi@gmail.com,12345
 - Ngo - brij@gmail.com , 123456
 - Volunteer - om@gmail.com,1234567        
----
+
 ---
 
 ## 🚀 **Future Enhancements**
