@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+// import DisasterDetailsPage from "./DisasterDetailsPage";
+import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
   // Static data
@@ -138,20 +140,41 @@ const Admin = () => {
 
   // Add new static data for reported disasters
   const reportedDisasters = {
-    active: [
+    pending: [
       {
         id: 1,
+        type: "Earthquake",
+        location: "San Francisco, CA",
+        severity: "High",
+        reportedAt: "2024-03-16",
+        affectedPeople: "Unknown",
+        description: "Magnitude 6.2 earthquake reported in downtown area",
+        status: "Pending",
+      },
+      {
+        id: 2,
+        type: "Tsunami Warning",
+        location: "Hawaii",
+        severity: "Critical",
+        reportedAt: "2024-03-16",
+        affectedPeople: "Potentially 10,000+",
+        description: "Tsunami warning issued after offshore earthquake",
+        status: "Pending",
+      },
+    ],
+    active: [
+      {
+        id: 3,
         type: "Hurricane",
         location: "Miami, FL",
         severity: "Critical",
         reportedAt: "2024-03-15",
         affectedPeople: "5,000+",
-        description:
-          "Category 4 hurricane causing severe flooding and infrastructure damage",
+        description: "Category 4 hurricane causing severe flooding",
         status: "Active",
       },
       {
-        id: 2,
+        id: 4,
         type: "Wildfire",
         location: "California",
         severity: "High",
@@ -163,7 +186,7 @@ const Admin = () => {
     ],
     resolved: [
       {
-        id: 3,
+        id: 5,
         type: "Flood",
         location: "Texas",
         severity: "Medium",
@@ -199,6 +222,16 @@ const Admin = () => {
       deadline: "48 hours",
     },
   ];
+
+  // Add this state for modal
+  const [selectedDisaster, setSelectedDisaster] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Add new state variables
+  const [selectedDisasterDetails, setSelectedDisasterDetails] = useState(null);
+  const [selectedDisasterStatus, setSelectedDisasterStatus] = useState(null);
+
+  const navigate = useNavigate();
 
   // Tab components
   const Overview = () => (
@@ -353,112 +386,245 @@ const Admin = () => {
     </div>
   );
 
-  const ReportedDisasters = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Active Disasters */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-6 flex items-center">
-          <span className="text-red-500 mr-2">⚠️</span>
-          Active Disasters
-        </h3>
-        <div className="space-y-4">
-          {reportedDisasters.active.map((disaster) => (
-            <motion.div
-              key={disaster.id}
-              whileHover={{ scale: 1.02 }}
-              className="border border-red-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-red-50"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-semibold text-lg text-red-700">
-                  {disaster.type}
-                </h4>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium 
-                  ${
-                    disaster.severity === "Critical"
-                      ? "bg-red-100 text-red-800"
-                      : disaster.severity === "High"
-                      ? "bg-orange-100 text-orange-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {disaster.severity}
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">
-                📍 {disaster.location}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">
-                👥 Affected: {disaster.affectedPeople}
-              </p>
-              <p className="text-sm text-gray-600 mb-3">
-                {disaster.description}
-              </p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500">
-                  Reported: {disaster.reportedAt}
-                </span>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                >
-                  View Details
-                </motion.button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+  const ReportedDisasters = () => {
+    const [activeSection, setActiveSection] = useState("pending");
 
-      {/* Resolved Disasters */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-6 flex items-center">
-          <span className="text-green-500 mr-2">✅</span>
-          Resolved Disasters
-        </h3>
-        <div className="space-y-4">
-          {reportedDisasters.resolved.map((disaster) => (
-            <motion.div
-              key={disaster.id}
+    const sections = [
+      { id: "pending", label: "Pending Reports", icon: "⚠️", color: "yellow" },
+      { id: "active", label: "Active Disasters", icon: "🔴", color: "red" },
+      {
+        id: "resolved",
+        label: "Resolved Disasters",
+        icon: "✅",
+        color: "green",
+      },
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="flex space-x-4 mb-6">
+          {sections.map((section) => (
+            <motion.button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
               whileHover={{ scale: 1.02 }}
-              className="border border-green-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-green-50"
+              whileTap={{ scale: 0.98 }}
+              className={`flex items-center px-4 py-2 rounded-lg font-medium ${
+                activeSection === section.id
+                  ? `bg-${section.color}-100 text-${section.color}-800 border-2 border-${section.color}-500`
+                  : "bg-white text-gray-600 hover:bg-gray-50"
+              }`}
             >
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-semibold text-lg text-green-700">
-                  {disaster.type}
-                </h4>
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Resolved
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">
-                📍 {disaster.location}
-              </p>
-              <p className="text-sm text-gray-600 mb-2">
-                👥 Affected: {disaster.affectedPeople}
-              </p>
-              <p className="text-sm text-gray-600 mb-3">
-                {disaster.description}
-              </p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500">
-                  Resolved: {disaster.resolvedAt}
-                </span>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  View Report
-                </motion.button>
-              </div>
-            </motion.div>
+              <span className="mr-2">{section.icon}</span>
+              {section.label}
+            </motion.button>
           ))}
         </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          {activeSection === "pending" && (
+            <div className="space-y-4">
+              {reportedDisasters.pending.map((disaster) => (
+                <motion.div
+                  key={disaster.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="border border-yellow-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-yellow-50"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-lg text-yellow-700">
+                      {disaster.type}
+                    </h4>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      {disaster.severity}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    📍 {disaster.location}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    👥 Affected: {disaster.affectedPeople}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {disaster.description}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-500">
+                      Reported: {disaster.reportedAt}
+                    </span>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        navigate(`/admin-dashboard/disaster/${disaster.id}`, {
+                          state: { disaster, status: "pending" },
+                        });
+                      }}
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+                    >
+                      View Details
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {activeSection === "active" && (
+            <div className="space-y-4">
+              {reportedDisasters.active.map((disaster) => (
+                <motion.div
+                  key={disaster.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="border border-red-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-red-50"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-lg text-red-700">
+                      {disaster.type}
+                    </h4>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      {disaster.severity}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    📍 {disaster.location}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    👥 Affected: {disaster.affectedPeople}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {disaster.description}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-500">
+                      Active since: {disaster.reportedAt}
+                    </span>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        navigate(`/admin-dashboard/disaster/${disaster.id}`, {
+                          state: { disaster, status: "active" },
+                        });
+                      }}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    >
+                      View Details
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {activeSection === "resolved" && (
+            <div className="space-y-4">
+              {reportedDisasters.resolved.map((disaster) => (
+                <motion.div
+                  key={disaster.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="border border-green-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-green-50"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-lg text-green-700">
+                      {disaster.type}
+                    </h4>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Resolved
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    📍 {disaster.location}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    👥 Affected: {disaster.affectedPeople}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {disaster.description}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-500">
+                      Resolved: {disaster.resolvedAt}
+                    </span>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        navigate(`/admin-dashboard/disaster/${disaster.id}`, {
+                          state: { disaster, status: "resolved" },
+                        });
+                      }}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                    >
+                      View Details
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  {
+    /* Notification Modal */
+  }
+  {
+    isModalOpen && selectedDisaster && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-xl p-6 max-w-lg w-full mx-4"
+        >
+          <h3 className="text-2xl font-bold mb-4">Disaster Alert</h3>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold">Type</h4>
+              <p>{selectedDisaster.type}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold">Location</h4>
+              <p>{selectedDisaster.location}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold">Severity</h4>
+              <p>{selectedDisaster.severity}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold">Description</h4>
+              <p>{selectedDisaster.description}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold">Affected People</h4>
+              <p>{selectedDisaster.affectedPeople}</p>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-4 mt-6">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsModalOpen(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+            >
+              Close
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            >
+              Alert Volunteers
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   const AidRequirements = () => (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -481,7 +647,7 @@ const Admin = () => {
                 {aid.deadline}
               </span>
             </div>
-            <p className="text-sm text-gray-600 mb-3">�� {aid.location}</p>
+            <p className="text-sm text-gray-600 mb-3">📍 {aid.location}</p>
             <div className="space-y-2 mb-4">
               {aid.requirements.map((req, index) => (
                 <div key={index} className="flex items-center justify-between">
@@ -553,6 +719,17 @@ const Admin = () => {
           {activeTab === "reported" && <ReportedDisasters />}
           {activeTab === "aid" && <AidRequirements />}
         </motion.div>
+
+        {selectedDisasterDetails && (
+          <DisasterDetails
+            disaster={selectedDisasterDetails}
+            status={selectedDisasterStatus}
+            onClose={() => {
+              setSelectedDisasterDetails(null);
+              setSelectedDisasterStatus(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );

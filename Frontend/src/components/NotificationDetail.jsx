@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Clock, AlertCircle, Check, X } from 'lucide-react';
+import Navigation from '../components/Navigation'
 
 const NotificationDetail = () => {
   const { id } = useParams();
@@ -128,6 +129,10 @@ const NotificationDetail = () => {
                 </span>
               ))}
             </div>
+          </div>
+
+          <div>
+              <Navigation />
           </div>
 
           {/* Action Buttons */}

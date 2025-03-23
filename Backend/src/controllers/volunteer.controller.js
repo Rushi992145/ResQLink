@@ -8,7 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 // Register a new volunteer
 const updateVolunteer = asyncHandler(async (req, res) => {
     const { userId, skills, availability, address, bloodGroup, aadharNumber, familyContact, emergencyContact, assignedDisaster } = req.body;
-
+    console.log(req.body);
     // Validate required fields
     if (!userId || !bloodGroup || !aadharNumber || !emergencyContact) {
         throw new ApiError(400, "Missing required fields");
@@ -60,6 +60,22 @@ const updateVolunteer = asyncHandler(async (req, res) => {
     }
 });
 
+const getVolunteerDetails = async (req, res) => {
+    try {
+      const { id } = req.body; // Extract volunteer ID from URL params
+    
+      console.log(id);
+      const volunteer = await Volunteer.findOne({ userId: id }); // Fetch volunteer details from DB
+      if (!volunteer) {
+        return res.status(404).json({ message: "Volunteer not found" });
+      }
+
+      res.status(200).json(volunteer); // Return volunteer details
+    } catch (error) {
+      console.error("Error fetching volunteer details:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
 
 // Get all volunteers
 const getAllVolunteers = asyncHandler(async (req, res) => {
@@ -111,6 +127,8 @@ const updateVolunteerStatus = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, volunteer, `Volunteer status updated to ${status}`));
 });
 
+
+
 // Assign a volunteer to a disaster
 const assignVolunteerToDisaster = asyncHandler(async (req, res) => {
     const { volunteerId, disasterId } = req.body;
@@ -154,5 +172,6 @@ export {
     getVolunteersByStatus,
     updateVolunteerStatus,
     assignVolunteerToDisaster,
-    removeVolunteerAssignment
+    removeVolunteerAssignment,
+    getVolunteerDetails
 };

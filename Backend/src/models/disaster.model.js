@@ -17,7 +17,7 @@ const DisasterSchema = new mongoose.Schema(
     affectedPeople: Number,
     status: {
       type: String,
-      enum: ["ongoing", "resolved"],
+      enum: ["ongoing","pending","resolved"],
       default: "ongoing",
     },
     assignedVolunteers: [
