@@ -20,6 +20,9 @@ import { setEmail } from "../Redux/authslice";
 import { setRole } from "../Redux/authslice";
 import { setName } from "../Redux/authslice";
 import { setId } from "../Redux/authslice";
+import { setFcmToken } from "../Redux/authslice";
+import { setLattitude } from "../Redux/authslice";
+import { setLongitude } from "../Redux/authslice";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -53,12 +56,20 @@ const Navbar = () => {
       dispatch(setRole(null));
       dispatch(setId(null));
       dispatch(setToken(null));
+      dispatch(setFcmToken(null));
+      dispatch(setLongitude(null));
+      dispatch(setLattitude(null));
+
       
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('email');
       localStorage.removeItem('name');
       localStorage.removeItem('id');
+      localStorage.removeItem('fcm_token');
+      localStorage.removeItem('longitude');
+      localStorage.removeItem('lattitude');
+
       navigate('/login');
     }
 
