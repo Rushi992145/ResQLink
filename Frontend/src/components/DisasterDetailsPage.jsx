@@ -8,6 +8,30 @@ const DisasterDetailsPage = () => {
   const { state } = useLocation();
   const { disaster, status } = state || {};
 
+  const title = "Alert!! A disaster is happend and alot of people needs you help";
+  const body =  "Please check your disaster-relief portal to get more information about the disaster and further instructions";
+
+  async function sendnotificationhandler()
+  {
+    try 
+    {
+      const response = await fetch('http://localhost:3000/api/notification/sendnotification',{
+        method : 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body : JSON.stringify({title,body,longitude,lattitude})
+      })
+
+      const value = await response.json();
+      console.log(value);
+    }
+    catch(error)
+    {
+      console.log(error.message);
+    }
+  }
+
   const getStatusStyles = () => {
     switch (status) {
       case "pending":
@@ -167,7 +191,7 @@ const DisasterDetailsPage = () => {
             <h2 className="text-xl font-semibold mb-4">Actions</h2>
             <div className="flex justify-center">
               {status === "pending" && (
-                <button className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium">
+                <button className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium" onClick={sendnotificationhandler}>
                   Alert Volunteers
                 </button>
               )}

@@ -103,7 +103,7 @@ const Navbar = () => {
       navigate('/login');
     }
 
-    console.log("token is :",token);
+    // console.log("token is :",token);
 
   return (
     <div className="fixed w-full top-0 z-50">

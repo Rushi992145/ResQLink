@@ -160,7 +160,7 @@ function App() {
   // }, []);
 
   useEffect(() => {
-    console.log("State values:", { longitude, lattitude, fcm_token });
+    // console.log("State values:", { longitude, lattitude, fcm_token });
 
     const getCurrentLocation = () => {
       navigator.geolocation.getCurrentPosition(
@@ -177,7 +177,7 @@ function App() {
           dispatch(setLongitude(location.long));
           dispatch(setLattitude(location.lati));
 
-          console.log("Retrieved location:", location);
+          // console.log("Retrieved location:", location);
 
           // Call updateUserLocation after longitude and latitude are set
           updateUserLocation(location.long, location.lati);

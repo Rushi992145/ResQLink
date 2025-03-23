@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-// import DisasterDetailsPage from "./DisasterDetailsPage";
+import DisasterDetailsPage from "./DisasterDetailsPage";
 import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
@@ -16,6 +17,30 @@ const Admin = () => {
   });
 
   const [activeTab, setActiveTab] = useState("overview");
+
+  useEffect(()=>{
+    async function getAllDisasterReport()
+    {
+      try 
+      {
+        const response = await fetch(' http://localhost:3000/api/report/getreport',{
+          method : 'GET',
+          headers : {
+            'Content-Type' : 'application/json'
+          }
+        })
+
+        const value = await response.json();
+        console.log("Disaster Report ",value);
+      }
+      catch(error)
+      {
+        console.log(error.message);
+      }
+    }
+
+    getAllDisasterReport();
+  },[])
 
   // Static volunteer data
   const pendingVolunteers = [
@@ -64,69 +89,6 @@ const Admin = () => {
       type: "Emergency Response",
       location: "Europe",
       date: "2024-03-13",
-    },
-  ];
-
-  // Static disaster reports
-  const disasterReports = [
-    {
-      id: 1,
-      location: "Miami, FL",
-      type: "Hurricane",
-      severity: "High",
-      status: "Active",
-      date: "2024-03-15",
-    },
-    {
-      id: 2,
-      location: "California",
-      type: "Wildfire",
-      severity: "Critical",
-      status: "Active",
-      date: "2024-03-14",
-    },
-    {
-      id: 3,
-      location: "Texas",
-      type: "Flood",
-      severity: "Medium",
-      status: "Resolved",
-      date: "2024-03-10",
-    },
-  ];
-
-  // Static volunteer assignments
-  const activeDisasters = [
-    {
-      id: 1,
-      type: "Hurricane",
-      location: "Miami, FL",
-      volunteersNeeded: 15,
-      assigned: 8,
-    },
-    {
-      id: 2,
-      type: "Wildfire",
-      location: "California",
-      volunteersNeeded: 25,
-      assigned: 12,
-    },
-  ];
-
-  const availableVolunteers = [
-    {
-      id: 1,
-      name: "Emma Wilson",
-      skills: "Medical",
-      availability: "Immediate",
-      rating: "4.8",
-    },
-    {
-      id: 2,
-      name: "James Brown",
-      skills: "Rescue",
-      availability: "Next Week",
-      rating: "4.5",
     },
   ];
 
