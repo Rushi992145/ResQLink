@@ -2,6 +2,7 @@ import User from '../models/user.model.js';
 import Fcm_Token from "../models/fcm_token.js"
 import admin from '../config/firebaseadmin.js';
 import fcm_token from '../models/fcm_token.js';
+import DisasterRequest from '../models/report.model.js';
 
 async function notify(title,body,fcm_token)
 {
@@ -21,18 +22,33 @@ async function notify(title,body,fcm_token)
     {
         console.log(error.message);
     }
-}
+}   
  
 const sendNotification = async (req, res) => {
     try {
-        const { title, body, longitude, lattitude } = req.body;
-
+        const { title, body, longitude, lattitude, disasterId } = req.body;
+ 
         // Convert user-provided longitude and latitude to numbers
         const userLongitude = parseFloat(longitude);
         const userLatitude = parseFloat(lattitude);
         const earthRadius = 6371; // Earth's radius in kilometers
 
-        console.log("Received data:", { title, body, longitude, lattitude });
+        console.log("Received data:", { title, body, longitude, lattitude, disasterId });
+
+        // Fetch disaster details using the ID
+        const disaster = await DisasterRequest.findById(disasterId);
+        if (!disaster) {
+            return res.status(404).json({
+                success: false,
+                message: "Disaster not found"
+            });
+        }
+
+        // Update disaster status to active
+        disaster.status = "approved";
+        await disaster.save();
+
+        
 
         // Fetch all FCM tokens from the database
         const fcm_token_array = await Fcm_Token.find({});
@@ -64,13 +80,17 @@ const sendNotification = async (req, res) => {
 
         console.log("Filtered tokens within range:", tokensWithinRange);
 
+
+
         for (const { fcm_token } of tokensWithinRange) {
             await notify(title, body, fcm_token);
         }
+        
 
         return res.status(200).json({
             success: true,
             message: "Notifications sent successfully to devices within 50 km radius",
+            disaster: disaster
         });
     } catch (error) {
         console.error("Error occurred:", error.message);

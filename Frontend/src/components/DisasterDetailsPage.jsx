@@ -94,6 +94,7 @@ const DisasterDetailsPage = () => {
             body: "Please check your disaster-relief portal to get more information about the disaster and further instructions",
             longitude: longitude,
             lattitude: lattitude,
+            disasterId: disaster._id
           }),
         }
       );
@@ -156,7 +157,7 @@ const DisasterDetailsPage = () => {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">{styles.icon}</span>
-                <h1 className="text-3xl font-bold text-gray-800">
+                <h1 className="text-3xl font-bold text-gray-800"> 
                   {disaster.disasterType}
                 </h1>
               </div>
