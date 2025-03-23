@@ -1,17 +1,16 @@
 import mongoose from "mongoose";
 
 const DisasterRequestSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+  name:String,
+  contactNumber:String,
   disasterType: {
     type: String,
-    enum: ["earthquake", "flood", "fire", "hurricane", "other"],
-    required: true,
+    enum: ["earthquake", "flood", "fire", "hurricane","landslide", "other"],
   },
-  location: String,
+  location: {
+    lati:String,
+    long:String,
+  },
   image: String,
   description: String,
   assistanceRequired: {
@@ -19,8 +18,7 @@ const DisasterRequestSchema = new mongoose.Schema({
   },
   severity: {
     type: String,
-    enum: ["low", "moderate", "high", "severe"],
-    required: true,
+    enum: ["mild", "moderate", "severe", "critical"],
   },
   status: {
     type: String,

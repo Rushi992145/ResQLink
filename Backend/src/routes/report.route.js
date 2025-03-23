@@ -10,8 +10,8 @@ import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-// Create a new disaster request (User must be authenticated)
-router.post("/", verifyJWT, createDisasterRequest);
+// Create a new disaster request 
+router.post("/",createDisasterRequest);
 
 // Get all disaster requests (Admin only)
 router.get("/", verifyJWT, authorizeRoles("admin"), getAllDisasterRequests);

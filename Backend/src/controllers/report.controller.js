@@ -6,9 +6,13 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 // Create a new disaster request
 const createDisasterRequest = asyncHandler(async (req, res) => {
-    const { userId, disasterType, location, image, severity } = req.body;
+    console.log("Request Body"); 
+    const { name,contactNumber, disasterType, location, image, description, assistanceRequired, severity } = req.body;
 
-    if (!userId || !disasterType || !severity) {
+    console.log("Received Data:", req.body); // Debugging
+
+    // Validate required fields
+    if (!disasterType || !severity) {
         throw new ApiError(400, "Missing required fields");
     }
 
@@ -20,26 +24,26 @@ const createDisasterRequest = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid severity level");
     }
 
-    const user = await User.findById(userId);
-    if (!user) {
-        throw new ApiError(404, "User not found");
-    }
-
+    // Ensure `userId` is set to `null` for anonymous users
     const disasterRequest = await DisasterRequest.create({
-        userId,
+        name,
+        contactNumber,
         disasterType,
         location,
+        description,
+        assistanceRequired,
         image,
         severity,
     });
+    console.log("Disaster Request:", disasterRequest); // Debugging
 
     return res.status(201).json(new ApiResponse(201, disasterRequest, "Disaster request created successfully"));
 });
 
+
 // Get all disaster requests
 const getAllDisasterRequests = asyncHandler(async (req, res) => {
     const disasterRequests = await DisasterRequest.find()
-        .populate("userId", "name email")
         .sort({ reportedAt: -1 });
 
     return res.status(200).json(new ApiResponse(200, disasterRequests, "All disaster requests fetched successfully"));
@@ -48,18 +52,18 @@ const getAllDisasterRequests = asyncHandler(async (req, res) => {
 // Get disaster requests by status
 const getDisasterRequestsByStatus = asyncHandler(async (req, res) => {
     const { status } = req.params;
+    console.log("Status:", status);
 
     if (!["pending", "approved", "rejected"].includes(status)) {
         throw new ApiError(400, "Invalid status");
     }
 
     const disasterRequests = await DisasterRequest.find({ status })
-        .populate("userId", "name email")
         .sort({ reportedAt: -1 });
 
-    if (!disasterRequests.length) {
-        throw new ApiError(404, "No disaster requests found for this status");
-    }
+    // if (!disasterRequests.length) {
+    //     throw new ApiError(404, "No disaster requests found for this status");
+    // }
 
     return res.status(200).json(new ApiResponse(200, disasterRequests, `Disaster requests with status '${status}' fetched successfully`));
 });

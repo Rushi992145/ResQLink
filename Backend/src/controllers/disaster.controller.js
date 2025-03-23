@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
  
 // Create a new disaster (Only Admin)
 const createDisaster = asyncHandler(async (req, res) => {
-    const { requestId, adminId, location, severity, affectedPeople } = req.body;
+    const { requestId, adminId, severity, affectedPeople } = req.body;
 
     if (!requestId || !adminId || !severity) {
         throw new ApiError(400, "Missing required fields");
@@ -21,7 +21,6 @@ const createDisaster = asyncHandler(async (req, res) => {
     const disaster = await Disaster.create({
         requestId,
         adminId,
-        location,
         severity,
         affectedPeople,
     });

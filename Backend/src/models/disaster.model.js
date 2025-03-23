@@ -4,19 +4,15 @@ const DisasterSchema = new mongoose.Schema(
   {
     requestId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "DisasterRequest",
-      required: true,
+      ref: "DisasterRequest",    
     },
     adminId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
-    location: String,
     severity: {
       type: String,
       enum: ["low", "moderate", "high", "severe"],
-      required: true,
     },
     affectedPeople: Number,
     status: {
