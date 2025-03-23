@@ -103,7 +103,7 @@ const Navbar = () => {
       navigate('/login');
     }
 
-    console.log("token is :",token);
+    // console.log("token is :",token);
 
   return (
     <div className="fixed w-full top-0 z-50">
@@ -212,8 +212,8 @@ const Navbar = () => {
                       onClick={() => setShowProfileMenu(!showProfileMenu)}
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${
-                          scrolled ? "bg-green-600" : "bg-white text-green-700"
+                        className={`w-10 h-10 rounded-full flex items-center justify-center  font-medium ${
+                          scrolled ? "bg-green-600 text-white" : "bg-white text-green-700"
                         }`}
                       >
                         {getInitials(name)}

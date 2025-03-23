@@ -152,5 +152,6 @@ export {
     updateAdminRole,
     assignAdminToDisaster,
     removeAdminFromDisaster,
-    updateAdminStatus
+    updateAdminStatus,
+    deleteUser
 };

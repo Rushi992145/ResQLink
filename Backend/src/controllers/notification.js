@@ -59,10 +59,10 @@ const sendNotification = async (req, res) => {
 
             console.log(`Distance to (${longitude}, ${lattitude}):`, distance);
 
-            return distance <= 1; 
+            return distance <= 50; 
         });
 
-        console.log("Filtered tokens within range:........................................................................................", tokensWithinRange);
+        console.log("Filtered tokens within range:", tokensWithinRange);
 
         for (const { fcm_token } of tokensWithinRange) {
             await notify(title, body, fcm_token);
