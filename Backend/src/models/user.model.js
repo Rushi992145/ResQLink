@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["admin", "volunteer", "ngo"],
       required: true,
-    },
+    }
   },
   { timestamps: true }
 );

@@ -4,7 +4,7 @@ import User from "../models/user.model.js";
 import Disaster from "../models/disaster.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+ 
 // Register a new admin
 const registerAdmin = asyncHandler(async (req, res) => {
     const { userId, contactNumber, role } = req.body;   

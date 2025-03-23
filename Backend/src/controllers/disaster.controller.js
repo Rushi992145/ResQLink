@@ -4,7 +4,7 @@ import User from "../models/user.model.js";
 import NGO from "../models/ngo.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+ 
 // Create a new disaster (Only Admin)
 const createDisaster = asyncHandler(async (req, res) => {
     const { requestId, adminId, location, severity, affectedPeople } = req.body;
