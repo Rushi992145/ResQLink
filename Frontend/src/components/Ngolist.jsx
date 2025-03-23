@@ -1,66 +1,72 @@
-import React, { useState } from "react";
+import React, { use, useState ,useEffect} from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Users, Award } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
+import axios from "axios";
 
 const NgoList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [ngos, setNgos] = useState([]);
 
-  const ngos = [
-    {
-      id: 1,
-      name: "Red Cross Society",
-      category: "Medical Aid",
-      location: "Global",
-      description:
-        "International humanitarian organization providing emergency assistance.",
-      volunteers: 5000,
-      rating: 4.8,
-      image: "https://example.com/redcross.jpg",
-    },
-    {
-      id: 2,
-      name: "Food for All",
-      category: "Food Aid",
-      location: "Global",
-      description: "Providing food assistance to communities in need.",
-      volunteers: 3000,
-      rating: 4.6,
-      image: "https://example.com/foodforall.jpg",
-    },
-    {
-      id: 3,
-      name: "UNICEF",
-      category: "Child Welfare",
-      location: "Global",
-      description: "Working to protect and support children worldwide.",
-      volunteers: 4500,
-      rating: 4.7,
-      image: "https://example.com/unicef.jpg",
-    },
-    {
-      id: 4,
-      name: "Habitat for Humanity",
-      category: "Shelter",
-      location: "Global",
-      description: "Building homes and hope for families in need.",
-      volunteers: 3500,
-      rating: 4.5,
-      image: "https://example.com/habitat.jpg",
-    },
-    {
-      id: 5,
-      name: "CARE International",
-      category: "Humanitarian Aid",
-      location: "Global",
-      description: "Fighting global poverty and providing emergency response.",
-      volunteers: 4000,
-      rating: 4.7,
-      image: "https://example.com/care.jpg",
-    },
-  ];
+  useEffect(() => { 
+    // useEffect to fetch data from the backend
+    const fetchNgos = async () => {       
+      try {
+        const response = await axios.get("http://localhost:3000/api/ngos/getallngo"); // Fetch data from the backend
+        console.log("NGO List",response.data);
+        setNgos(response.data.data); // Set the fetched data to the state
+      } catch (error) {
+        console.error("Error fetching NGOs:", error);
+      }
+    };
+  
+    fetchNgos(); // Call the function inside useEffect
+  }, []); // Empty dependency array to run only once when the component mounts
+  
+  // const ngos = [
+  //   {
+  //     id: 1,
+  //     name: "Red Cross Society",
+  //     category: "Medical Aid",
+  //     location: "Global",
+  //     city: "New York",
+  //     image: "https://example.com/redcross.jpg",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Food for All",
+  //     category: "Food Aid",
+  //     location: "Global",
+  //     city: "Los Angeles",
+  //     image: "https://example.com/foodforall.jpg",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "UNICEF",
+  //     category: "Child Welfare",
+  //     location: "Global",
+  //     city: "Chicago",
+  //     image: "https://example.com/unicef.jpg",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Habitat for Humanity",
+  //     category: "Shelter",
+  //     location: "Global",
+  //     city: "Houston",
+  //     image: "https://example.com/habitat.jpg",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "CARE International",
+  //     category: "Humanitarian Aid",
+  //     location: "Global",
+  //     city: "Miami",
+  //     image: "https://example.com/care.jpg",
+  //   },
+  // ];
 
   const categories = [
     { id: "all", name: "All Categories", icon: "🌟" },
@@ -73,12 +79,12 @@ const NgoList = () => {
 
   const filteredNgos = ngos.filter((ngo) => {
     const matchesSearch =
-      ngo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ngo.description.toLowerCase().includes(searchTerm.toLowerCase());
+      (ngo?.organizationName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (ngo?.city?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     const matchesCategory =
       !categoryFilter ||
       categoryFilter === "all" ||
-      ngo.category === categoryFilter;
+      ngo?.status === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
@@ -134,36 +140,27 @@ const NgoList = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredNgos.map((ngo) => (
                   <motion.div
-                    key={ngo.id}
+                    key={ngo._id}
                     whileHover={{ scale: 1.02 }}
                     className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300"
-                    onClick={() => navigate(`/ngo/${ngo.id}`)}
+                    onClick={() => navigate(`/ngo/${ngo._id}`, { state: { ngoData: ngo } })}
                   >
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-bold text-gray-900">
-                          {ngo.name}
+                          {ngo.organizationName}
                         </h3>
                         <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                          {ngo.category}
+                          {ngo.status}
                         </span>
                       </div>
-                      <p className="text-gray-600 text-sm mb-4">
-                        {ngo.description}
-                      </p>
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          {ngo.volunteers.toLocaleString()}+ volunteers
+                          <MapPin className="w-4 h-4" />
+                          {ngo.city}
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                          <Award className="w-4 h-4 text-yellow-500" />
-                          <span className="text-sm font-medium text-gray-700">
-                            {ngo.rating} Rating
-                          </span>
-                        </div>
+                      <div className="mt-4 flex items-center justify-end">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}

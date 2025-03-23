@@ -16,7 +16,6 @@ const NGOSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
-    missionStatement: String,
     contactPerson: String,
     contactNumber: String,
     address: String,
@@ -31,6 +30,7 @@ const NGOSchema = new mongoose.Schema(
       },
     ],
     website: String,
+    city: String,
     status: {
       type: String,
       enum: ["Active", "Inactive"],
