@@ -57,7 +57,8 @@ const saveUser = async (req,res) =>{
         
         const fcm_token_exist = await Fcm_Token.find({fcm_token});
 
-        if(fcm_token_exist)
+        console.log(fcm_token_exist.length)
+        if(fcm_token_exist.length)
         {
             return res.status(400).json({
                 success : false,
