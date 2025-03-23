@@ -5,7 +5,7 @@ const DisasterRequestSchema = new mongoose.Schema({
   contactNumber:String,
   disasterType: {
     type: String,
-    enum: ["earthquake", "flood", "fire", "hurricane", "other"],
+    enum: ["earthquake", "flood", "fire", "hurricane","landslide", "other"],
   },
   location: {
     lati:String,
@@ -18,7 +18,7 @@ const DisasterRequestSchema = new mongoose.Schema({
   },
   severity: {
     type: String,
-    enum: ["low", "moderate", "high", "severe"],
+    enum: ["mild", "moderate", "severe", "critical"],
   },
   status: {
     type: String,

@@ -55,11 +55,11 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      {/* Hero Section - Remove wave divider and adjust bottom padding */}
-      <section className="relative py-20 bg-green-600 text-white overflow-hidden pb-32">
-        {/* Animated background elements */}
+      {/* Hero Section with improved gradient */}
+      <section className="relative py-20 bg-gradient-to-b from-green-50 via-green-100 to-green-200 text-green-800 overflow-hidden pb-32">
+        {/* Animated background elements with softer colors */}
         <motion.div
-          className="absolute top-0 right-0 w-72 h-72 bg-green-500 rounded-full opacity-20"
+          className="absolute top-0 right-0 w-72 h-72 bg-green-300 rounded-full opacity-20"
           animate={{
             scale: [1, 1.2, 1],
             rotate: [0, 90, 0],
@@ -71,7 +71,7 @@ const LandingPage = () => {
           }}
         />
         <motion.div
-          className="absolute bottom-0 left-0 w-96 h-96 bg-green-500 rounded-full opacity-10"
+          className="absolute bottom-0 left-0 w-96 h-96 bg-green-400 rounded-full opacity-10"
           animate={{
             scale: [1.2, 1, 1.2],
             rotate: [0, -90, 0],
@@ -84,63 +84,44 @@ const LandingPage = () => {
         />
 
         <div className="container mx-auto px-6 relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <motion.h1
-              className="text-5xl font-bold mb-6"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+          <motion.div className="max-w-3xl mx-auto text-center">
+            <motion.h1 className="text-5xl font-bold mb-6 text-green-800">
               <motion.span
                 className="inline-block"
-                whileHover={{ scale: 1.05, color: "#ffffff" }}
+                whileHover={{ scale: 1.05, color: "#047857" }}
               >
                 Disaster
               </motion.span>{" "}
               <motion.span
                 className="inline-block"
-                whileHover={{ scale: 1.05, color: "#ffffff" }}
+                whileHover={{ scale: 1.05, color: "#047857" }}
               >
                 Relief
               </motion.span>{" "}
               <motion.span
                 className="inline-block"
-                whileHover={{ scale: 1.05, color: "#ffffff" }}
+                whileHover={{ scale: 1.05, color: "#047857" }}
               >
                 Platform
               </motion.span>
             </motion.h1>
 
-            <motion.p
-              className="text-xl mb-8 leading-relaxed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
+            <motion.p className="text-xl mb-8 leading-relaxed text-green-700">
               A community-powered platform connecting those affected by
               disasters with resources, volunteers, and NGOs for real-time
               emergency response and recovery.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            >
+            {/* Updated button colors */}
+            <motion.div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/register">
                 <motion.button
                   whileHover={{
                     scale: 1.05,
-                    boxShadow: "0 0 20px rgba(255,255,255,0.3)",
+                    boxShadow: "0 0 20px rgba(16, 185, 129, 0.3)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-white text-green-600 font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-300 hover:rotate-1"
+                  className="bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition-all duration-300 hover:bg-green-700"
                 >
                   Join Our Community
                 </motion.button>
@@ -150,23 +131,18 @@ const LandingPage = () => {
                 <motion.button
                   whileHover={{
                     scale: 1.05,
-                    boxShadow: "0 0 20px rgba(255,255,255,0.2)",
+                    boxShadow: "0 0 20px rgba(16, 185, 129, 0.2)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg transform transition-all duration-300 hover:-rotate-1"
+                  className="bg-white bg-opacity-50 border-2 border-green-600 text-green-700 font-bold py-3 px-8 rounded-lg transform transition-all duration-300 hover:bg-white hover:bg-opacity-100"
                 >
                   Learn More
                 </motion.button>
               </Link>
             </motion.div>
 
-            {/* Enhanced statistics section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
-            >
+            {/* Statistics with improved colors */}
+            <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
               {[
                 { number: "500+", label: "Disasters Managed", icon: "🚨" },
                 { number: "1000+", label: "Volunteers", icon: "👥" },
@@ -176,19 +152,13 @@ const LandingPage = () => {
                 <motion.div
                   key={index}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="bg-green-700 bg-opacity-20 rounded-xl p-6 backdrop-blur-sm border border-white border-opacity-20 shadow-xl"
+                  className="bg-white bg-opacity-90 rounded-xl p-6 backdrop-blur-sm border border-green-200 shadow-xl"
                 >
                   <div className="text-3xl mb-2">{stat.icon}</div>
-                  <motion.h3
-                    className="text-3xl font-bold text-white mb-1"
-                    whileHover={{ scale: 1.1 }}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                  >
+                  <motion.h3 className="text-3xl font-bold text-green-700 mb-1">
                     {stat.number}
                   </motion.h3>
-                  <p className="text-sm text-white text-opacity-90 font-medium">
+                  <p className="text-sm text-green-600 font-medium">
                     {stat.label}
                   </p>
                 </motion.div>
@@ -198,11 +168,11 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Action Buttons Section - Combined with NGO section */}
-      <section className="py-16 bg-gradient-to-b from-green-600 via-green-400 to-white relative overflow-hidden -mt-20">
-        {/* Background elements for combined section */}
+      {/* Action Buttons Section with improved gradient */}
+      <section className="py-16 bg-gradient-to-b from-green-200 via-white to-green-50 relative overflow-hidden -mt-20">
+        {/* Background elements with softer colors */}
         <motion.div
-          className="absolute top-0 right-10 w-96 h-96 bg-gradient-to-br from-green-400 to-green-500 rounded-full opacity-30"
+          className="absolute top-0 right-10 w-96 h-96 bg-gradient-to-br from-green-200 to-green-300 rounded-full opacity-30"
           animate={{
             scale: [1, 1.2, 1],
             rotate: [0, 45, 0],
@@ -215,7 +185,7 @@ const LandingPage = () => {
           }}
         />
         <motion.div
-          className="absolute top-60 left-10 w-80 h-80 bg-gradient-to-tr from-green-300 to-green-400 rounded-full opacity-25"
+          className="absolute top-60 left-10 w-80 h-80 bg-gradient-to-tr from-green-100 to-green-200 rounded-full opacity-25"
           animate={{
             scale: [1.2, 1, 1.2],
             rotate: [0, -45, 0],
@@ -242,14 +212,12 @@ const LandingPage = () => {
         />
 
         <div className="container mx-auto px-6 relative">
-          {/* Action Buttons */}
+          {/* Action Cards with improved colors */}
           <div className="grid md:grid-cols-2 gap-8 mb-32">
-            {/* Report Disaster Card */}
             <motion.div
               whileHover={{
                 y: -10,
-                boxShadow:
-                  "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
               }}
               className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg overflow-hidden shadow-md"
             >
@@ -272,12 +240,10 @@ const LandingPage = () => {
               </div>
             </motion.div>
 
-            {/* Request Assistance Card */}
             <motion.div
               whileHover={{
                 y: -10,
-                boxShadow:
-                  "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
               }}
               className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-lg overflow-hidden shadow-md"
             >
@@ -300,7 +266,7 @@ const LandingPage = () => {
             </motion.div>
           </div>
 
-          {/* Volunteer Recruitment Section */}
+          {/* Volunteer Section with improved colors */}
           <div className="py-20 relative">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -372,7 +338,7 @@ const LandingPage = () => {
             </motion.div>
           </div>
 
-          {/* NGO Section */}
+          {/* NGO Section with improved background */}
           <div className="py-20 bg-gradient-to-b from-white to-green-50">
             <div className="text-center mb-16">
               <motion.div
