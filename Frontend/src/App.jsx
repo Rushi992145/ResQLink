@@ -35,6 +35,7 @@ function App() {
 
   useEffect(() => {
     async function getToken() {
+      
       const fcmToken = await generateToken();
       console.log("fcm_token is:", fcmToken);
       localStorage.setItem('fcm_token',fcmToken)
