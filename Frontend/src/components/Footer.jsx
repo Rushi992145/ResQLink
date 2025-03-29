@@ -9,15 +9,14 @@ import {
   Instagram,
   Linkedin,
   Shield,
-  ExternalLink,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-green-700 to-green-800 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-gradient-to-b from-green-700 to-green-800 text-white w-full">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 ${window.location.pathname.includes('/ngo-dashboard') ? 'md:pl-72' : ''}`}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -76,7 +75,6 @@ const Footer = () => {
                     }
                     className="flex items-center space-x-2 text-green-100 hover:text-white transition-colors duration-200 text-sm"
                   >
-                    {/* <ExternalLink className="w-4 h-4" /> */}
                     <span>{item}</span>
                   </Link>
                 </motion.li>
@@ -159,7 +157,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <motion.div
-          className="mt-8 pt-6 border-t border-green-600"
+          className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-green-600"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -168,7 +166,7 @@ const Footer = () => {
             <p className="text-sm text-green-100">
               © {new Date().getFullYear()} ResQLink. All rights reserved.
             </p>
-            <div className="flex items-center space-x-6">
+            <div className="flex flex-wrap justify-center md:justify-end items-center gap-4 md:gap-6">
               {["Privacy Policy", "Terms of Service", "Cookie Policy"].map(
                 (item) => (
                   <Link

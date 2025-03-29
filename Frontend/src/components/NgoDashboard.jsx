@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { User, Bell, Clock, Building, Home, Settings, LogOut } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Bell, Clock, Building, Home, Settings, LogOut, Menu, X, MessageCircle } from 'lucide-react';
 import NgoProfile from './NgoProfile';
 import NgoNotifications from './NgoNotifications';
 import NgoPreviousWork from './NgoPreviousWork';
+import SidebarNgo from './SidebarNgo';
+import MainContentNgo from './MainContentNgo';
 
 const NgoDashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [error, setError] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
   const tabs = [
     { id: 'profile', label: 'NGO Profile', icon: Building },
@@ -15,83 +19,95 @@ const NgoDashboard = () => {
     { id: 'previous', label: 'Previous Work', icon: Clock },
   ];
 
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (error) {
     return <div className="text-red-500 p-4">Something went wrong: {error.message}</div>;
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50 pt-20">
-      {/* Sidebar */}
-      <div className="fixed left-0 top-20 h-[calc(100vh-5rem)] w-72 bg-white shadow-lg z-40">
-        {/* Profile Section */}
-        <div className="p-8 border-b border-gray-100 bg-gradient-to-b from-green-50 to-white">
-          <div className="flex flex-col items-center">
-            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-4 shadow-lg ring-4 ring-white">
-              <User className="w-14 h-14 text-white" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-1">NGO Name</h2>
-            <p className="text-sm text-gray-500">Location</p>
-            <div className="mt-4 flex items-center space-x-2 text-green-600">
-              <Building className="w-4 h-4" />
-              <span className="text-sm font-medium">Active Organization</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="p-6 h-[calc(100%-16rem)] overflow-y-auto custom-scrollbar">
-          <div className="space-y-2">
-            {tabs.map((tab) => (
-              <motion.button
-                key={tab.id}
-                className={`w-full flex items-center px-6 py-3.5 rounded-xl transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-green-50 text-green-600 shadow-sm border border-green-100'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-                onClick={() => setActiveTab(tab.id)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <tab.icon className="w-5 h-5 mr-3" />
-                <span className="font-medium">{tab.label}</span>
-              </motion.button>
-            ))}
-          </div>
-
-          {/* Additional Options */}
-          <div className="mt-8 space-y-2">
-           
-
-           
-
-            <motion.button
-              className="w-full flex items-center px-6 py-3.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <LogOut className="w-5 h-5 mr-3" />
-              <span className="font-medium">Logout</span>
-            </motion.button>
-          </div>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 ml-72">
-        <div className="max-w-7xl mx-auto px-8 py-8">
+    <div className="min-h-screen bg-gray-50 pt-20">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="fixed top-24 left-4 z-50 p-2 rounded-lg bg-white shadow-lg flex items-center justify-center md:hidden"
+      >
+        {isSidebarOpen ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="min-h-[calc(100vh-8rem)]"
+            initial={{ rotate: 0 }}
+            animate={{ rotate: 180 }}
+            transition={{ duration: 0.2 }}
           >
-            {activeTab === 'profile' && <NgoProfile />}
-            {activeTab === 'notifications' && <NgoNotifications />}
-            {activeTab === 'previous' && <NgoPreviousWork />}
+            <X className="w-6 h-6 text-gray-600" />
           </motion.div>
+        ) : (
+          <motion.div
+            initial={{ rotate: 0 }}
+            animate={{ rotate: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Menu className="w-6 h-6 text-gray-600" />
+          </motion.div>
+        )}
+      </button>
+
+      {/* Chatbot Toggle Button */}
+      <motion.button
+        onClick={() => setIsChatbotOpen(!isChatbotOpen)}
+        className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 transition-colors"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <MessageCircle className="w-6 h-6" />
+      </motion.button>
+
+      <div className="flex h-[calc(100vh-5rem)]">
+        {/* Sidebar */}
+        <AnimatePresence mode="wait">
+          {isSidebarOpen && (
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 20 }}
+              className="fixed md:relative inset-y-0 left-0 z-40"
+            >
+              <SidebarNgo
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isSidebarOpen={isSidebarOpen}
+                setIsSidebarOpen={setIsSidebarOpen}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-hidden">
+          <MainContentNgo activeTab={activeTab} />
         </div>
       </div>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 };
