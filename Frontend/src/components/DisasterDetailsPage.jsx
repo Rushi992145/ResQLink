@@ -10,11 +10,7 @@ const DisasterDetailsPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { disaster, status } = state || {};
-  const [volunteerLocations, setVolunteerLocations] = useState([
-    { lat: 18.6518, lng: 73.7566, name: "Volunteer Location 1" }, // Near Nigdi
-    { lat: 18.6499, lng: 73.759, name: "Volunteer Location 2" }, // Another nearby point
-    { lat: 18.6525, lng: 73.7542, name: "Volunteer Location 3" }, // Another nearby point
-  ]);
+  const [volunteerLocations, setVolunteerLocations] = useState([]);
 
   const [isNotifying, setIsNotifying] = useState(false);
   const longitude = useSelector((state) => state.auth.longitude);

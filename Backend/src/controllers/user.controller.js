@@ -30,23 +30,15 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with this email already exists");
   }
 
-  const user = await User.create({ name, email, password, role });
+    const user = await User.create({ name, email, password, role });
 
   if (!user) {
     throw new ApiError(500, "Error creating user");
   }
 
-    if(role=='volunteer')
-    {
-        const volunteerExist = await Volunteer.create({userId : user._id});
-        console.log(volunteerExist)
-    }
-
-    if (!user) {
-        throw new ApiError(500, "Error creating user");
-    }
-
-    return res.status(201).json(new ApiResponse(201, { user }, "User registered successfully"));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, { user }, "User registered successfully"));
 });
 
 // Login user
