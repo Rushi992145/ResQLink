@@ -52,6 +52,8 @@ const sendNotification = async (req, res) => {
 
         const fcm_token_array = await Fcm_Token.find({}, { fcm_token: 1, _id: 0 });
 
+        
+
         console.log(fcm_token_array)
         for (const fcm_token_obj of fcm_token_array) {
             if(fcm_token_obj)

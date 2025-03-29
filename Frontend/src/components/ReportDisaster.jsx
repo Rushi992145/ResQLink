@@ -9,6 +9,7 @@ const ReportDisaster = () => {
       lati: "",
       long: "",
     },
+    address: "",
     description: "",
     severity: "moderate",
     peopleAffected: "",
@@ -65,6 +66,7 @@ const ReportDisaster = () => {
       setFormData({
         disasterType: "",
         location: { lati: "", long: "" },
+        address: "",
         description: "",
         severity: "moderate",
         peopleAffected: "",
@@ -89,7 +91,8 @@ const ReportDisaster = () => {
             Report a Disaster
           </h1>
           <p className="text-gray-600 text-center mb-8 text-sm">
-            Your quick action can help save lives. Please provide as much detail as possible.
+            Your quick action can help save lives. Please provide as much detail
+            as possible.
           </p>
 
           <motion.div
@@ -101,12 +104,17 @@ const ReportDisaster = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 mb-1 text-sm">Disaster Type</label>
+                  <label className="block text-gray-700 mb-1 text-sm">
+                    Disaster Type
+                  </label>
                   <select
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                     value={formData.disasterType}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, disasterType: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        disasterType: e.target.value,
+                      }))
                     }
                     required
                   >
@@ -121,12 +129,17 @@ const ReportDisaster = () => {
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-1 text-sm">Severity Level</label>
+                  <label className="block text-gray-700 mb-1 text-sm">
+                    Severity Level
+                  </label>
                   <select
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                     value={formData.severity}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, severity: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        severity: e.target.value,
+                      }))
                     }
                     required
                   >
@@ -139,20 +152,48 @@ const ReportDisaster = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-1 text-sm">Description</label>
+                <label className="block text-gray-700 mb-1 text-sm">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
+                  placeholder="Enter the exact location/address of the disaster"
+                  value={formData.address}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      address: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 mb-1 text-sm">
+                  Description
+                </label>
                 <textarea
                   className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                   rows="3"
                   placeholder="Describe the situation in detail"
                   value={formData.description}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   required
                 ></textarea>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 mb-1 text-sm">Contact Name</label>
+                  <label className="block text-gray-700 mb-1 text-sm">
+                    Contact Name
+                  </label>
                   <input
                     type="text"
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
@@ -166,14 +207,19 @@ const ReportDisaster = () => {
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-1 text-sm">Contact Phone</label>
+                  <label className="block text-gray-700 mb-1 text-sm">
+                    Contact Phone
+                  </label>
                   <input
                     type="tel"
                     className="w-full px-4 py-2 rounded-lg border focus:ring-green-500 focus:border-green-500"
                     placeholder="Your phone number"
                     value={formData.contactNumber}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, contactNumber: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        contactNumber: e.target.value,
+                      }))
                     }
                     required
                   />
@@ -181,7 +227,9 @@ const ReportDisaster = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-1 text-sm">Upload Images (if any)</label>
+                <label className="block text-gray-700 mb-1 text-sm">
+                  Upload Images (if any)
+                </label>
                 <input
                   type="file"
                   accept="image/*"

@@ -12,10 +12,11 @@ const Navigation = ({longitude,lattitude}) => {
 
   // Define the destination coordinates
   const destination = {
-    lat: parseFloat(longitude),
-    lng: parseFloat(lattitude)
+    lat: parseFloat(lattitude),
+    lng: parseFloat(longitude)
 };
 
+  console.log("current position",currentPosition,"disaster position",destination);
   // Format destination coordinates for display
   const formatDestination = () => {
     return `Lat: ${destination.lat.toFixed(4)}, Lng: ${destination.lng.toFixed(4)}`;
