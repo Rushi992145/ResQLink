@@ -146,7 +146,6 @@ const Admin = () => {
   // Modify the tabs array
   const tabs = [
     { id: "overview", label: "Overview", icon: "📊" },
-    { id: "approval", label: "User Approval", icon: "👥" },
     { id: "reported", label: "Reported Disasters", icon: "🚨" },
     { id: "aid", label: "Aid Requirements", icon: "🆘" },
     { id: "donations", label: "Donations", icon: "💰" },
@@ -838,17 +837,11 @@ const Admin = () => {
       }).format(amount); // No need to divide by 100 as backend stores in rupees
     };
 
-    // Calculate statistics
+    // Simplify the calculateStats function
     const calculateStats = () => {
       return {
         totalReceived: donations.reduce((sum, d) => 
           d.status === 'completed' ? sum + d.amount : sum, 0
-        ),
-        totalAllocated: donations.reduce((sum, d) => 
-          d.status === 'completed' && d.isAllocated ? sum + d.amount : sum, 0
-        ),
-        pendingAllocation: donations.reduce((sum, d) => 
-          d.status === 'completed' && !d.isAllocated ? sum + d.amount : sum, 0
         ),
         totalDonations: donations.length,
         completedDonations: donations.filter(d => d.status === 'completed').length
@@ -876,7 +869,7 @@ const Admin = () => {
     return (
       <div className="space-y-6">
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -902,55 +895,6 @@ const Admin = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Allocated</p>
-                <h3 className="text-2xl font-bold text-gray-800">
-                  {formatAmount(stats.totalAllocated)}
-                </h3>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <span className="text-2xl">📊</span>
-              </div>
-            </div>
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-500 h-2 rounded-full" 
-                style={{ 
-                  width: `${(stats.totalAllocated / stats.totalReceived * 100) || 0}%` 
-                }}
-              ></div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pending Allocation</p>
-                <h3 className="text-2xl font-bold text-gray-800">
-                  {formatAmount(stats.pendingAllocation)}
-                </h3>
-              </div>
-              <div className="p-3 bg-yellow-100 rounded-full">
-                <span className="text-2xl">⏳</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Awaiting distribution
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
             className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-purple-500"
           >
             <div className="flex items-center justify-between">
