@@ -146,7 +146,7 @@ const Admin = () => {
   // Modify the tabs array
   const tabs = [
     { id: "overview", label: "Overview", icon: "📊" },
-    // { id: "approval", label: "User Approval", icon: "👥" },
+    { id: "approval", label: "User Approval", icon: "👥" },
     { id: "reported", label: "Reported Disasters", icon: "🚨" },
     { id: "aid", label: "Aid Requirements", icon: "🆘" },
     { id: "donations", label: "Donations", icon: "💰" },
