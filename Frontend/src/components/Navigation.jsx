@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const Navigation = () => {
+const Navigation = ({longitude,lattitude}) => {
+
   const [currentPosition, setCurrentPosition] = useState(null);
   const [map, setMap] = useState(null);
   const [directionsService, setDirectionsService] = useState(null);
@@ -11,9 +12,9 @@ const Navigation = () => {
 
   // Define the destination coordinates
   const destination = {
-    lat: 18.6517,
-    lng: 73.7616
-  };
+    lat: parseFloat(longitude),
+    lng: parseFloat(lattitude)
+};
 
   // Format destination coordinates for display
   const formatDestination = () => {

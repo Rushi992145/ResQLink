@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { Play, Clock, BookOpen } from "lucide-react";
+import EmergencyGuide from "./EmergencyGuide";
+import ChatbotButton from "./ChatbotButton";
 
 // Mock data for NGOs
 const ngoData = [
@@ -162,6 +165,41 @@ const LandingPage = () => {
       console.error("Invalid NGO data");
     }
   };
+
+  const courses = [
+    {
+      id: 1,
+      title: "First Aid Basics",
+      description:
+        "Learn essential first aid techniques and emergency response procedures.",
+      duration: "2 hours",
+      level: "Beginner",
+      modules: 5,
+      progress: 60,
+      image: "https://example.com/first-aid.jpg",
+    },
+    {
+      id: 2,
+      title: "Disaster Management",
+      description:
+        "Understanding disaster types and effective response strategies.",
+      duration: "3 hours",
+      level: "Intermediate",
+      modules: 8,
+      progress: 30,
+      image: "https://example.com/disaster.jpg",
+    },
+    {
+      id: 3,
+      title: "Emergency Communication",
+      description: "Master effective communication during crisis situations.",
+      duration: "1.5 hours",
+      level: "Advanced",
+      modules: 4,
+      progress: 0,
+      image: "https://example.com/communication.jpg",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
@@ -448,6 +486,9 @@ const LandingPage = () => {
             </motion.div>
           </div>
 
+          {/* Emergency Guide Section */}
+          <EmergencyGuide />
+
           {/* NGO Section with improved background */}
           <div className="py-20 bg-gradient-to-b from-white to-green-50">
             <div className="text-center mb-16">
@@ -662,6 +703,9 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Chatbot Button */}
+      <ChatbotButton />
     </div>
   );
 };

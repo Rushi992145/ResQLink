@@ -36,11 +36,11 @@ import { setLattitude } from "./Redux/authslice";
 
 function App() {
   const dispatch = useDispatch();
-  const token = useSelector((state)=>state.auth.token);
-  const role = useSelector((state)=>state.auth.role);
-  const fcm_token = useSelector((state)=>state.auth.fcm_token);
-  const longitude = useSelector((state)=>state.auth.longitude);
-  const lattitude = useSelector((state)=>state.auth.lattitude);
+  const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.role);
+  const fcm_token = useSelector((state) => state.auth.fcm_token);
+  const longitude = useSelector((state) => state.auth.longitude);
+  const lattitude = useSelector((state) => state.auth.lattitude);
 
   //   console.log("here",longitude,lattitude);
   //   const getCurrentLocation = async () => {
@@ -53,7 +53,7 @@ function App() {
 
   //           localStorage.setItem('longitude',location.long);
   //           localStorage.setItem('lattitude',location.lati);
-            
+
   //           dispatch(setLongitude(location.long));
   //           dispatch(setLattitude(location.lati));
   //           console.log("Retrieved location:", location);
@@ -68,7 +68,7 @@ function App() {
   //     localStorage.setItem("fcm_token", fcmToken);
   //     dispatch(setFcmToken(fcmToken));
 
-  //     try 
+  //     try
   //     {
   //         if(fcm_token)
   //         {
@@ -88,7 +88,7 @@ function App() {
   //         else
   //         {
   //           console.log("no fcm_token received",fcm_token );
-  //         } 
+  //         }
   //     }
   //     catch(error)
   //     {
@@ -103,7 +103,7 @@ function App() {
 
   //   async function updateToken()
   //   {
-  //     try 
+  //     try
   //     {
   //         if(fcm_token)
   //         {
@@ -121,7 +121,7 @@ function App() {
   //         else
   //         {
   //           console.log("no fcm_token received",fcm_token );
-  //         } 
+  //         }
   //     }
   //     catch(error)
   //     {
@@ -131,7 +131,7 @@ function App() {
 
   //   async function updateToken()
   //   {
-  //     try 
+  //     try
   //     {
   //         if(fcm_token)
   //         {
@@ -150,7 +150,7 @@ function App() {
   //         else
   //         {
   //           console.log("no fcm_token received",fcm_token );
-  //         } 
+  //         }
   //     }
   //     catch(error)
   //     {
@@ -163,7 +163,13 @@ function App() {
   // }, []);
 
   useEffect(() => {
-    console.log("State values:", { longitude, lattitude, fcm_token,role,token });
+    console.log("State values:", {
+      longitude,
+      lattitude,
+      fcm_token,
+      role,
+      token,
+    });
 
     const getCurrentLocation = () => {
       navigator.geolocation.getCurrentPosition(
@@ -201,18 +207,29 @@ function App() {
 
       try {
         if (fcmToken && longitude && lattitude) {
-          const response = await fetch("http://localhost:3000/api/notification/updateuserlocation", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ fcm_token: fcmToken, longitude, lattitude }),
-          });
+          const response = await fetch(
+            "http://localhost:3000/api/notification/updateuserlocation",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fcm_token: fcmToken,
+                longitude,
+                lattitude,
+              }),
+            }
+          );
 
           const value = await response.json();
           console.log("Update User Location Response:", value);
         } else {
-          console.log("Missing required data for API call:", { fcm_token, longitude, lattitude });
+          console.log("Missing required data for API call:", {
+            fcm_token,
+            longitude,
+            lattitude,
+          });
         }
       } catch (error) {
         console.log("Error updating user location:", error.message);
@@ -222,13 +239,16 @@ function App() {
     const updateToken = async () => {
       try {
         if (fcm_token) {
-          const response = await fetch("http://localhost:3000/api/notification/saveUser", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ fcm_token }),
-          });
+          const response = await fetch(
+            "http://localhost:3000/api/notification/saveUser",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ fcm_token }),
+            }
+          );
 
           const value = await response.json();
           console.log("Save User Response:", value);
@@ -241,6 +261,7 @@ function App() {
     };
 
     // Get current location and update the token
+    generateToken();
     getCurrentLocation();
     updateToken();
 
@@ -249,8 +270,6 @@ function App() {
       toast(payload.notification.body);
     });
   }, [dispatch, fcm_token, longitude, lattitude]);
-
-
 
   // console.log(token, role);
   return (
