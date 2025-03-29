@@ -116,7 +116,7 @@ const Navbar = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo and Name */}
             <Link to="/">
               <motion.div
@@ -132,13 +132,13 @@ const Navbar = () => {
                   } p-2 rounded-full transition-colors duration-500`}
                 >
                   <Shield
-                    className={`h-8 w-8 ${
+                    className={`h-6 w-6 md:h-8 md:w-8 ${
                       scrolled ? "text-white" : "text-green-700"
                     }`}
                   />
                 </div>
                 <span
-                  className={`text-2xl font-extrabold tracking-tight ${
+                  className={`text-xl md:text-2xl font-extrabold tracking-tight ${
                     scrolled ? "text-green-700" : "text-white"
                   }`}
                 >

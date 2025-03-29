@@ -10,8 +10,7 @@ const DisasterDetailsPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { disaster, status } = state || {};
-  const [volunteerLocations, setVolunteerLocations] = useState([
-  ]);
+  const [volunteerLocations, setVolunteerLocations] = useState([]);
 
   const [isNotifying, setIsNotifying] = useState(false);
   const longitude = useSelector((state) => state.auth.longitude);
