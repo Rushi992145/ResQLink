@@ -8,7 +8,7 @@ import DisasterRequest from "../models/report.model.js"
 
 // Register a new volunteer
 const updateVolunteer = asyncHandler(async (req, res) => {
-    const { userId, skills, availability, address, bloodGroup, aadharNumber, familyContact, emergencyContact, assignedDisaster } = req.body;
+    const { userId, skills, availability,phone,city, address, bloodGroup, aadharNumber, familyContact, emergencyContact, assignedDisaster } = req.body;
     console.log(req.body);
     // Validate required fields
     if (!userId || !bloodGroup || !aadharNumber || !emergencyContact) {
@@ -36,6 +36,8 @@ const updateVolunteer = asyncHandler(async (req, res) => {
         volunteer.address = address;
         volunteer.bloodGroup = bloodGroup;
         volunteer.aadharNumber = aadharNumber;
+        volunteer.phone = phone;
+        volunteer.city = city;
         volunteer.familyContact = familyContact;
         volunteer.emergencyContact = emergencyContact;
         volunteer.assignedDisaster = assignedDisaster;

@@ -12,6 +12,8 @@ const VolunteerSchema = new mongoose.Schema(
       type: String,
       enum: ["Full-time", "Part-time", "On-call"],
     },
+    phone: { type: String },
+    city: { type: String },
     address: { type: String },
     bloodGroup: { type: String },
     aadharNumber: { type: String },
