@@ -201,11 +201,14 @@ const Admin = () => {
   const fetchDonations = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:3000/api/payment/admin/donations", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/payment/admin/donations",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       const data = await response.json();
       if (data.success) {
         setDonations(data.donations);
@@ -778,71 +781,204 @@ const Admin = () => {
   // Update the AidDetailsModal component
   const AidDetailsModal = React.memo(({ aid, onClose }) => {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-2xl p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl"
         >
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-2xl font-bold">Aid Request Details</h3>
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6 pb-4 border-b">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800">
+                Aid Request Details
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">ID: {aid._id}</p>
+            </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              ✕
+              <svg
+                className="w-6 h-6 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
 
           {/* Modal content */}
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-semibold text-gray-700">
+          <div className="space-y-6">
+            {/* Requester Information */}
+            <div className="bg-gray-50 p-4 rounded-xl">
+              <h4 className="font-semibold text-gray-700 mb-3 flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
                 Requester Information
               </h4>
-              <p className="text-gray-600">Name: {aid.name}</p>
-              <p className="text-gray-600">Contact: {aid.contactNumber}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Name</p>
+                  <p className="text-gray-800 font-medium">{aid.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Contact</p>
+                  <p className="text-gray-800 font-medium">
+                    {aid.contactNumber}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <h4 className="font-semibold text-gray-700">Disaster Details</h4>
-              <p className="text-gray-600">Type: {aid.disasterType}</p>
-              <p className="text-gray-600">Location: {aid.location}</p>
-              <p className="text-gray-600">Description: {aid.description}</p>
+            {/* Disaster Details */}
+            <div className="bg-gray-50 p-4 rounded-xl">
+              <h4 className="font-semibold text-gray-700 mb-3 flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Disaster Details
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Type</p>
+                  <p className="text-gray-800 font-medium">
+                    {aid.disasterType}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Location</p>
+                  <p className="text-gray-800 font-medium">{aid.location}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Description</p>
+                  <p className="text-gray-800 font-medium">{aid.description}</p>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <h4 className="font-semibold text-gray-700">Requirements</h4>
-              <div className="space-y-2">
+            {/* Requirements */}
+            <div className="bg-gray-50 p-4 rounded-xl">
+              <h4 className="font-semibold text-gray-700 mb-3 flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+                Requirements
+              </h4>
+              <div className="space-y-3">
                 {aid.requirements.map((req, index) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-gray-800">Type: {req.type}</p>
-                    <p className="text-gray-600">Quantity: {req.quantity}</p>
-                    <p className="text-gray-600">Status: {req.status}</p>
-                    {req.urgent && (
-                      <span className="inline-block px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs mt-2">
-                        Urgent
-                      </span>
-                    )}
+                  <div
+                    key={index}
+                    className="bg-white p-4 rounded-lg shadow-sm"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-800 font-medium">{req.type}</p>
+                        <p className="text-sm text-gray-600">
+                          Quantity: {req.quantity}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {req.urgent && (
+                          <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                            Urgent
+                          </span>
+                        )}
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            req.status === "pending"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : req.status === "fulfilled"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-orange-100 text-orange-700"
+                          }`}
+                        >
+                          {req.status}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div>
-              <h4 className="font-semibold text-gray-700">Timeline</h4>
-              <p className="text-gray-600">
-                Created: {new Date(aid.createdAt).toLocaleString()}
-              </p>
-              <p className="text-gray-600">
-                Deadline: {new Date(aid.deadline).toLocaleString()}
-              </p>
+            {/* Timeline */}
+            <div className="bg-gray-50 p-4 rounded-xl">
+              <h4 className="font-semibold text-gray-700 mb-3 flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                Timeline
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Created</p>
+                  <p className="text-gray-800 font-medium">
+                    {new Date(aid.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Deadline</p>
+                  <p className="text-gray-800 font-medium">
+                    {new Date(aid.deadline).toLocaleString()}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-4">
+            {/* Footer */}
+            <div className="flex justify-end space-x-4 pt-4 border-t">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
               >
                 Close
               </button>
@@ -861,31 +997,37 @@ const Admin = () => {
         month: "short",
         day: "numeric",
         hour: "2-digit",
-        minute: "2-digit"
+        minute: "2-digit",
       });
     };
 
     const formatAmount = (amount) => {
-      return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR'
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
       }).format(amount); // No need to divide by 100 as backend stores in rupees
     };
 
     // Calculate statistics
     const calculateStats = () => {
       return {
-        totalReceived: donations.reduce((sum, d) => 
-          d.status === 'completed' ? sum + d.amount : sum, 0
+        totalReceived: donations.reduce(
+          (sum, d) => (d.status === "completed" ? sum + d.amount : sum),
+          0
         ),
-        totalAllocated: donations.reduce((sum, d) => 
-          d.status === 'completed' && d.isAllocated ? sum + d.amount : sum, 0
+        totalAllocated: donations.reduce(
+          (sum, d) =>
+            d.status === "completed" && d.isAllocated ? sum + d.amount : sum,
+          0
         ),
-        pendingAllocation: donations.reduce((sum, d) => 
-          d.status === 'completed' && !d.isAllocated ? sum + d.amount : sum, 0
+        pendingAllocation: donations.reduce(
+          (sum, d) =>
+            d.status === "completed" && !d.isAllocated ? sum + d.amount : sum,
+          0
         ),
         totalDonations: donations.length,
-        completedDonations: donations.filter(d => d.status === 'completed').length
+        completedDonations: donations.filter((d) => d.status === "completed")
+          .length,
       };
     };
 
@@ -900,11 +1042,7 @@ const Admin = () => {
     }
 
     if (error) {
-      return (
-        <div className="text-center py-8 text-red-500">
-          {error}
-        </div>
-      );
+      return <div className="text-center py-8 text-red-500">{error}</div>;
     }
 
     return (
@@ -950,10 +1088,12 @@ const Admin = () => {
               </div>
             </div>
             <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-500 h-2 rounded-full" 
-                style={{ 
-                  width: `${(stats.totalAllocated / stats.totalReceived * 100) || 0}%` 
+              <div
+                className="bg-blue-500 h-2 rounded-full"
+                style={{
+                  width: `${
+                    (stats.totalAllocated / stats.totalReceived) * 100 || 0
+                  }%`,
                 }}
               ></div>
             </div>
@@ -976,9 +1116,7 @@ const Admin = () => {
                 <span className="text-2xl">⏳</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Awaiting distribution
-            </p>
+            <p className="text-sm text-gray-500 mt-2">Awaiting distribution</p>
           </motion.div>
 
           <motion.div
@@ -1075,23 +1213,27 @@ const Admin = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        donation.status === 'completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : donation.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          donation.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : donation.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
                         {donation.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        donation.isAllocated
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {donation.isAllocated ? 'Allocated' : 'Unallocated'}
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          donation.isAllocated
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {donation.isAllocated ? "Allocated" : "Unallocated"}
                       </span>
                     </td>
                   </tr>
