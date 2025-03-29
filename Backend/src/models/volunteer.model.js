@@ -27,6 +27,7 @@ const VolunteerSchema = new mongoose.Schema(
       enum: ["Available", "Assigned", "Inactive"],
       default: "Available",
     },
+    isAssigned : { type : Boolean}
   },
   { timestamps: true }
 );

@@ -12,7 +12,7 @@ const DisasterSchema = new mongoose.Schema(
     },
     severity: {
       type: String,
-      enum: ["low", "moderate", "high", "severe"],
+      enum: ["low", "moderate", "high", "severe","Low","Moderate","High","Severe"],
     },
     affectedPeople: Number,
     status: {

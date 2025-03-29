@@ -48,44 +48,17 @@ const sendNotification = async (req, res) => {
         disaster.status = "approved";
         await disaster.save();
 
-        
+        // console.log("fcm_token_array",fcm_token_array);
 
-        // Fetch all FCM tokens from the database
-        const fcm_token_array = await Fcm_Token.find({});
+        const fcm_token_array = await Fcm_Token.find({}, { fcm_token: 1, _id: 0 });
 
-        console.log("fcm_token_array",fcm_token_array);
-
-        const tokensWithinRange = fcm_token_array.filter(({ longitude, lattitude }) => {
-            const placeLongitude = parseFloat(longitude);
-            const placeLatitude = parseFloat(lattitude);
-
-            console.log(longitude,lattitude);
-            console.log(placeLatitude,placeLongitude)
-            const dLat = (placeLatitude - userLatitude) * (Math.PI / 180);
-            const dLon = (placeLongitude - userLongitude) * (Math.PI / 180);
-
-            const a =
-                Math.sin(dLat / 2) ** 2 +
-                Math.cos(userLatitude * (Math.PI / 180)) *
-                    Math.cos(placeLatitude * (Math.PI / 180)) *
-                    Math.sin(dLon / 2) ** 2;
-
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distance = earthRadius * c;
-
-            console.log(`Distance to (${longitude}, ${lattitude}):`, distance);
-
-            return distance <= 50; 
-        });
-
-        console.log("Filtered tokens within range:", tokensWithinRange);
-
-
-
-        for (const { fcm_token } of tokensWithinRange) {
-            await notify(title, body, fcm_token);
+        console.log(fcm_token_array)
+        for (const fcm_token_obj of fcm_token_array) {
+            if(fcm_token_obj)
+            {
+                await notify(title, body, fcm_token_obj.fcm_token);
+            }
         }
-        
 
         return res.status(200).json({
             success: true,

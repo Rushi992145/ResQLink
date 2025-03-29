@@ -3,13 +3,14 @@ import { getMessaging } from "firebase/messaging";
 import { getToken } from "firebase/messaging";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD9NQWsWTfaULAj5Hpxv3k6XvOM-XRQg5I",
-    authDomain: "disaster-relief-37cdd.firebaseapp.com",
-    projectId: "disaster-relief-37cdd",
-    storageBucket: "disaster-relief-37cdd.firebasestorage.app",
-    messagingSenderId: "439591138753",
-    appId: "1:439591138753:web:1086fd068290817f80ab40"
-};
+    apiKey: "AIzaSyB0eQJD0sBLaFI447U3fzHz8J3vrL1yXcg",
+    authDomain: "disaster-relief-22af7.firebaseapp.com",
+    projectId: "disaster-relief-22af7",
+    storageBucket: "disaster-relief-22af7.firebasestorage.app",
+    messagingSenderId: "405605884653",
+    appId: "1:405605884653:web:c27c03b0db0541d27322e4"
+  };
+  
 
 export const app = initializeApp(firebaseConfig);
 export const messaging = getMessaging(app);
@@ -21,7 +22,7 @@ export const generateToken = async() =>{
     {
         if(permission=='granted')
         {
-            const token = await getToken(messaging, {vapidKey : "BBWzt30wOxipq63aog-ABg282aLFW1zZ0Gu4jFqFJ6oJtKgNy_pPcVwcC169ei9JcdDa-hbS9nb6_bfPYtCeAwA"});
+            const token = await getToken(messaging, {vapidKey : "BBWzt30wOxipq63aog-BJXopwzofNE3InEkNQxa2PhBaDvFiyOO2vrmpdoqC9H9JXWYunLOc5SRhSiWmCht1IIWXnXDaYCFbmA4bCGOCkA-hbS9nb6_bfPYtCeAwA"});
             console.log("token is :",token);
             return token;
         }
