@@ -82,7 +82,7 @@ const saveUser = async (req,res) =>{
     {
         const { fcm_token,longitude,lattitude} = req.body;
         
-        if(!fcm_token)
+        if(!fcm_token || fcm_token==undefined)
         {
             return res.status(400).json({
                 success : false,

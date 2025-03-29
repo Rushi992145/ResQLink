@@ -238,6 +238,7 @@ function App() {
     };
 
     // Get current location and update the token
+    generateToken();
     getCurrentLocation();
     updateToken();
 
