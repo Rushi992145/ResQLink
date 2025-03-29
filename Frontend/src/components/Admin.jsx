@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import DisasterDetailsPage from "./DisasterDetailsPage";
+// import DisasterDetailsPage from "./DisasterDetailsPage";
 import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
@@ -57,30 +57,6 @@ const Admin = () => {
   }, []);
 
   const [activeTab, setActiveTab] = useState("overview");
-
-  useEffect(()=>{
-    async function getAllDisasterReport()
-    {
-      try 
-      {
-        const response = await fetch(' http://localhost:3000/api/report/getreport',{
-          method : 'GET',
-          headers : {
-            'Content-Type' : 'application/json'
-          }
-        })
-
-        const value = await response.json();
-        console.log("Disaster Report ",value);
-      }
-      catch(error)
-      {
-        console.log(error.message);
-      }
-    }
-
-    getAllDisasterReport();
-  },[])
 
   // Static volunteer data
   const pendingVolunteers = [
@@ -175,29 +151,29 @@ const Admin = () => {
     { id: "aid", label: "Aid Requirements", icon: "🆘" },
   ];
 
-  const aidRequirements = [
-    {
-      id: 1,
-      disaster: "Hurricane Miami",
-      requirements: [
-        { type: "Medical Supplies", quantity: "500 units", urgent: true },
-        { type: "Food & Water", quantity: "1000 packages", urgent: true },
-        { type: "Shelter", quantity: "200 tents", urgent: false },
-      ],
-      location: "Miami, FL",
-      deadline: "24 hours",
-    },
-    {
-      id: 2,
-      disaster: "California Wildfire",
-      requirements: [
-        { type: "Respiratory Masks", quantity: "2000 units", urgent: true },
-        { type: "Water Supply", quantity: "5000 liters", urgent: true },
-      ],
-      location: "California",
-      deadline: "48 hours",
-    },
-  ];
+  // Add these state variables at the top of the Admin component
+  const [aidRequirements, setAidRequirements] = useState([]);
+  const [isAidModalOpen, setIsAidModalOpen] = useState(false);
+  const [selectedAid, setSelectedAid] = useState(null);
+
+  // Add this useEffect to fetch aid requirements
+  useEffect(() => {
+    fetchAidRequirements();
+  }, []);
+
+  // Add this function to fetch aid requirements
+  const fetchAidRequirements = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/aid/all");
+      const data = await response.json();
+
+      if (data.success) {
+        setAidRequirements(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch aid requirements:", error);
+    }
+  };
 
   // Add this state for modal
   const [selectedDisaster, setSelectedDisaster] = useState(null);
@@ -624,59 +600,191 @@ const Admin = () => {
     );
   }
 
-  const AidRequirements = () => (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-xl font-semibold mb-6 flex items-center">
-        <span className="text-blue-500 mr-2">🆘</span>
-        Current Aid Requirements
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {aidRequirements.map((aid) => (
-          <motion.div
-            key={aid.id}
-            whileHover={{ scale: 1.02 }}
-            className="border border-blue-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300"
-          >
-            <div className="flex justify-between items-start mb-3">
-              <h4 className="font-semibold text-lg text-blue-700">
-                {aid.disaster}
-              </h4>
+  // Update the AidRequirements component
+  const AidRequirements = React.memo(() => {
+    // Helper function to format date
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
+
+    // Helper function to get status color - memoize it
+    const getStatusColor = React.useCallback((status) => {
+      switch (status) {
+        case "pending":
+          return "yellow";
+        case "fulfilled":
+          return "green";
+        case "partially-fulfilled":
+          return "orange";
+        default:
+          return "gray";
+      }
+    }, []);
+
+    // Memoize the render of each aid requirement
+    const renderAidRequirement = React.useCallback(
+      (aid) => (
+        <motion.div
+          key={aid._id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl shadow-lg p-6"
+        >
+          {/* Header */}
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {aid.disasterType}
+              </h3>
+              <p className="text-sm text-gray-600">
+                Requested by: {aid.name || "Anonymous"}
+              </p>
+            </div>
+            <div className="text-right">
               <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {aid.deadline}
+                Deadline: {formatDate(aid.deadline)}
               </span>
             </div>
-            <p className="text-sm text-gray-600 mb-3">📍 {aid.location}</p>
-            <div className="space-y-2 mb-4">
+          </div>
+
+          {/* Location */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-600">
+              📍 Location: {aid.location?.lati}, {aid.location?.long}
+            </p>
+            <p className="text-sm text-gray-600">
+              📞 Contact: {aid.contactNumber || "Not provided"}
+            </p>
+          </div>
+
+          {/* Requirements */}
+          <div className="space-y-3">
+            <h4 className="font-medium text-gray-700">Requirements:</h4>
+            <div className="grid gap-2">
               {aid.requirements.map((req, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">{req.type}</span>
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium mr-2">
-                      {req.quantity}
-                    </span>
+                <div
+                  key={index}
+                  className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-gray-800">{req.type}</span>
+                    <span className="text-gray-600">({req.quantity})</span>
                     {req.urgent && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
                         Urgent
                       </span>
                     )}
                   </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium bg-${getStatusColor(
+                      req.status
+                    )}-100 text-${getStatusColor(req.status)}-800`}
+                  >
+                    {req.status}
+                  </span>
                 </div>
               ))}
             </div>
-            <div className="flex justify-end">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+          </div>
+
+          {/* Description */}
+          {aid.description && (
+            <div className="mt-4 text-sm text-gray-600">
+              <p className="font-medium">Additional Details:</p>
+              <p>{aid.description}</p>
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="mt-6 flex justify-between items-center pt-4 border-t">
+            <span className="text-sm text-gray-500">
+              Created: {formatDate(aid.createdAt)}
+            </span>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => {
+                  setSelectedAid(aid);
+                  setIsAidModalOpen(true);
+                }}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
-                Manage Aid
-              </motion.button>
+                View Details
+              </button>
             </div>
-          </motion.div>
-        ))}
+          </div>
+        </motion.div>
+      ),
+      [formatDate, getStatusColor]
+    );
+
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Aid Requirements</h2>
+        </div>
+
+        {aidRequirements.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No aid requirements found
+          </div>
+        ) : (
+          <div className="grid gap-6">
+            {aidRequirements.map(renderAidRequirement)}
+          </div>
+        )}
+
+        {/* Aid Details Modal */}
+        {isAidModalOpen && selectedAid && (
+          <AidDetailsModal
+            aid={selectedAid}
+            onClose={() => setIsAidModalOpen(false)}
+          />
+        )}
       </div>
-    </div>
-  );
+    );
+  });
+
+  // Create a separate AidDetailsModal component
+  const AidDetailsModal = React.memo(({ aid, onClose }) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-2xl font-bold">Aid Request Details</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Modal content */}
+          <div className="space-y-4">
+            {/* ... Detailed aid information ... */}
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  });
 
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
