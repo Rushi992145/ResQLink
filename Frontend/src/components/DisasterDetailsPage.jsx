@@ -2,12 +2,20 @@ import React, { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import Navigation from "../components/Navigation"
+import Marker from "./Marker";
 
 const DisasterDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
   const { disaster, status } = state || {};
+  const [volunteerLocations, setVolunteerLocations] = useState([
+    { lat: 18.6518, lng: 73.7566, name: "Volunteer Location 1" }, // Near Nigdi
+    { lat: 18.6499, lng: 73.7590, name: "Volunteer Location 2" }, // Another nearby point
+    { lat: 18.6525, lng: 73.7542, name: "Volunteer Location 3" }  // Another nearby point
+  ]);
+  
   const [isNotifying, setIsNotifying] = useState(false);
   const longitude = useSelector((state) => state.auth.longitude);
   const lattitude = useSelector((state) => state.auth.lattitude);
@@ -137,7 +145,7 @@ const DisasterDetailsPage = () => {
   }
 
   return (
-    <div className={`min-h-screen ${styles.bgColor} pt-16`}>
+    <div className={`min-h-screen w-full ${styles.bgColor} pt-16`}>
       <div className="container mx-auto px-6 py-8">
         {/* Navigation */}
         <div className="mb-8">
@@ -167,6 +175,7 @@ const DisasterDetailsPage = () => {
                   ? `${disaster.location.lati}, ${disaster.location.long}`
                   : "Location not available"}
               </p>
+              <Marker longitude={disaster.location.long} latitude={disaster.location.lati} volunteerLocations={volunteerLocations}/>
             </div>
             <span
               className={`px-4 py-2 rounded-full text-sm font-medium ${styles.statusBadge}`}
