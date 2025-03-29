@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Clock, AlertCircle, Check, X } from 'lucide-react';
 import Navigation from '../components/Navigation'
@@ -13,6 +12,8 @@ const NotificationDetail = () => {
   const location = useLocation();
   const disasterId = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
   const [notification,setNotification] = useState(null);
+  const [hasActiveDisaster, setHasActiveDisaster] = useState(false);
+  const [isAccepting, setIsAccepting] = useState(false);
 
   useEffect(()=>{
      async function getNotificationData()
@@ -36,18 +37,57 @@ const NotificationDetail = () => {
      getNotificationData();
   },[])
 
-  function acceptrequesthandler()
-  {
-    try 
-    {
-      
-    }
-    catch(error)
-    {
-      console.log(error.message);
-    }
-  }
+  useEffect(() => {
+    checkActiveDisaster();
+  }, []);
 
+  const checkActiveDisaster = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/volunteer/active-disaster', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      setHasActiveDisaster(data.hasActiveDisaster);
+    } catch (error) {
+      console.error('Error checking active disaster:', error);
+    }
+  };
+
+  const acceptRequestHandler = async () => {
+    if (hasActiveDisaster) {
+      alert('You cannot accept new disasters until your current disaster is resolved');
+      return;
+    }
+
+    setIsAccepting(true);
+    try {
+      const response = await fetch('http://localhost:3000/api/volunteer/accept-disaster', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          disasterId: disasterId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to accept disaster');
+      }
+
+      const data = await response.json();
+      alert('Successfully accepted the disaster request');
+      navigate('/volunteer/notifications');
+    } catch (error) {
+      console.error('Error accepting disaster:', error);
+      alert('Failed to accept disaster request');
+    } finally {
+      setIsAccepting(false);
+    }
+  };
 
   // Mock data - In a real app, you would fetch this based on the ID
   // const notification = {
@@ -182,13 +222,26 @@ const NotificationDetail = () => {
           {notification && notification.status === 'pending' && (
             <div className="flex space-x-4 pt-6 border-t border-gray-200">
               <motion.button
-                onClick={() => handleResponse('accepted')}
-                className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center justify-center space-x-2"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                onClick={acceptRequestHandler}
+                disabled={hasActiveDisaster || isAccepting}
+                className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center space-x-2 ${
+                  hasActiveDisaster 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-green-600 hover:bg-green-700'
+                } text-white transition-colors duration-200`}
+                whileHover={!hasActiveDisaster && { scale: 1.02 }}
+                whileTap={!hasActiveDisaster && { scale: 0.98 }}
               >
-                <Check size={20} />
-                <span onClick={acceptrequesthandler}>Accept Request</span>
+                {isAccepting ? (
+                  <span>Accepting...</span>
+                ) : hasActiveDisaster ? (
+                  <span>Complete your active disaster first</span>
+                ) : (
+                  <>
+                    <Check size={20} />
+                    <span>Accept Request</span>
+                  </>
+                )}
               </motion.button>
             </div>
           )}

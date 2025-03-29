@@ -29,7 +29,9 @@ const VolunteerSchema = new mongoose.Schema(
       default: "Available",
     },
     disasterAssigned : { type: mongoose.Schema.Types.ObjectId,
-      ref: "DisasterRequest",}
+      ref: "DisasterRequest",
+      default: null,
+    }
   },
   { timestamps: true }
 );

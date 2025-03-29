@@ -11,14 +11,13 @@ const DisasterDetailsPage = () => {
   const { state } = useLocation();
   const { disaster, status } = state || {};
   const [volunteerLocations, setVolunteerLocations] = useState([
-    { lat: 18.6518, lng: 73.7566, name: "Volunteer Location 1" }, // Near Nigdi
-    { lat: 18.6499, lng: 73.759, name: "Volunteer Location 2" }, // Another nearby point
-    { lat: 18.6525, lng: 73.7542, name: "Volunteer Location 3" }, // Another nearby point
   ]);
 
   const [isNotifying, setIsNotifying] = useState(false);
   const longitude = useSelector((state) => state.auth.longitude);
   const lattitude = useSelector((state) => state.auth.lattitude);
+
+  const [isResolvingDisaster, setIsResolvingDisaster] = useState(false);
 
   const title =
     "Alert!! A disaster is happend and alot of people needs you help";
@@ -122,6 +121,47 @@ const DisasterDetailsPage = () => {
       alert("Error sending notification. Please try again.");
     } finally {
       setIsNotifying(false);
+    }
+  };
+
+  const handleMarkResolved = async () => {
+    setIsResolvingDisaster(true);
+    try {
+      // First update the disaster request status
+      const reportResponse = await fetch(`http://localhost:3000/api/report/${disaster._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status: 'rejected' }) // Using 'rejected' as resolved status
+      });
+
+      if (!reportResponse.ok) {
+        throw new Error('Failed to update disaster status');
+      }
+
+      // Then update the disaster status in disaster collection
+      const disasterResponse = await fetch(`http://localhost:3000/api/disaster/${disaster._id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status: 'resolved' })
+      });
+
+      if (!disasterResponse.ok) {
+        throw new Error('Failed to update disaster status');
+      }
+
+      alert('Disaster marked as resolved successfully');
+      navigate('/admin-dashboard'); // Redirect back to dashboard
+    } catch (error) {
+      console.error('Error marking disaster as resolved:', error);
+      alert('Failed to mark disaster as resolved. Please try again.');
+    } finally {
+      setIsResolvingDisaster(false);
     }
   };
 
@@ -404,8 +444,40 @@ const DisasterDetailsPage = () => {
                 </button>
               )}
               {status === "active" && (
-                <button className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium">
-                  Mark as Resolved
+                <button 
+                  onClick={handleMarkResolved}
+                  disabled={isResolvingDisaster}
+                  className={`px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium flex items-center ${
+                    isResolvingDisaster ? "opacity-75 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isResolvingDisaster ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Resolving...
+                    </>
+                  ) : (
+                    "Mark as Resolved"
+                  )}
                 </button>
               )}
               {status === "resolved" && (
