@@ -6,7 +6,8 @@ import {
     updateVolunteerStatus,
     assignVolunteerToDisaster,
     removeVolunteerAssignment,
-    getVolunteerDetails
+    getVolunteerDetails,
+    acceptRequest
 } from "../controllers/volunteer.controller.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
@@ -20,7 +21,7 @@ router.post("/getvoldetails", getVolunteerDetails);
 // Get all volunteers (Admin only)
 router.get("/", verifyJWT, authorizeRoles("admin"), getAllVolunteers);
 
-
+router.post("/acceptrequest",acceptRequest);
 
 // Get volunteers by status (Admin only)
 router.get("/status/:status", verifyJWT, authorizeRoles("admin"), getVolunteersByStatus);

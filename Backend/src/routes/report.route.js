@@ -4,7 +4,8 @@ import {
     getAllDisasterRequests,
     getDisasterRequestsByStatus,
     updateDisasterRequestStatus,
-    deleteDisasterRequest
+    deleteDisasterRequest,
+    getReportById
 } from "../controllers/report.controller.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
@@ -16,11 +17,13 @@ router.post("/",createDisasterRequest);
 // Get all disaster requests (Admin only)
 router.get("/getreport", getAllDisasterRequests);
 
+router.get("/getdisaster/:id",getReportById)
+
 // Get disaster requests by status (Admin only)
 router.get("/status/:status", verifyJWT, authorizeRoles("admin"), getDisasterRequestsByStatus);
 
 // Update disaster request status (Admin only)
-router.put("/:requestId", verifyJWT, authorizeRoles("admin"), updateDisasterRequestStatus);
+router.put("/:requestId",updateDisasterRequestStatus);
 
 // Delete a disaster request (Admin only)
 router.delete("/:requestId", verifyJWT, authorizeRoles("admin"), deleteDisasterRequest);
