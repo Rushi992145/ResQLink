@@ -22,6 +22,9 @@ import CourseDetail from "./components/CourseDetail";
 import NgoList from "./components/Ngolist";
 import NgoDetail from "./components/Ngodetail";
 import DisasterDetailsPage from "./components/DisasterDetailsPage";
+import DisasterList from "./components/DisasterList";
+import DisasterDetailList from "./components/DisasterDetailList";
+import FundInfo from "./components/FundInfo";
 
 import { generateToken } from "./Notification/firebase";
 import { messaging } from "./Notification/firebase";
@@ -262,6 +265,9 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/disasters" element={<DisasterList />} />
+          <Route path="/disaster/:id" element={<DisasterDetailList />} />
+          <Route path="/fund-info" element={<FundInfo />} />
 
           {/* User - Open Route */}
           <Route path="/report-disaster" element={<ReportDisaster />} />
