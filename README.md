@@ -79,32 +79,62 @@ Through **geolocation**, **notifications**, and **role-specific dashboards**, Re
 
 ## 📸 **Screenshots**
 
- 📷 Replace the image URLs below with your own uploaded screenshots (e.g., from GitHub, Imgur, or Drive)
-
 - 🏠 **Landing Page:**  
-  ![Landing Page](https://via.placeholder.com/800x400?text=Landing+Page)
+  ![Landing Page](https://github.com/brijmohan17/Images/blob/main/Land1.png)
+  ![Landing Page](https://github.com/brijmohan17/Images/blob/main/land4.png)
 
-- 🧑‍🚒 **Volunteer Dashboard:**  
-  ![Volunteer Dashboard](https://via.placeholder.com/800x400?text=Volunteer+Dashboard)
+- 🧑‍🦒 **Volunteer Dashboard:**  
+  ![Volunteer Dashboard](https://github.com/brijmohan17/Images/blob/main/vol2.png)
+  ![Volunteer Dashboard](https://github.com/brijmohan17/Images/blob/main/vol3.png)
+  ![Volunteer Dashboard](https://github.com/brijmohan17/Images/blob/main/vol4.png)
 
 - 🏥 **NGO Panel:**  
-  ![NGO Panel](https://via.placeholder.com/800x400?text=NGO+Panel)
+  ![NGO Panel](https://github.com/brijmohan17/Images/blob/main/n1.png)
+  ![NGO Panel](https://github.com/brijmohan17/Images/blob/main/n2.png)
+  ![NGO Panel](https://github.com/brijmohan17/Images/blob/main/n3.png)
 
 - 🧑‍💼 **Admin Portal:**  
-  ![Admin Portal](https://via.placeholder.com/800x400?text=Admin+Portal)
+  ![Admin Portal](https://github.com/brijmohan17/Images/blob/main/ad1.png)
+  ![Admin Portal](https://github.com/brijmohan17/Images/blob/main/ad2.png)
+  ![Admin Portal](https://github.com/brijmohan17/Images/blob/main/ad3.png)
+  ![Admin Portal](https://github.com/brijmohan17/Images/blob/main/ad4.png)
+  ![Admin Portal](https://github.com/brijmohan17/Images/blob/main/ad5.png)
 
 ---
 
-## 🌍 **Deployed Links**
 
-- 🔗 **Live App:** [https://resqlink.vercel.app](https://resqlink.vercel.app)  
-- 🔗 **Backend API:** [https://resqlink-api.onrender.com](https://resqlink-api.onrender.com)
-
----
 
 ## 🎥 **Demo Video**
 
-📹 [Watch Our Demo](https://your-demo-link-here.com)
+📹 [Watch Our Demo]([https://your-demo-link-here.com](https://drive.google.com/drive/folders/1u7CMJuIy364FzjRVRJZWXQiGH_3i5kn1))
+
+---
+
+## 🔧 **Installation Steps**
+
+```sh
+# Clone the repository
+git clone https://github.com/Rushi992145/X-Force.git
+cd X-Force
+
+# Set up Frontend
+cd Frontend
+npm install
+npm run dev
+
+# Set up Backend
+cd ../Backend
+npm install
+npm run dev
+```
+
+
+---
+## 🔑 **Credentials**
+Email & Password
+- Admin - rushi@gmail.com,12345
+- Ngo - brij@gmail.com , 123456
+- Volunteer - om@gmail.com,1234567        
 
 ---
 
@@ -118,7 +148,7 @@ Through **geolocation**, **notifications**, and **role-specific dashboards**, Re
 
 ---
 
-## 🤝 **Team X-Force **
+## 🤝 **Team X-Force**
 
 > *“In times of crisis, coordination saves lives.”*  
 > Built with ❤️ for those who need help, by those who want to help.

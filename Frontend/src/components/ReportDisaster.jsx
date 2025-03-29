@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 const ReportDisaster = () => {
   const [formData, setFormData] = useState({
@@ -38,7 +39,7 @@ const ReportDisaster = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    toast.success("Submitted disaster report...");
     try {
       const location = await getCurrentLocation(); // Ensure location is updated before submission
 
@@ -56,6 +57,7 @@ const ReportDisaster = () => {
         throw new Error("Network response was not ok");
       }
 
+      toast.success("Disaster report submitted successfully!");
       console.log("Disaster report submitted successfully!");
 
       // Reset the form
