@@ -24,7 +24,7 @@ const Navigation = () => {
   useEffect(() => {
     // Load Google Maps API script
     const script = document.createElement('script');
-    script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSy3jX8bN3Jz3X9uBr1oyLFwFYLIB9jS_jyT&libraries=places`;
+    script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyVdMLfKsY88s5IHijDyH68MEbyEFht-4DW&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = initMap;
@@ -46,7 +46,7 @@ const Navigation = () => {
     try {
       // Create map instance with destination center
       const mapInstance = new window.google.maps.Map(document.getElementById('map'), {
-        center: destination, // Use destination as center
+        center: destination,
         zoom: 12,
         disableDefaultUI: true,
         zoomControl: true,

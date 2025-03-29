@@ -4,6 +4,9 @@
   "description": "Backed blue bit hackthon",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": "20.10.0"
+  },
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
