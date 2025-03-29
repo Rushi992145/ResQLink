@@ -5,10 +5,17 @@ import Profile from './Profile';
 import Notifications from './Notifications';
 import PreviousWork from './PreviousWork';
 import Learning from './Learning';
+import ChatbotModal from '../Modals/ChatBotModal';
+import { MessageCircle } from 'lucide-react';
 
 const VolunteerDashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [error, setError] = useState(null);
+    const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  
+    const toggleChatbot = () => {
+      setIsChatbotOpen(!isChatbotOpen);
+    };
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -23,6 +30,18 @@ const VolunteerDashboard = () => {
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-gray-50 pt-16 pb-8">
+
+       {/* Chatbot Toggle Button */}
+            <button 
+              onClick={toggleChatbot}
+              className="fixed bottom-6 right-6 z-40 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition-all"
+            >
+              {<MessageCircle />}
+            </button>
+      
+            {/* Chatbot Modal */}
+            {isChatbotOpen && <ChatbotModal onClose={toggleChatbot} />}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* <h1 className="text-3xl font-bold text-gray-900 mb-8">Volunteer Dashboard</h1> */}
         
@@ -46,7 +65,7 @@ const VolunteerDashboard = () => {
               </motion.button>
             ))}
           </div>
-        </div>
+        </div> 
 
         {/* Content Area */}
         <motion.div
