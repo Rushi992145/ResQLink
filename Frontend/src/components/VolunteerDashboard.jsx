@@ -1,84 +1,113 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { User, Bell, Clock, BookOpen } from 'lucide-react';
-import Profile from './Profile';
-import Notifications from './Notifications';
-import PreviousWork from './PreviousWork';
-import Learning from './Learning';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
+import SideBarVolunteer from './SideBarVolunteer';
+import MainContentVolunteer from './MainContentVolunteer';
 import ChatbotModal from '../Modals/ChatBotModal';
 import { MessageCircle } from 'lucide-react';
 
 const VolunteerDashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
-  const [error, setError] = useState(null);
-    const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  
-    const toggleChatbot = () => {
-      setIsChatbotOpen(!isChatbotOpen);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsDesktop(width >= 768);
+      if (width >= 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
     };
 
-  const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'previous', label: 'Previous Work', icon: Clock },
-    { id: 'learning', label: 'Learning', icon: BookOpen },
-  ];
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  if (error) {
-    return <div className="text-red-500">Something went wrong: {error.message}</div>;
-  }
+  const toggleChatbot = () => {
+    setIsChatbotOpen(!isChatbotOpen);
+  };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gray-50 pt-16 pb-8">
-
-       {/* Chatbot Toggle Button */}
-            <button 
-              onClick={toggleChatbot}
-              className="fixed bottom-6 right-6 z-40 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition-all"
-            >
-              {<MessageCircle />}
-            </button>
-      
-            {/* Chatbot Modal */}
-            {isChatbotOpen && <ChatbotModal onClose={toggleChatbot} />}
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* <h1 className="text-3xl font-bold text-gray-900 mb-8">Volunteer Dashboard</h1> */}
-        
-        {/* Tabs Navigation */}
-        <div className="bg-white rounded-xl shadow-sm mb-6 mt-6">
-          <div className="flex flex-wrap">
-            {tabs.map((tab) => (
-              <motion.button
-                key={tab.id}
-                className={`flex items-center px-6 py-4 space-x-2 ${
-                  activeTab === tab.id
-                    ? 'border-b-2 border-green-600 text-green-600'
-                    : 'text-gray-600 hover:text-green-600'
-                }`}
-                onClick={() => setActiveTab(tab.id)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <tab.icon className="w-5 h-5" />
-                <span className="font-medium">{tab.label}</span>
-              </motion.button>
-            ))}
-          </div>
-        </div> 
-
-        {/* Content Area */}
+    <div className="min-h-[calc(100vh-5rem)] mt-20 md:mt-24">
+      {/* Menu Button - Visible on mobile */}
+      <motion.button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="fixed top-24 left-4 z-40 p-2.5 bg-white rounded-xl shadow-md md:hidden hover:bg-gray-50 border border-gray-100"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ rotate: isSidebarOpen ? 180 : 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-white rounded-xl  min-h-[600px]"
         >
-          {activeTab === 'profile' && <Profile />}
-          {activeTab === 'notifications' && <Notifications />}
-          {activeTab === 'previous' && <PreviousWork />}
-          {activeTab === 'learning' && <Learning />}
+          {isSidebarOpen ? (
+            <X className="w-5 h-5 text-gray-600" />
+          ) : (
+            <Menu className="w-5 h-5 text-gray-600" />
+          )}
         </motion.div>
+      </motion.button>
+
+      {/* Chatbot Toggle Button */}
+      <motion.button 
+        onClick={toggleChatbot}
+        className="fixed bottom-6 right-6 z-40 bg-green-500 text-white p-3.5 rounded-xl shadow-lg hover:bg-green-600 transition-all"
+        whileHover={{ scale: 1.05, rotate: 5 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <MessageCircle className="w-5 h-5" />
+      </motion.button>
+
+      {/* Chatbot Modal */}
+      {isChatbotOpen && <ChatbotModal onClose={toggleChatbot} />}
+
+      {/* Overlay for mobile */}
+      <AnimatePresence>
+        {isSidebarOpen && !isDesktop && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <div className="flex h-[calc(100vh-5rem)]">
+        {/* Sidebar */}
+        <AnimatePresence>
+          <motion.div 
+            className={`fixed md:relative inset-y-0 left-0 z-30 transform ${
+              isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            } md:translate-x-0 transition-transform duration-300 ease-in-out h-full`}
+            initial={{ x: '-100%' }}
+            animate={{ x: isSidebarOpen ? 0 : '-100%' }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 20 }}
+          >
+            <SideBarVolunteer
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Main Content */}
+        <div 
+          className={`flex-1 transition-all duration-300 ${
+            isSidebarOpen && !isDesktop ? 'opacity-50 pointer-events-none' : 'opacity-100'
+          }`}
+        >
+          <MainContentVolunteer activeTab={activeTab} />
+        </div>
       </div>
     </div>
   );

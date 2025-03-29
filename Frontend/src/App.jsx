@@ -276,67 +276,70 @@ function App() {
 
   // console.log(token, role);
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <BrowserRouter>
-        <Navbar></Navbar>
+        <Navbar />
+        
+        <main className="flex-grow">
+          <Routes>
+            {/* Open Route */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/donate" element={<DonationForm />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/disasters" element={<DisasterList />} />
+            <Route path="/disaster/:id" element={<DisasterDetailList />} />
+            <Route path="/fund-info" element={<FundInfo />} />
 
-        <Routes>
-          {/* Open Route */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/donate" element={<DonationForm />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/disasters" element={<DisasterList />} />
-          <Route path="/disaster/:id" element={<DisasterDetailList />} />
-          <Route path="/fund-info" element={<FundInfo />} />
+            {/* User - Open Route */}
+            <Route path="/report-disaster" element={<ReportDisaster />} />
+            <Route path="/request-assistance" element={<RequestAssistance />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/volunteer" element={<VolunteerDashboard />} />
 
-          {/* User - Open Route */}
-          <Route path="/report-disaster" element={<ReportDisaster />} />
-          <Route path="/request-assistance" element={<RequestAssistance />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/volunteer" element={<VolunteerDashboard />} />
-
-          <Route
-            path="/volunteer/notifications/:id"
-            element={<NotificationDetail />}
-          />
-
-          {/* Volunteer - Private Route */}
-          {role && role === "volunteer" && (
             <Route
-              path="/volunteer-dashboard"
-              element={<VolunteerDashboard />}
+              path="/volunteer/notifications/:id"
+              element={<NotificationDetail />}
             />
-          )}
 
-          {/* Ngo - Private Route */}
-          {role && role === "ngo" && (
-            <Route path="/ngo-dashboard" element={<NgoDashboard />} />
-          )}
-
-          {/* Admin - Private Route */}
-          {role && role === "admin" && (
-            <>
-              <Route path="/admin-dashboard" element={<Admin />} />
+            {/* Volunteer - Private Route */}
+            {role && role === "volunteer" && (
               <Route
-                path="/admin-dashboard/disaster/:id"
-                element={<DisasterDetailsPage />}
+                path="/volunteer-dashboard"
+                element={<VolunteerDashboard />}
               />
-            </>
-          )}
+            )}
 
-          <Route path="/ngolist" element={<NgoList />} />
-          <Route path="/ngo/:id" element={<NgoDetail />} />
+            {/* Ngo - Private Route */}
+            {role && role === "ngo" && (
+              <Route path="/ngo-dashboard" element={<NgoDashboard />} />
+            )}
 
-          <Route path="*" element={<Login />} />
-        </Routes>
-        <Footer></Footer>
+            {/* Admin - Private Route */}
+            {role && role === "admin" && (
+              <>
+                <Route path="/admin-dashboard" element={<Admin />} />
+                <Route
+                  path="/admin-dashboard/disaster/:id"
+                  element={<DisasterDetailsPage />}
+                />
+              </>
+            )}
+
+            <Route path="/ngolist" element={<NgoList />} />
+            <Route path="/ngo/:id" element={<NgoDetail />} />
+
+            <Route path="*" element={<Login />} />
+          </Routes>
+        </main>
+
+        <Footer />
       </BrowserRouter>
-    </>
+    </div>
   );
 }
 
