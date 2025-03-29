@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Play, Clock, BookOpen } from "lucide-react";
 import EmergencyGuide from "./EmergencyGuide";
+import ChatbotButton from "./ChatbotButton";
 
 // Mock data for NGOs
 const ngoData = [
@@ -857,6 +858,9 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Chatbot Button */}
+      <ChatbotButton />
     </div>
   );
 };

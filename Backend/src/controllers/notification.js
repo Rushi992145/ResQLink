@@ -5,13 +5,13 @@ import fcm_token from '../models/fcm_token.js';
 import DisasterRequest from '../models/report.model.js';
 
 async function notify(title,body,fcm_token)
-{
+{ 
     const message = {
         notification : {
             title,body
         },
         token : fcm_token
-    }
+    } 
 
     try 
     {
@@ -82,7 +82,7 @@ const saveUser = async (req,res) =>{
     {
         const { fcm_token,longitude,lattitude} = req.body;
         
-        if(!fcm_token)
+        if(!fcm_token || fcm_token=='undefined')
         {
             return res.status(400).json({
                 success : false,

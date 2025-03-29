@@ -4,11 +4,12 @@ import cookieParser from "cookie-parser";
 import notificationRouter from "./routes/notification.js";
 const app = express();
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
@@ -25,6 +26,7 @@ import disasterAssignmentRoutes from "./routes/disasterAssignment.route.js";
 import reportRoutes from "./routes/report.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import aidRoutes from "./routes/aidRoutes.js";
+import paymentGatewayRoutes from "./routes/paymentGateway.route.js";
 
 //routes declaration
 app.use("/api/users", userRouter);
@@ -35,6 +37,7 @@ app.use("/api/assignments", disasterAssignmentRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notification", notificationRouter);
+app.use("/api/payment", paymentGatewayRoutes);
 
 app.use("/api/aid", aidRoutes);
 
