@@ -18,7 +18,7 @@ const DisasterRequestSchema = new mongoose.Schema({
   },
   severity: {
     type: String,
-    enum: ["mild", "moderate", "severe", "critical"],
+    enum: ["mild", "moderate", "severe", "critical","high","Mild","Critical","Moderate","Severe"],
   },
   status: {
     type: String,
@@ -29,6 +29,12 @@ const DisasterRequestSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  assignedVolunteers : [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+    }
+  ]
 });
 
 export default mongoose.model("DisasterRequest", DisasterRequestSchema);
