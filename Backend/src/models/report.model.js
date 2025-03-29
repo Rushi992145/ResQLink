@@ -11,6 +11,7 @@ const DisasterRequestSchema = new mongoose.Schema({
     lati:String,
     long:String,
   },
+  address : String,
   image: String,
   description: String,
   assistanceRequired: {
