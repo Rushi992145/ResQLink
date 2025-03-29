@@ -102,10 +102,37 @@ const deleteDisasterRequest = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {}, "Disaster request deleted successfully"));
 });
 
+const getReportById = async (req,res) => {
+    try 
+    {
+        const id = req.params.id;
+
+        console.log(id);
+        const report = await DisasterRequest.find({_id : id});
+
+        return res.status(200).json({
+            success : true,
+            message : "disaster fetched successfully",
+            data : report
+    })
+
+    }
+    catch(error)
+    {
+        console.log(error.message);
+        return res.status(500).json({
+            success : false,
+            message : "Internal server error"
+        })
+    }
+}
+
 export {
     createDisasterRequest,
     getAllDisasterRequests,
     getDisasterRequestsByStatus,
     updateDisasterRequestStatus,
-    deleteDisasterRequest
+    deleteDisasterRequest,
+    getReportById
 };
+

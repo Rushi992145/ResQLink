@@ -3,14 +3,40 @@ import Aid from "../models/Aid.js";
 // Create new aid requirement
 export const createAid = async (req, res) => {
   try {
-    const { disasterType, location, requirements, deadline } = req.body;
+    const {
+      name,
+      contactNumber,
+      disasterType,
+      location,
+      requirements,
+      deadline,
+      description,
+    } = req.body;
 
     // Check if all required fields are provided
-    if (!disasterType || !location || !requirements || !deadline) {
+    if (
+      !name ||
+      !contactNumber ||
+      !disasterType ||
+      !location ||
+      !requirements ||
+      !deadline ||
+      !description
+    ) {
+      console.log("Missing required fields:", {
+        name,
+        contactNumber,
+        disasterType,
+        location,
+        requirements,
+        deadline,
+        description,
+      });
+
       return res.status(400).json({
         success: false,
         message:
-          "All fields (disasterType, location, requirements, deadline) are required",
+          "All fields (name, contactNumber, disasterType, location, requirements, deadline, description) are required",
       });
     }
 
@@ -44,10 +70,13 @@ export const createAid = async (req, res) => {
 
     // Create aid requirement
     const aid = await Aid.create({
+      name,
+      contactNumber,
       disasterType,
       location,
       requirements,
       deadline: parsedDeadline,
+      description,
     });
 
     res.status(201).json({
@@ -56,7 +85,7 @@ export const createAid = async (req, res) => {
       data: aid,
     });
   } catch (error) {
-    console.error("Error creating aid:", error); // Add detailed logging to track server-side errors
+    console.error("Error creating aid:", error);
 
     res.status(500).json({
       success: false,
@@ -108,7 +137,7 @@ export const getAidById = async (req, res) => {
 // Update aid requirement
 export const updateAid = async (req, res) => {
   try {
-    const { requirements, status } = req.body;
+    const { requirements, status, description } = req.body;
     const aid = await Aid.findById(req.params.id);
 
     if (!aid) {
@@ -120,6 +149,7 @@ export const updateAid = async (req, res) => {
 
     if (requirements) aid.requirements = requirements;
     if (status) aid.status = status;
+    if (description) aid.description = description;
     aid.updatedAt = Date.now();
 
     await aid.save();

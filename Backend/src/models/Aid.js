@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 
 const aidSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  contactNumber: {
+    type: String,
+    required: true,
+  },
   disasterType: {
     type: String,
     required: true,
@@ -32,6 +40,10 @@ const aidSchema = new mongoose.Schema({
   ],
   deadline: {
     type: Date,
+    required: true,
+  },
+  description: {
+    type: String,
     required: true,
   },
   status: {

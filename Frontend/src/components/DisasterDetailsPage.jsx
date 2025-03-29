@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import Navigation from "../components/Navigation"
+import Navigation from "../components/Navigation";
 import Marker from "./Marker";
 
 const DisasterDetailsPage = () => {
@@ -12,34 +12,35 @@ const DisasterDetailsPage = () => {
   const { disaster, status } = state || {};
   const [volunteerLocations, setVolunteerLocations] = useState([
     { lat: 18.6518, lng: 73.7566, name: "Volunteer Location 1" }, // Near Nigdi
-    { lat: 18.6499, lng: 73.7590, name: "Volunteer Location 2" }, // Another nearby point
-    { lat: 18.6525, lng: 73.7542, name: "Volunteer Location 3" }  // Another nearby point
+    { lat: 18.6499, lng: 73.759, name: "Volunteer Location 2" }, // Another nearby point
+    { lat: 18.6525, lng: 73.7542, name: "Volunteer Location 3" }, // Another nearby point
   ]);
-  
+
   const [isNotifying, setIsNotifying] = useState(false);
   const longitude = useSelector((state) => state.auth.longitude);
   const lattitude = useSelector((state) => state.auth.lattitude);
 
-  const title = "Alert!! A disaster is happend and alot of people needs you help";
-  const body =  "Please check your disaster-relief portal to get more information about the disaster and further instructions";
+  const title =
+    "Alert!! A disaster is happend and alot of people needs you help";
+  const body =
+    "Please check your disaster-relief portal to get more information about the disaster and further instructions";
 
-  async function sendnotificationhandler()
-  {
-    try 
-    {
-      const response = await fetch('http://localhost:3000/api/notification/sendnotification',{
-        method : 'POST',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body : JSON.stringify({title,body,longitude,lattitude})
-      })
+  async function sendnotificationhandler() {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/notification/sendnotification",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title, body, longitude, lattitude }),
+        }
+      );
 
       const value = await response.json();
       console.log(value);
-    }
-    catch(error)
-    {
+    } catch (error) {
       console.log(error.message);
     }
   }
@@ -102,7 +103,7 @@ const DisasterDetailsPage = () => {
             body: "Please check your disaster-relief portal to get more information about the disaster and further instructions",
             longitude: longitude,
             lattitude: lattitude,
-            disasterId: disaster._id
+            disasterId: disaster._id,
           }),
         }
       );
@@ -165,7 +166,7 @@ const DisasterDetailsPage = () => {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">{styles.icon}</span>
-                <h1 className="text-3xl font-bold text-gray-800"> 
+                <h1 className="text-3xl font-bold text-gray-800">
                   {disaster.disasterType}
                 </h1>
               </div>
@@ -175,13 +176,96 @@ const DisasterDetailsPage = () => {
                   ? `${disaster.location.lati}, ${disaster.location.long}`
                   : "Location not available"}
               </p>
-              <Marker longitude={disaster.location.long} latitude={disaster.location.lati} volunteerLocations={volunteerLocations}/>
             </div>
             <span
               className={`px-4 py-2 rounded-full text-sm font-medium ${styles.statusBadge}`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </span>
+          </div>
+
+          {/* Map Container */}
+          <div className="mt-6 bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <svg
+                  className="w-5 h-5 mr-2 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Disaster Location
+              </h3>
+            </div>
+            <div className="relative h-[400px] w-full">
+              <div className="absolute inset-0 bg-gray-50 animate-pulse rounded-b-xl">
+                <Marker
+                  longitude={disaster.location.long}
+                  latitude={disaster.location.lati}
+                  volunteerLocations={volunteerLocations}
+                />
+              </div>
+              {/* Map Controls Overlay */}
+              <div className="absolute top-4 right-4 space-y-2">
+                <button className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors">
+                  <svg
+                    className="w-5 h-5 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+                <button className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors">
+                  <svg
+                    className="w-5 h-5 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                    />
+                  </svg>
+                </button>
+              </div>
+              {/* Volunteer Locations Legend */}
+              <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-md p-3">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                  Volunteer Locations
+                </h4>
+                <div className="space-y-1">
+                  {volunteerLocations.map((loc, index) => (
+                    <div key={index} className="flex items-center text-sm">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                      <span className="text-gray-600">{loc.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
