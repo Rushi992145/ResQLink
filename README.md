@@ -102,16 +102,11 @@ Through **geolocation**, **notifications**, and **role-specific dashboards**, Re
 
 ---
 
-## 🌍 **Deployed Links**
 
-- 🔗 **Live App:** [https://resqlink.vercel.app](https://resqlink.vercel.app)  
-- 🔗 **Backend API:** [https://resqlink-api.onrender.com](https://resqlink-api.onrender.com)
-
----
 
 ## 🎥 **Demo Video**
 
-📹 [Watch Our Demo](https://your-demo-link-here.com)
+📹 [Watch Our Demo]([https://your-demo-link-here.com](https://drive.google.com/drive/folders/1u7CMJuIy364FzjRVRJZWXQiGH_3i5kn1))
 
 ---
 
@@ -135,7 +130,7 @@ npm run dev
 
 
 ---
-## 🔑 **Credential**
+## 🔑 **Credentials**
 Email & Password
 - Admin - rushi@gmail.com,12345
 - Ngo - brij@gmail.com , 123456

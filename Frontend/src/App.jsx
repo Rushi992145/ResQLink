@@ -160,7 +160,7 @@ function App() {
   // }, []);
 
   useEffect(() => {
-    // console.log("State values:", { longitude, lattitude, fcm_token });
+    console.log("State values:", { longitude, lattitude, fcm_token,role,token });
 
     const getCurrentLocation = () => {
       navigator.geolocation.getCurrentPosition(
