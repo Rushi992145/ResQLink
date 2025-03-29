@@ -11,7 +11,6 @@ const VolunteerSchema = new mongoose.Schema(
     availability: {
       type: String,
       enum: ["Full-time", "Part-time", "On-call"],
-      required: true,
     },
     address: { type: String },
     bloodGroup: { type: String },
@@ -27,7 +26,8 @@ const VolunteerSchema = new mongoose.Schema(
       enum: ["Available", "Assigned", "Inactive"],
       default: "Available",
     },
-    isAssigned : { type : Boolean}
+    disasterAssigned : { type: mongoose.Schema.Types.ObjectId,
+      ref: "DisasterRequest",}
   },
   { timestamps: true }
 );

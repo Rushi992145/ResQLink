@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 import Disaster from "../models/disaster.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import DisasterRequest from "../models/report.model.js"
 
 // Register a new volunteer
 const updateVolunteer = asyncHandler(async (req, res) => {
@@ -166,6 +167,44 @@ const removeVolunteerAssignment = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, volunteer, "Volunteer assignment removed successfully"));
 });
 
+
+const acceptRequest = async (req,res) => {
+    try 
+    {
+        const {id,disasterId} = req.body;
+
+       const userExist = await Volunteer.findOne({userId : id});
+
+       console.log(userExist._id)
+        const updateUser = await Volunteer.findOneAndUpdate({ _id : userExist._id },{
+            disasterAssigned : disasterId
+        },{new : true})
+
+        const updateReport = await DisasterRequest.findByIdAndUpdate(disasterId,{
+            $push : {
+                assignedVolunteers : id
+            }
+        })
+
+        return res.status(200).json({
+            success : true,
+            message : "Request accepted successfully",
+            userExist,
+            updateUser,
+            updateReport
+        })
+    }
+    catch(error)
+    {
+        console.log(error.message)
+        return res.status(500).json({
+            success : false,
+            message : "Internal Server Error"
+        })
+    }
+}
+
+
 export {
     updateVolunteer,
     getAllVolunteers,
@@ -173,5 +212,6 @@ export {
     updateVolunteerStatus,
     assignVolunteerToDisaster,
     removeVolunteerAssignment,
-    getVolunteerDetails
+    getVolunteerDetails,
+    acceptRequest
 };

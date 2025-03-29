@@ -28,6 +28,10 @@ const Notifications = () => {
 
         // Filter only approved disasters
         const approvedDisasters = value.data.filter(disaster => disaster.status === 'approved');
+        console.log("approved disaster",approvedDisasters);
+        
+
+        console.log("here",approvedDisasters[0].location.lati);
         
         // Transform the data to match notification format
         const formattedNotifications = approvedDisasters.map(disaster => ({
@@ -36,11 +40,13 @@ const Notifications = () => {
           timestamp: disaster.reportedAt,
           status: 'pending',
           description: disaster.description,
-          location: `${disaster.location.lati}, ${disaster.location.long}`,
+          // location: `${disaster.location.lati}, ${disaster.location.long}`,
           type: disaster.disasterType,
           priority: disaster.severity,
           disaster: disaster
         }));
+
+        console.log("formattedNotifications",formattedNotifications);
 
         setNotifications(formattedNotifications);
       } catch (error) {
@@ -148,26 +154,7 @@ const Notifications = () => {
                   <p className="text-sm text-gray-600 mt-2">{notification.description}</p>
                   <p className="text-sm text-gray-500 mt-1">📍 {notification.location}</p>
                 </div>
-                {notification.status === 'pending' && (
-                  <div className="flex space-x-3 ml-4">
-                    <motion.button
-                      onClick={(e) => handleResponse(e, notification.id, 'accepted')}
-                      className="p-2.5 bg-green-600 text-white rounded-full hover:bg-green-700"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Check size={18} />
-                    </motion.button>
-                    <motion.button
-                      onClick={(e) => handleResponse(e, notification.id, 'rejected')}
-                      className="p-2.5 bg-red-600 text-white rounded-full hover:bg-red-700"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <X size={18} />
-                    </motion.button>
-                  </div>
-                )}
+                
                 {notification.status === 'accepted' && (
                   <div className="ml-4">
                     <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">

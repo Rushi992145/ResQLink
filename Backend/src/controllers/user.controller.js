@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import Volunteer from "../models/volunteer.model.js"
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -35,9 +36,17 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error creating user");
   }
 
-  return res
-    .status(201)
-    .json(new ApiResponse(201, { user }, "User registered successfully"));
+    if(role=='volunteer')
+    {
+        const volunteerExist = await Volunteer.create({userId : user._id});
+        console.log(volunteerExist)
+    }
+
+    if (!user) {
+        throw new ApiError(500, "Error creating user");
+    }
+
+    return res.status(201).json(new ApiResponse(201, { user }, "User registered successfully"));
 });
 
 // Login user
