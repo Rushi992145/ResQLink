@@ -146,9 +146,10 @@ const Admin = () => {
   // Modify the tabs array
   const tabs = [
     { id: "overview", label: "Overview", icon: "📊" },
-    // { id: "approval", label: "User Approval", icon: "👥" },
+    { id: "approval", label: "User Approval", icon: "👥" },
     { id: "reported", label: "Reported Disasters", icon: "🚨" },
     { id: "aid", label: "Aid Requirements", icon: "🆘" },
+    { id: "donations", label: "Donations", icon: "💰" },
   ];
 
   // Add these state variables at the top of the Admin component
@@ -185,6 +186,38 @@ const Admin = () => {
   const [selectedDisasterStatus, setSelectedDisasterStatus] = useState(null);
 
   const navigate = useNavigate();
+
+  // Add this state near other useState declarations
+  const [donations, setDonations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Add this useEffect to fetch donations
+  useEffect(() => {
+    fetchDonations();
+  }, []);
+
+  // Add this function to fetch donations
+  const fetchDonations = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://localhost:3000/api/payment/admin/donations", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setDonations(data.donations);
+      } else {
+        setError("Failed to fetch donations");
+      }
+    } catch (error) {
+      setError("Error connecting to server");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Tab components
   const Overview = () => (
@@ -820,6 +853,263 @@ const Admin = () => {
     );
   });
 
+  // Update the Donations component
+  const Donations = () => {
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    };
+
+    const formatAmount = (amount) => {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR'
+      }).format(amount); // No need to divide by 100 as backend stores in rupees
+    };
+
+    // Calculate statistics
+    const calculateStats = () => {
+      return {
+        totalReceived: donations.reduce((sum, d) => 
+          d.status === 'completed' ? sum + d.amount : sum, 0
+        ),
+        totalAllocated: donations.reduce((sum, d) => 
+          d.status === 'completed' && d.isAllocated ? sum + d.amount : sum, 0
+        ),
+        pendingAllocation: donations.reduce((sum, d) => 
+          d.status === 'completed' && !d.isAllocated ? sum + d.amount : sum, 0
+        ),
+        totalDonations: donations.length,
+        completedDonations: donations.filter(d => d.status === 'completed').length
+      };
+    };
+
+    const stats = calculateStats();
+
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="text-center py-8 text-red-500">
+          {error}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Received</p>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  {formatAmount(stats.totalReceived)}
+                </h3>
+              </div>
+              <div className="p-3 bg-green-100 rounded-full">
+                <span className="text-2xl">💰</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              From {stats.completedDonations} donations
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Allocated</p>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  {formatAmount(stats.totalAllocated)}
+                </h3>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-full">
+                <span className="text-2xl">📊</span>
+              </div>
+            </div>
+            <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-500 h-2 rounded-full" 
+                style={{ 
+                  width: `${(stats.totalAllocated / stats.totalReceived * 100) || 0}%` 
+                }}
+              ></div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Pending Allocation</p>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  {formatAmount(stats.pendingAllocation)}
+                </h3>
+              </div>
+              <div className="p-3 bg-yellow-100 rounded-full">
+                <span className="text-2xl">⏳</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              Awaiting distribution
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-purple-500"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total Donations</p>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  {stats.totalDonations}
+                </h3>
+              </div>
+              <div className="p-3 bg-purple-100 rounded-full">
+                <span className="text-2xl">🤝</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              {stats.completedDonations} completed
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Existing table header */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Donation Records</h2>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        {/* Existing table component */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Donor Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Contact
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Purpose
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Allocation
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {donations.map((donation) => (
+                  <tr key={donation._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {donation.donorName}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {formatAmount(donation.amount)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {donation.phone}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {donation.email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">
+                        {donation.purpose}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {formatDate(donation.createdAt)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        donation.status === 'completed' 
+                          ? 'bg-green-100 text-green-800' 
+                          : donation.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {donation.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        donation.isAllocated
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {donation.isAllocated ? 'Allocated' : 'Unallocated'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {donations.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No donations found
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       <div className="container mx-auto px-6 py-8">
@@ -858,6 +1148,7 @@ const Admin = () => {
           {activeTab === "approval" && <UserApproval />}
           {activeTab === "reported" && <ReportedDisasters />}
           {activeTab === "aid" && <AidRequirements />}
+          {activeTab === "donations" && <Donations />}
         </motion.div>
 
         {selectedDisasterDetails && (

@@ -22,6 +22,10 @@ import CourseDetail from "./components/CourseDetail";
 import NgoList from "./components/Ngolist";
 import NgoDetail from "./components/Ngodetail";
 import DisasterDetailsPage from "./components/DisasterDetailsPage";
+import DisasterList from "./components/DisasterList";
+import DisasterDetailList from "./components/DisasterDetailList";
+import FundInfo from "./components/FundInfo";
+import DonationForm from './components/DonationForm';
 
 import { generateToken } from "./Notification/firebase";
 import { messaging } from "./Notification/firebase";
@@ -30,6 +34,8 @@ import { onMessage } from "firebase/messaging";
 import { setFcmToken } from "./Redux/authslice";
 import { setLongitude } from "./Redux/authslice";
 import { setLattitude } from "./Redux/authslice";
+
+
 
 function App() {
   const dispatch = useDispatch();
@@ -277,10 +283,14 @@ function App() {
         <Routes>
           {/* Open Route */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/donate" element={<DonationForm />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/disasters" element={<DisasterList />} />
+          <Route path="/disaster/:id" element={<DisasterDetailList />} />
+          <Route path="/fund-info" element={<FundInfo />} />
 
           {/* User - Open Route */}
           <Route path="/report-disaster" element={<ReportDisaster />} />
