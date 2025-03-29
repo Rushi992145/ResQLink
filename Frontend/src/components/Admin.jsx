@@ -166,6 +166,7 @@ const Admin = () => {
     try {
       const response = await fetch("http://localhost:3000/api/aid/all");
       const data = await response.json();
+      console.log(data);
 
       if (data.success) {
         setAidRequirements(data.data);
@@ -642,8 +643,9 @@ const Admin = () => {
               <h3 className="text-lg font-semibold text-gray-800">
                 {aid.disasterType}
               </h3>
+              <p className="text-sm text-gray-600">Requested by: {aid.name}</p>
               <p className="text-sm text-gray-600">
-                Requested by: {aid.name || "Anonymous"}
+                Contact: {aid.contactNumber}
               </p>
             </div>
             <div className="text-right">
@@ -653,13 +655,11 @@ const Admin = () => {
             </div>
           </div>
 
-          {/* Location */}
+          {/* Location and Description */}
           <div className="mb-4">
-            <p className="text-sm text-gray-600">
-              📍 Location: {aid.location?.lati}, {aid.location?.long}
-            </p>
-            <p className="text-sm text-gray-600">
-              📞 Contact: {aid.contactNumber || "Not provided"}
+            <p className="text-sm text-gray-600">📍 Location: {aid.location}</p>
+            <p className="text-sm text-gray-600 mt-2">
+              📝 Description: {aid.description}
             </p>
           </div>
 
@@ -692,14 +692,6 @@ const Admin = () => {
               ))}
             </div>
           </div>
-
-          {/* Description */}
-          {aid.description && (
-            <div className="mt-4 text-sm text-gray-600">
-              <p className="font-medium">Additional Details:</p>
-              <p>{aid.description}</p>
-            </div>
-          )}
 
           {/* Footer */}
           <div className="mt-6 flex justify-between items-center pt-4 border-t">
@@ -750,7 +742,7 @@ const Admin = () => {
     );
   });
 
-  // Create a separate AidDetailsModal component
+  // Update the AidDetailsModal component
   const AidDetailsModal = React.memo(({ aid, onClose }) => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -771,7 +763,49 @@ const Admin = () => {
 
           {/* Modal content */}
           <div className="space-y-4">
-            {/* ... Detailed aid information ... */}
+            <div>
+              <h4 className="font-semibold text-gray-700">
+                Requester Information
+              </h4>
+              <p className="text-gray-600">Name: {aid.name}</p>
+              <p className="text-gray-600">Contact: {aid.contactNumber}</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-gray-700">Disaster Details</h4>
+              <p className="text-gray-600">Type: {aid.disasterType}</p>
+              <p className="text-gray-600">Location: {aid.location}</p>
+              <p className="text-gray-600">Description: {aid.description}</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-gray-700">Requirements</h4>
+              <div className="space-y-2">
+                {aid.requirements.map((req, index) => (
+                  <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-800">Type: {req.type}</p>
+                    <p className="text-gray-600">Quantity: {req.quantity}</p>
+                    <p className="text-gray-600">Status: {req.status}</p>
+                    {req.urgent && (
+                      <span className="inline-block px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs mt-2">
+                        Urgent
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-gray-700">Timeline</h4>
+              <p className="text-gray-600">
+                Created: {new Date(aid.createdAt).toLocaleString()}
+              </p>
+              <p className="text-gray-600">
+                Deadline: {new Date(aid.deadline).toLocaleString()}
+              </p>
+            </div>
+
             <div className="mt-6 flex justify-end space-x-4">
               <button
                 onClick={onClose}

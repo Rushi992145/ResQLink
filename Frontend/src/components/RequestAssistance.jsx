@@ -84,10 +84,12 @@ const RequestAssistance = () => {
     setSuccess(false);
 
     try {
-      // Directly create the aid request
+      // Create the aid request with all required fields from the schema
       const aidRequestBody = {
+        name: formData.name,
+        contactNumber: formData.contactNumber,
         disasterType: formData.disasterType,
-        location: formData.location, // Already a string from handleGetLocation
+        location: formData.location,
         requirements: formData.requirements.map((req) => ({
           type: req.type,
           quantity: req.quantity,
@@ -95,6 +97,7 @@ const RequestAssistance = () => {
           status: "pending",
         })),
         deadline: formData.deadline,
+        description: formData.description,
         status: "active",
       };
 
@@ -110,7 +113,7 @@ const RequestAssistance = () => {
 
       // Check if the response was not ok (e.g., 4xx, 5xx status codes)
       if (!aidResponse.ok) {
-        const aidErrorData = await aidResponse.json(); // Get the response body with error message
+        const aidErrorData = await aidResponse.json();
         throw new Error(
           aidErrorData.message || `HTTP error! status: ${aidResponse.status}`
         );
@@ -121,18 +124,18 @@ const RequestAssistance = () => {
 
       if (aidData.success) {
         setSuccess(true);
-        // Reset form
+        // Reset form with all fields
         setFormData({
+          name: "",
+          contactNumber: "",
           disasterType: "",
           location: "",
           requirements: [
             { type: "", quantity: "", urgent: false, status: "pending" },
           ],
           deadline: "",
-          status: "active",
           description: "",
-          contactNumber: "",
-          name: "",
+          status: "active",
         });
       } else {
         throw new Error(aidData.message || "Failed to create aid request");
@@ -141,7 +144,7 @@ const RequestAssistance = () => {
       console.error("Error submitting request:", error);
       setError(
         error.message ||
-          "Failed to submit request. Please make sure you're logged in as an admin and try again."
+          "Failed to submit request. Please check all required fields and try again."
       );
     } finally {
       setIsSubmitting(false);
