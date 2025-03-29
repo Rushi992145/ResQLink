@@ -39,10 +39,11 @@ const ReportDisaster = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log("here");
     toast.success("Submitted disaster report...");
     try {
       const location = await getCurrentLocation(); // Ensure location is updated before submission
-
       console.log("Submitting with location:", location);
 
       const response = await fetch("http://localhost:3000/api/report/", {
