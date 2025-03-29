@@ -52,6 +52,8 @@ const updateVolunteer = asyncHandler(async (req, res) => {
             skills,
             availability,
             address,
+            phone,
+            city,
             bloodGroup,
             aadharNumber,
             familyContact,
