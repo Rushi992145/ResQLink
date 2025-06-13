@@ -17,7 +17,7 @@ const NGOSchema = new mongoose.Schema(
       required: true,
     },
     contactPerson: String,
-    contactNumber: String,
+    contact: String,
     address: String,
     focusAreas: {
       type: [String],

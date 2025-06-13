@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 const Admin = () => {
   // Static data
   const [stats] = useState({
-    totalDisasters: 156,
-    totalRequests: 243,
-    approvedVolunteers: 89,
-    pendingVolunteers: 34,
-    approvedNGOs: 45,
+    totalDisasters: 17,
+    totalRequests: 12,
+    approvedVolunteers: 4,
+    pendingVolunteers: 0,
+    approvedNGOs: 2,
     pendingNGOs: 12,
-    ongoingEfforts: 78,
+    ongoingEfforts: 10,
   });
 
   // Add state for disaster reports
@@ -989,8 +989,160 @@ const Admin = () => {
     );
   });
 
-  // Update the Donations component
+  // First, add this new component inside your Admin.jsx file
+  const DonationDetailsModal = ({ donation, onClose }) => {
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
+
+    const formatAmount = (amount) => {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+      }).format(amount);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+        >
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6 pb-4 border-b">
+            <h3 className="text-2xl font-bold text-gray-800">Donation Details</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="space-y-6">
+            {/* Donor Information */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-700 mb-3">Donor Information</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Name</p>
+                  <p className="font-medium">{donation.donorName}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Amount</p>
+                  <p className="font-medium text-green-600">
+                    {formatAmount(donation.amount)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Phone</p>
+                  <p className="font-medium">{donation.phone}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="font-medium">{donation.email}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Donation Details */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-700 mb-3">Donation Details</h4>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-gray-500">Purpose</p>
+                  <p className="font-medium">{donation.purpose}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <span
+                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      donation.status === "completed"
+                        ? "bg-green-100 text-green-800"
+                        : donation.status === "pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {donation.status}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Allocation Status</p>
+                  <span
+                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      donation.isAllocated
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {donation.isAllocated ? "Allocated" : "Unallocated"}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Transaction Date</p>
+                  <p className="font-medium">{formatDate(donation.createdAt)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Information */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-700 mb-3">Payment Information</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Payment ID</p>
+                  <p className="font-medium">{donation.paymentId || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Order ID</p>
+                  <p className="font-medium">{donation.orderId || 'N/A'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-6 pt-4 border-t flex justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            >
+              Close
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
+
+  // Then modify the Donations component to include the modal functionality
   const Donations = () => {
+    // Add these state variables at the top of the Donations component
+    const [selectedDonation, setSelectedDonation] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
     const formatDate = (dateString) => {
       return new Date(dateString).toLocaleDateString("en-US", {
         year: "numeric",
@@ -1193,6 +1345,9 @@ const Admin = () => {
     );
   };
 
+  // Add this state for the ChatbotModal
+  const [showChatbot, setShowChatbot] = useState(false);
+
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       <div className="container mx-auto px-6 py-8">
@@ -1244,6 +1399,33 @@ const Admin = () => {
             }}
           />
         )}
+
+        {/* Add this right before the closing div */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowChatbot(true)}
+            className="bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-colors"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              />
+            </svg>
+          </motion.button>
+        </div>
+
+        {/* Add the ChatbotModal */}
+        {showChatbot && <ChatbotModal onClose={() => setShowChatbot(false)} />}
       </div>
     </div>
   );

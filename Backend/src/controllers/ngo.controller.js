@@ -39,7 +39,7 @@ const updateNGO = asyncHandler(async (req, res) => {
     ngo.registrationNumber = registrationNumber;
     ngo.focusAreas = focusAreas;
     ngo.address = address;
-    ngo.contactNumber = contact;
+    ngo.contact = contact;
     ngo.website = website;
     ngo.city = city;
 

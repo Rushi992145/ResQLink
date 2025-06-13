@@ -7,7 +7,8 @@ import {
     assignVolunteerToDisaster,
     removeVolunteerAssignment,
     getVolunteerDetails,
-    acceptRequest
+    acceptRequest,
+    checkVolunteerStatus
 } from "../controllers/volunteer.controller.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
@@ -34,5 +35,8 @@ router.post("/assign", verifyJWT, authorizeRoles("admin"), assignVolunteerToDisa
 
 // Remove a volunteer assignment (Admin only)
 router.put("/remove/:volunteerId", verifyJWT, authorizeRoles("admin"), removeVolunteerAssignment);
+
+// Add this route
+router.post("/check-status", checkVolunteerStatus);
 
 export default router;

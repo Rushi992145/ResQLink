@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Clock, AlertCircle, Check, X } from 'lucide-react';
 import Navigation from '../components/Navigation'
 import { useLocation } from 'react-router-dom';
+import CertificateGenerator from './CertificateGenerator';
 
 
 const NotificationDetail = () => {
@@ -14,44 +15,46 @@ const NotificationDetail = () => {
   const [notification,setNotification] = useState(null);
   const [hasActiveDisaster, setHasActiveDisaster] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
-
-  useEffect(()=>{
-     async function getNotificationData()
-     {
-        try
-        {
-          const response = await fetch(`http://localhost:3000/api/report/getdisaster/${disasterId}`);
-
-          const value = await response.json();
-
-          console.log("disaster is :",value.data);
-          setNotification(value.data[0]);
- 
-        }
-        catch(error)
-        {
-          console.log(error.message);
-        }
-     }
-
-     getNotificationData();
-  },[])
+  const [isVolunteerAssigned, setIsVolunteerAssigned] = useState(false);
 
   useEffect(() => {
-    checkActiveDisaster();
-  }, []);
+    checkVolunteerStatus();
+    getNotificationData();
+  }, [disasterId]);
 
-  const checkActiveDisaster = async () => {
+  const checkVolunteerStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/volunteer/active-disaster', {
+      const response = await fetch('http://localhost:3000/api/volunteer/check-status', {
+        method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        },
+        body: JSON.stringify({
+          disasterId: disasterId,
+          id: localStorage.getItem('userId') // Get userId from localStorage
+        })
       });
       const data = await response.json();
+      setIsVolunteerAssigned(data.isAssigned);
       setHasActiveDisaster(data.hasActiveDisaster);
     } catch (error) {
-      console.error('Error checking active disaster:', error);
+      console.error('Error checking volunteer status:', error);
+    }
+  };
+
+  const getNotificationData = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/report/getdisaster/${disasterId}`);
+
+      const value = await response.json();
+
+      console.log("disaster is :",value.data);
+      setNotification(value.data[0]);
+    }
+    catch(error)
+    {
+      console.log(error.message);
     }
   };
 
@@ -63,13 +66,14 @@ const NotificationDetail = () => {
 
     setIsAccepting(true);
     try {
-      const response = await fetch('http://localhost:3000/api/volunteer/accept-disaster', {
+      const response = await fetch('http://localhost:3000/api/volunteer/acceptrequest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
+          id: localStorage.getItem('userId'),
           disasterId: disasterId
         })
       });
@@ -79,8 +83,13 @@ const NotificationDetail = () => {
       }
 
       const data = await response.json();
-      alert('Successfully accepted the disaster request');
-      navigate('/volunteer/notifications');
+      if (data.success) {
+        setIsVolunteerAssigned(true);
+        alert('Successfully accepted the disaster request');
+        navigate('/volunteer/notifications');
+      } else {
+        throw new Error(data.message || 'Failed to accept disaster');
+      }
     } catch (error) {
       console.error('Error accepting disaster:', error);
       alert('Failed to accept disaster request');
@@ -219,44 +228,37 @@ const NotificationDetail = () => {
           </div>
 
           {/* Action Buttons */}
-          {notification && notification.status === 'pending' && (
+          {notification && (
             <div className="flex space-x-4 pt-6 border-t border-gray-200">
-              <motion.button
-                onClick={acceptRequestHandler}
-                disabled={hasActiveDisaster || isAccepting}
-                className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center space-x-2 ${
-                  hasActiveDisaster 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-green-600 hover:bg-green-700'
-                } text-white transition-colors duration-200`}
-                whileHover={!hasActiveDisaster && { scale: 1.02 }}
-                whileTap={!hasActiveDisaster && { scale: 0.98 }}
-              >
-                {isAccepting ? (
-                  <span>Accepting...</span>
-                ) : hasActiveDisaster ? (
-                  <span>Complete your active disaster first</span>
-                ) : (
-                  <>
-                    <Check size={20} />
-                    <span>Accept Request</span>
-                  </>
-                )}
-              </motion.button>
-            </div>
-          )}
-
-          {notification && notification.status === 'approved' && (
-            <div className="flex space-x-4 pt-6 border-t border-gray-200">
-              <motion.button
-                onClick={() => handleResponse('accepted')}
-                className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center justify-center space-x-2"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                
-                <span>You have accepted this disaster request</span>
-              </motion.button>
+              {!isVolunteerAssigned ? (
+                <motion.button
+                  onClick={acceptRequestHandler}
+                  disabled={hasActiveDisaster || isAccepting}
+                  className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center space-x-2 ${
+                    hasActiveDisaster || isAccepting
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-green-600 hover:bg-green-700'
+                  } text-white transition-colors duration-200`}
+                  whileHover={!hasActiveDisaster && !isAccepting && { scale: 1.02 }}
+                  whileTap={!hasActiveDisaster && !isAccepting && { scale: 0.98 }}
+                >
+                  {isAccepting ? (
+                    <span>Accepting...</span>
+                  ) : hasActiveDisaster ? (
+                    <span>Complete your active disaster first</span>
+                  ) : (
+                    <>
+                      <Check size={20} />
+                      <span>Accept Request</span>
+                    </>
+                  )}
+                </motion.button>
+              ) : (
+                <div className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg flex items-center justify-center space-x-2">
+                  <Check size={20} className="text-green-600" />
+                  <span>You have accepted this disaster request</span>
+                </div>
+              )}
             </div>
           )}
         </div>

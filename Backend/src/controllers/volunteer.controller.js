@@ -171,43 +171,87 @@ const removeVolunteerAssignment = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, volunteer, "Volunteer assignment removed successfully"));
 });
 
+const checkVolunteerStatus = asyncHandler(async (req, res) => {
+    const { id, disasterId } = req.body;
 
-const acceptRequest = async (req,res) => {
-    try 
-    {
-        const {id,disasterId} = req.body;
+    const volunteer = await Volunteer.findOne({ userId: id });
+    if (!volunteer) {
+        return res.json({
+            success: true,
+            isAssigned: false,
+            hasActiveDisaster: false
+        });
+    }
 
-       const userExist = await Volunteer.findOne({userId : id});
+    // Check if volunteer is assigned to this specific disaster
+    const isAssigned = volunteer.disasterAssigned?.toString() === disasterId;
+    
+    // Check if volunteer has any active disaster
+    const hasActiveDisaster = volunteer.disasterAssigned !== null;
 
-       console.log(userExist._id)
-        const updateUser = await Volunteer.findOneAndUpdate({ _id : userExist._id },{
-            disasterAssigned : disasterId
-        },{new : true})
+    return res.json({
+        success: true,
+        isAssigned,
+        hasActiveDisaster
+    });
+});
 
-        const updateReport = await DisasterRequest.findByIdAndUpdate(disasterId,{
-            $push : {
-                assignedVolunteers : id
-            }
-        })
+// Update the existing acceptRequest function to include status update
+const acceptRequest = async (req, res) => {
+    try {
+        const { id, disasterId } = req.body;
+
+        const userExist = await Volunteer.findOne({ userId: id });
+        
+        if (!userExist) {
+            return res.status(404).json({
+                success: false,
+                message: "Volunteer not found"
+            });
+        }
+
+        if (userExist.disasterAssigned) {
+            return res.status(400).json({
+                success: false,
+                message: "You already have an active disaster assignment"
+            });
+        }
+
+        const updateUser = await Volunteer.findOneAndUpdate(
+            { _id: userExist._id },
+            {
+                disasterAssigned: disasterId,
+                status: "Assigned" // Update volunteer status
+            },
+            { new: true }
+        );
+
+        const updateReport = await DisasterRequest.findByIdAndUpdate(
+            disasterId,
+            {
+                $push: {
+                    assignedVolunteers: id
+                }
+            },
+            { new: true }
+        );
 
         return res.status(200).json({
-            success : true,
-            message : "Request accepted successfully",
-            userExist,
-            updateUser,
-            updateReport
-        })
-    }
-    catch(error)
-    {
-        console.log(error.message)
+            success: true,
+            message: "Request accepted successfully",
+            data: {
+                volunteer: updateUser,
+                report: updateReport
+            }
+        });
+    } catch (error) {
+        console.log(error.message);
         return res.status(500).json({
-            success : false,
-            message : "Internal Server Error"
-        })
+            success: false,
+            message: "Internal Server Error"
+        });
     }
-}
-
+};
 
 export {
     updateVolunteer,
@@ -217,5 +261,6 @@ export {
     assignVolunteerToDisaster,
     removeVolunteerAssignment,
     getVolunteerDetails,
+    checkVolunteerStatus,
     acceptRequest
 };

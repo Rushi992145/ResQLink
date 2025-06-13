@@ -133,32 +133,50 @@ const DisasterDetailsPage = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ status: 'rejected' }) // Using 'rejected' as resolved status
+        body: JSON.stringify({ 
+          status: 'rejected', // Using 'rejected' as resolved status
+          resolvedAt: new Date().toISOString() // Add resolved date
+        })
       });
 
       if (!reportResponse.ok) {
-        throw new Error('Failed to update disaster status');
+        throw new Error('Failed to update disaster report status');
       }
 
-      // Then update the disaster status in disaster collection
-      const disasterResponse = await fetch(`http://localhost:3000/api/disaster/${disaster._id}/status`, {
-        method: 'PUT',
+      // Create a disaster record if it doesn't exist and update its status
+      const disasterResponse = await fetch(`http://localhost:3000/api/report/resolve/${disaster._id}`, {
+        method: 'POST', // Changed to POST as we're creating/updating a record
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ status: 'resolved' })
+        body: JSON.stringify({ 
+          status: 'resolved',
+          resolvedAt: new Date().toISOString()
+        })
       });
 
       if (!disasterResponse.ok) {
         throw new Error('Failed to update disaster status');
       }
 
+      // Update volunteer status for this disaster
+      const volunteerResponse = await fetch(`http://localhost:3000/api/volunteer/complete-disaster/${disaster._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!volunteerResponse.ok) {
+        throw new Error('Failed to update volunteer status');
+      }
+
       alert('Disaster marked as resolved successfully');
       navigate('/admin-dashboard'); // Redirect back to dashboard
     } catch (error) {
       console.error('Error marking disaster as resolved:', error);
-      alert('Failed to mark disaster as resolved. Please try again.');
     } finally {
       setIsResolvingDisaster(false);
     }

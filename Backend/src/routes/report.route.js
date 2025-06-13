@@ -5,7 +5,8 @@ import {
     getDisasterRequestsByStatus,
     updateDisasterRequestStatus,
     deleteDisasterRequest,
-    getReportById
+    getReportById,
+    resolveDisaster
 } from "../controllers/report.controller.js";
 import { verifyJWT, authorizeRoles } from "../middlewares/auth.middleware.js";
 
@@ -27,5 +28,8 @@ router.put("/:requestId",updateDisasterRequestStatus);
 
 // Delete a disaster request (Admin only)
 router.delete("/:requestId", verifyJWT, authorizeRoles("admin"), deleteDisasterRequest);
+
+// Add these routes
+router.post("/resolve/:requestId", resolveDisaster);
 
 export default router;

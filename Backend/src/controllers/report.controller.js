@@ -3,6 +3,7 @@ import DisasterRequest from "../models/report.model.js";
 import User from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import Disaster from "../models/disaster.model.js";
 
 // Create a new disaster request
 const createDisasterRequest = asyncHandler(async (req, res) => {
@@ -71,7 +72,7 @@ const getDisasterRequestsByStatus = asyncHandler(async (req, res) => {
 // Update disaster request status (Approve/Reject)
 const updateDisasterRequestStatus = asyncHandler(async (req, res) => {
     const { requestId } = req.params;
-    const { status } = req.body;
+    const { status, resolvedAt } = req.body;
 
     if (!["approved", "rejected"].includes(status)) {
         throw new ApiError(400, "Invalid status value");
@@ -83,9 +84,14 @@ const updateDisasterRequestStatus = asyncHandler(async (req, res) => {
     }
 
     disasterRequest.status = status;
+    if (status === "rejected") {
+        disasterRequest.resolvedAt = resolvedAt;
+    }
     await disasterRequest.save();
 
-    return res.status(200).json(new ApiResponse(200, disasterRequest, `Disaster request status updated to ${status}`));
+    return res.status(200).json(
+        new ApiResponse(200, disasterRequest, `Disaster request ${status}`)
+    );
 });
 
 // Delete a disaster request
@@ -127,12 +133,38 @@ const getReportById = async (req,res) => {
     }
 }
 
+// Add new resolveDisaster function
+const resolveDisaster = asyncHandler(async (req, res) => {
+    const { requestId } = req.params;
+    const { status, resolvedAt } = req.body;
+
+    // Find or create disaster record
+    let disaster = await Disaster.findOne({ requestId });
+    
+    if (!disaster) {
+        disaster = await Disaster.create({
+            requestId,
+            status: 'resolved',
+            resolvedAt
+        });
+    } else {
+        disaster.status = 'resolved';
+        disaster.resolvedAt = resolvedAt;
+        await disaster.save();
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, disaster, "Disaster resolved successfully")
+    );
+});
+
 export {
     createDisasterRequest,
     getAllDisasterRequests,
     getDisasterRequestsByStatus,
     updateDisasterRequestStatus,
     deleteDisasterRequest,
-    getReportById
+    getReportById,
+    resolveDisaster
 };
 
