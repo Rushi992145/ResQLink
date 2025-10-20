@@ -48,17 +48,16 @@ const sendNotification = async (req, res) => {
         disaster.status = "approved";
         await disaster.save();
 
-        // console.log("fcm_token_array",fcm_token_array);
-
         const fcm_token_array = await Fcm_Token.find({}, { fcm_token: 1, _id: 0 });
 
-        
+        console.log("FCM TOKENS ARE ",fcm_token_array)
 
-        console.log(fcm_token_array)
+        // Send notification to each person
         for (const fcm_token_obj of fcm_token_array) {
             if(fcm_token_obj)
             {
-                await notify(title, body, fcm_token_obj.fcm_token);
+                const res = await notify(title, body, fcm_token_obj.fcm_token);
+                console.log(`Response of ${fcm_token_obj} is ${res}`);
             }
         }
 
