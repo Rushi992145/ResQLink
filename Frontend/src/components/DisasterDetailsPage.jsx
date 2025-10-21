@@ -5,6 +5,10 @@ import { motion } from "framer-motion";
 import Navigation from "../components/Navigation";
 import Marker from "./Marker";
 
+import { toast } from 'react-hot-toast'
+import { messaging } from "../Notification/firebase";
+import { onMessage } from "firebase/messaging";
+
 const DisasterDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -18,30 +22,6 @@ const DisasterDetailsPage = () => {
 
   const [isResolvingDisaster, setIsResolvingDisaster] = useState(false);
 
-  const title =
-    "Alert!! A disaster is happend and alot of people needs you help";
-  const body =
-    "Please check your disaster-relief portal to get more information about the disaster and further instructions";
-
-  async function sendnotificationhandler() {
-    try {
-      const response = await fetch(
-        "http://localhost:3000/api/notification/sendnotification",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ title, body, longitude, lattitude }),
-        }
-      );
-
-      const value = await response.json();
-      console.log(value);
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
 
   const getStatusStyles = () => {
     switch (status) {
@@ -110,7 +90,6 @@ const DisasterDetailsPage = () => {
       console.log("Notification Response:", data);
 
       if (response.ok) {
-        alert("Volunteers have been notified successfully!");
         navigate("/admin-dashboard");
       } else {
         alert("Failed to notify volunteers. Please try again.");
@@ -133,7 +112,7 @@ const DisasterDetailsPage = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           status: 'rejected', // Using 'rejected' as resolved status
           resolvedAt: new Date().toISOString() // Add resolved date
         })
@@ -150,7 +129,7 @@ const DisasterDetailsPage = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           status: 'resolved',
           resolvedAt: new Date().toISOString()
         })
@@ -427,9 +406,8 @@ const DisasterDetailsPage = () => {
                 <button
                   onClick={sendVolunteerAlert}
                   disabled={isNotifying}
-                  className={`px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium flex items-center ${
-                    isNotifying ? "opacity-75 cursor-not-allowed" : ""
-                  }`}
+                  className={`px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium flex items-center ${isNotifying ? "opacity-75 cursor-not-allowed" : ""
+                    }`}
                 >
                   {isNotifying ? (
                     <>
@@ -461,12 +439,11 @@ const DisasterDetailsPage = () => {
                 </button>
               )}
               {status === "active" && (
-                <button 
+                <button
                   onClick={handleMarkResolved}
                   disabled={isResolvingDisaster}
-                  className={`px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium flex items-center ${
-                    isResolvingDisaster ? "opacity-75 cursor-not-allowed" : ""
-                  }`}
+                  className={`px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium flex items-center ${isResolvingDisaster ? "opacity-75 cursor-not-allowed" : ""
+                    }`}
                 >
                   {isResolvingDisaster ? (
                     <>
