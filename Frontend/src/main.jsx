@@ -16,7 +16,7 @@ const store = configureStore({
 
 createRoot(document.getElementById('root')).render(
     <Provider store={store}>
-        <Toaster position="bottom-right"/>
+        {/* <Toaster position="top-right"/> */}
         <App />
     </Provider>
 )

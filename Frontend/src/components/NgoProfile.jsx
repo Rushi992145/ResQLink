@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { Building } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const NgoProfile = () => {
     const accesstoken = useSelector((state) => state.auth.token);
@@ -86,10 +87,10 @@ const NgoProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    const toastId=toast.loading("Updating the profile")
     // Validate required fields
     if (!formData.organizationName || !formData.registrationNumber || !formData.focusAreas.length) {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields',{id:toastId});
       return;
     }
 
@@ -113,14 +114,14 @@ const NgoProfile = () => {
         });
 
         if (response.ok) {
-            alert('Profile updated successfully!');
+            toast.success('Profile updated successfully!',{id:toastId});
         } else {
             const errorData = await response.json();
-            alert(errorData.message || 'Failed to update profile');
+            toast.error(errorData.message || 'Failed to update profile',{id:toastId});
         }
     } catch (error) {
         console.error('Error updating profile:', error);
-        alert('Something went wrong');
+        toast.error('Something went wrong');
     }
   };
 

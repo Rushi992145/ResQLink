@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 // import DisasterDetailsPage from "./DisasterDetailsPage";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Admin = () => {
   // Static data
@@ -407,11 +408,10 @@ const Admin = () => {
               onClick={() => setActiveSection(section.id)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`flex items-center px-4 py-2 rounded-lg font-medium ${
-                activeSection === section.id
+              className={`flex items-center px-4 py-2 rounded-lg font-medium cursor-pointer ${activeSection === section.id
                   ? `bg-${section.color}-100 text-${section.color}-800 border-2 border-${section.color}-500`
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
+                  : "bg-white text-gray-600 hover:bg-gray-50 "
+                }`}
             >
               <span className="mr-2">{section.icon}</span>
               {section.label}
@@ -421,13 +421,13 @@ const Admin = () => {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           {activeSection === "pending" && (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               {disasterReports.pending.map((disaster) => (
                 <motion.div
                   key={disaster._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="border border-yellow-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-yellow-50"
+                  className=" border border-yellow-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-yellow-50"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold text-lg text-yellow-700">
@@ -474,7 +474,7 @@ const Admin = () => {
           )}
 
           {activeSection === "active" && (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               {disasterReports.active.map((disaster) => (
                 <motion.div
                   key={disaster._id}
@@ -525,7 +525,7 @@ const Admin = () => {
           )}
 
           {activeSection === "resolved" && (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               {disasterReports.resolved.map((disaster) => (
                 <motion.div
                   key={disaster._id}
@@ -923,13 +923,12 @@ const Admin = () => {
                           </span>
                         )}
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            req.status === "pending"
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${req.status === "pending"
                               ? "bg-yellow-100 text-yellow-700"
                               : req.status === "fulfilled"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-orange-100 text-orange-700"
-                          }`}
+                                ? "bg-green-100 text-green-700"
+                                : "bg-orange-100 text-orange-700"
+                            }`}
                         >
                           {req.status}
                         </span>
@@ -1077,13 +1076,12 @@ const Admin = () => {
                 <div>
                   <p className="text-sm text-gray-500">Status</p>
                   <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      donation.status === "completed"
+                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.status === "completed"
                         ? "bg-green-100 text-green-800"
                         : donation.status === "pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
                   >
                     {donation.status}
                   </span>
@@ -1091,11 +1089,10 @@ const Admin = () => {
                 <div>
                   <p className="text-sm text-gray-500">Allocation Status</p>
                   <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      donation.isAllocated
+                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.isAllocated
                         ? "bg-blue-100 text-blue-800"
                         : "bg-gray-100 text-gray-800"
-                    }`}
+                      }`}
                   >
                     {donation.isAllocated ? "Allocated" : "Unallocated"}
                   </span>
@@ -1307,24 +1304,22 @@ const Admin = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          donation.status === "completed"
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.status === "completed"
                             ? "bg-green-100 text-green-800"
                             : donation.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
                       >
                         {donation.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          donation.isAllocated
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.isAllocated
                             ? "bg-blue-100 text-blue-800"
                             : "bg-gray-100 text-gray-800"
-                        }`}
+                          }`}
                       >
                         {donation.isAllocated ? "Allocated" : "Unallocated"}
                       </span>
@@ -1349,25 +1344,24 @@ const Admin = () => {
   const [showChatbot, setShowChatbot] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-16">
+    <div className="min-h-screen bg-gray-100 pt-12 mt-20">
       <div className="container mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
+        {/* <h1 className="text-3xl font-bold text-gray-800 mb-8">
           Admin Dashboard
-        </h1>
+        </h1> */}
 
         {/* Enhanced Navigation Tabs */}
-        <div className="flex overflow-x-auto mb-8 bg-white rounded-lg shadow-sm">
+        <div className="flex overflow-x-hidden overflow-y-hidden mb-8 bg-white rounded-lg shadow-sm">
           {tabs.map((tab) => (
             <motion.button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`px-6 py-3 text-sm font-medium whitespace-nowrap flex items-center ${
-                activeTab === tab.id
+              className={`px-6 py-3 text-sm font-medium whitespace-nowrap flex items-center cursor-pointer ${activeTab === tab.id
                   ? "text-green-600 border-b-2 border-green-600 bg-green-50"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              }`}
+                }`}
             >
               <span className="mr-2">{tab.icon}</span>
               {tab.label}

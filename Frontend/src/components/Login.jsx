@@ -8,6 +8,7 @@ import { setEmail } from "../Redux/authslice";
 import { setRole } from "../Redux/authslice";
 import { setName } from "../Redux/authslice";
 import { setId } from "../Redux/authslice";
+import toast from "react-hot-toast";
 
 
 const Login = () => {
@@ -23,43 +24,50 @@ const Login = () => {
     e.preventDefault();
     // Handle login logic here
 
-    console.log(formData,typeof(formData));
+    console.log(formData, typeof (formData));
+    const toastId = toast.loading("Logging in..")
+    try {
+      const response = await fetch('http://localhost:3000/api/users/login', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData)
+      })
 
-    const response = await fetch('http://localhost:3000/api/users/login',{
-      method : 'POST',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body : JSON.stringify(formData)
-    })
+      const value = await response.json();
+      if (response.ok && value.data) {
 
-    const value = await response.json();
-    console.log("value is : ",value.data);
 
-    localStorage.setItem('token',value.data.token);
-    localStorage.setItem('role',value.data.user.role);
-    localStorage.setItem('email',value.data.user.email);
-    localStorage.setItem('name',value.data.user.name);
-    localStorage.setItem('id',value.data.user._id);
+        console.log("value is : ", value.data);
+        toast.success("Login successfully", { id: toastId })
+        localStorage.setItem('token', value.data.token);
+        localStorage.setItem('role', value.data.user.role);
+        localStorage.setItem('email', value.data.user.email);
+        localStorage.setItem('name', value.data.user.name);
+        localStorage.setItem('id', value.data.user._id);
 
-    dispatch(setToken(value.data.token));
-    dispatch(setName(value.data.user.name));
-    dispatch(setEmail(value.data.user.email));
-    dispatch(setRole(value.data.user.role));
-    dispatch(setId(value.data.user._id));
+        dispatch(setToken(value.data.token));
+        dispatch(setName(value.data.user.name));
+        dispatch(setEmail(value.data.user.email));
+        dispatch(setRole(value.data.user.role));
+        dispatch(setId(value.data.user._id));
 
-    if(value.data.user.role=='volunteer')
-    {
-      navigate('/volunteer-dashboard');
-    }
-    else if(value.data.user.role=='ngo')
-    {
-      console.log("role is :",value.data.user.role);
-      navigate('/ngo-dashboard');
-    }
-    else
-    {
-      navigate('/admin-dashboard');
+        if (value.data.user.role == 'volunteer') {
+          navigate('/volunteer-dashboard');
+        }
+        else if (value.data.user.role == 'ngo') {
+          console.log("role is :", value.data.user.role);
+          navigate('/ngo-dashboard');
+        }
+        else {
+          navigate('/admin-dashboard');
+        }
+      }else{
+        toast.error(value.message || "Login failed",{id:toastId})
+      }
+    } catch (err) {
+        toast.error("Network error",{id:toastId})
     }
 
   };

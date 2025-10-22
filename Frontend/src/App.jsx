@@ -35,7 +35,8 @@ import { setFcmToken } from "./Redux/authslice";
 import { setLongitude } from "./Redux/authslice";
 import { setLattitude } from "./Redux/authslice";
 
-import { toast } from 'react-hot-toast'
+// import { toast } from 'react-hot-toast'
+import  {Toaster}  from 'react-hot-toast'
 
 
 function App() {
@@ -153,6 +154,7 @@ function App() {
   // console.log(token, role);
   return (
     <div className="min-h-screen flex flex-col">
+      
       <BrowserRouter>
         <Navbar />
 
@@ -215,6 +217,12 @@ function App() {
 
         <Footer />
       </BrowserRouter>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        containerStyle={{ zIndex: 999999 }}
+        toastOptions={{ duration: 4000 }}
+      />
     </div>
   );
 }

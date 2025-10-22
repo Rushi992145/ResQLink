@@ -22,7 +22,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   // Fallback for local dev: load from file (ignored in .gitignore)
   const { createRequire } = await import("module");
   const require = createRequire(import.meta.url);
-  serviceAccount = require("../reqlink123-792ea-firebase-adminsdk-fbsvc-57f7170f2f.json");
+  serviceAccount = require("../hackathon2-3d3c7-firebase-adminsdk-fbsvc-e8edf8c75d.json");
 }
 
 admin.initializeApp({

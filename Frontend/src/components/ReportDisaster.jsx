@@ -61,6 +61,7 @@ const ReportDisaster = () => {
 
       toast.success("Disaster report submitted successfully!");
       console.log("Disaster report submitted successfully!");
+      // toast.dismiss(toastId);
 
       // Reset the form
       setFormData({
@@ -75,6 +76,8 @@ const ReportDisaster = () => {
         images: [],
       });
     } catch (error) {
+      toast.dismiss(toastId)
+      toast.error(error.message||"something went wrong")
       console.error("Error submitting disaster report:", error);
     }
   };
