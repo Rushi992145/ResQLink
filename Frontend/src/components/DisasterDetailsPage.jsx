@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Navigation from "../components/Navigation";
 import Marker from "./Marker";
 
-import { toast } from 'react-hot-toast'
+import toast from "react-hot-toast";
 import { messaging } from "../Notification/firebase";
 import { onMessage } from "firebase/messaging";
 
@@ -67,6 +67,8 @@ const DisasterDetailsPage = () => {
   const styles = getStatusStyles();
 
   const sendVolunteerAlert = async () => {
+    console.log("button clickeds")
+    const toastId = toast.loading("Sending alert to volunteers...");
     setIsNotifying(true);
     try {
       const response = await fetch(
@@ -86,24 +88,29 @@ const DisasterDetailsPage = () => {
         }
       );
 
-      const data = await response.json();
-      console.log("Notification Response:", data);
+      // const data = await response.json();
+      // console.log("Notification Response:", data);
 
       if (response.ok) {
+        toast.success("Notification sent", { id: toastId });
         navigate("/admin-dashboard");
       } else {
-        alert("Failed to notify volunteers. Please try again.");
+        toast.error("Failed to notify volunteers.", { id: toastId });
       }
     } catch (error) {
       console.error("Error sending notification:", error);
-      alert("Error sending notification. Please try again.");
+      toast.error("Error sending notification. Please try again.", { id: toastId });
     } finally {
       setIsNotifying(false);
     }
   };
 
+
+
+
   const handleMarkResolved = async () => {
     setIsResolvingDisaster(true);
+    const toastId=toast.loading("Marking disaster as resolved...")
     try {
       // First update the disaster request status
       const reportResponse = await fetch(`http://localhost:3000/api/report/${disaster._id}`, {
@@ -152,10 +159,11 @@ const DisasterDetailsPage = () => {
         throw new Error('Failed to update volunteer status');
       }
 
-      alert('Disaster marked as resolved successfully');
+      toast.success('Disaster marked as resolved successfully',{id:toastId});
       navigate('/admin-dashboard'); // Redirect back to dashboard
     } catch (error) {
       console.error('Error marking disaster as resolved:', error);
+       toast.error(error.message || 'Failed to mark disaster as resolved', { id: toastId });
     } finally {
       setIsResolvingDisaster(false);
     }
@@ -182,13 +190,13 @@ const DisasterDetailsPage = () => {
   }
 
   return (
-    <div className={`min-h-screen w-full ${styles.bgColor} pt-16`}>
+    <div className={`min-h-screen w-full ${styles.bgColor} pt-24`}>
       <div className="container mx-auto px-6 py-8">
         {/* Navigation */}
         <div className="mb-8">
           <button
             onClick={() => navigate("/admin-dashboard")}
-            className="flex items-center text-gray-600 hover:text-gray-800"
+            className="flex items-center text-gray-600 cursor-pointer hover:text-gray-800"
           >
             ← Back to Dashboard
           </button>
@@ -406,7 +414,7 @@ const DisasterDetailsPage = () => {
                 <button
                   onClick={sendVolunteerAlert}
                   disabled={isNotifying}
-                  className={`px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium flex items-center ${isNotifying ? "opacity-75 cursor-not-allowed" : ""
+                  className={`px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium flex items-center ${isNotifying ? "opacity-75 cursor-not-allowed" : "cursor-pointer"
                     }`}
                 >
                   {isNotifying ? (

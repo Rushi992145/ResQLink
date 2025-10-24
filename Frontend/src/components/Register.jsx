@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 
 const Register = () => {
@@ -16,7 +17,7 @@ const Register = () => {
     e.preventDefault();
     // Handle registration logic here
     console.log(formData,typeof(formData));
-
+    const toastid=toast.loading("Registering your account...");
     try 
     {
       const response = await fetch('http://localhost:3000/api/users/register',{
@@ -28,13 +29,19 @@ const Register = () => {
       })
 
       const value = await response.json();
-      console.log("value is : ",value.data.user);
-    
-      navigate('/login')
+      if(response.ok && value?.data?.user){
+        console.log("value is : ",value.data.user);
+        toast.success("Registration successful",{id:toastid})
+        navigate('/login')
+
+      }else{
+        toast.error(value?.message || "Registration failed. Please try again.",{id:toastid})
+      }
     }
     catch(error)
     {
       console.log(error.message);
+      toast.error("Network error.Please try again later",{id:toastid})
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const RequestAssistance = () => {
   const [formData, setFormData] = useState({
@@ -82,7 +83,7 @@ const RequestAssistance = () => {
     setIsSubmitting(true);
     setError(null);
     setSuccess(false);
-
+    const toastId=toast.loading("Submitting aid request...")
     try {
       // Create the aid request with all required fields from the schema
       const aidRequestBody = {
@@ -124,6 +125,7 @@ const RequestAssistance = () => {
 
       if (aidData.success) {
         setSuccess(true);
+        toast.success("Aid request submitted successfully",{id:toastId})
         // Reset form with all fields
         setFormData({
           name: "",
@@ -138,9 +140,12 @@ const RequestAssistance = () => {
           status: "active",
         });
       } else {
+        
         throw new Error(aidData.message || "Failed to create aid request");
+
       }
     } catch (error) {
+      toast.error(error.message || "Failed to submit request",{id:toastId})
       console.error("Error submitting request:", error);
       setError(
         error.message ||
@@ -152,7 +157,7 @@ const RequestAssistance = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100">
+    <div className="min-h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100  mt-14">
       <div className="container mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -166,17 +171,17 @@ const RequestAssistance = () => {
             Please provide details about the assistance needed for the disaster.
           </p>
 
-          {error && (
+          {/* {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {error}
             </div>
-          )}
+          )} */}
 
-          {success && (
+          {/* {success && (
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
               Aid request submitted successfully!
             </div>
-          )}
+          )} */}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
