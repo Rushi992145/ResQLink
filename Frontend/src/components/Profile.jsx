@@ -2,7 +2,6 @@ import React, { useState , useEffect, use} from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import toast from "react-hot-toast";
 
 const Profile = () => {
   const accesstoken = useSelector((state) => state.auth.token);
@@ -71,7 +70,7 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const toastId=toast.loading("Updating profile...")
+
     try {
       const response = await axios.post(
         "http://localhost:3000/api/volunteers/", 
@@ -84,10 +83,10 @@ const Profile = () => {
         }
       );
 
-      toast.success("Profile updated successfully!",{id:toastId});
+      alert("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Failed to update profile. Please try again.",{id:toastId});
+      alert("Failed to update profile. Please try again.");
     }
   };
 
