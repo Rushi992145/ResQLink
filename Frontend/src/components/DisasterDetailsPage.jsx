@@ -92,7 +92,8 @@ const DisasterDetailsPage = () => {
       if (response.ok) {
         navigate("/admin-dashboard");
       } else {
-        alert("Failed to notify volunteers. Please try again.");
+        // alert("Failed to notify volunteers. Please try again.");
+        console.log("Failed to notify volunteers. Please try again.")
       }
     } catch (error) {
       console.error("Error sending notification:", error);
