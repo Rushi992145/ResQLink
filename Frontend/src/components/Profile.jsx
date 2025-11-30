@@ -1,4 +1,4 @@
-import React, { useState , useEffect, use} from "react";
+import React, { useState, useEffect, use } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -12,10 +12,10 @@ const Profile = () => {
   useEffect(() => {
     const fetchVolunteerDetails = async () => {
       try {
-        console.log("temp",id)
+        console.log("temp", id)
         const response = await axios.post(
           "http://localhost:3000/api/volunteers/getvoldetails", // Use POST instead of GET
-          { id },  // Pass `id` inside the request body
+          { userId: id },  // Pass `id` inside the request body
           {
             headers: {
               Authorization: `Bearer ${accesstoken}`,
@@ -23,18 +23,28 @@ const Profile = () => {
             }
           }
         );
-        console.log(response.data);
-        setFormData(response.data);  
+
+        console.log("Volunteer data is: ", response.data);
+        const payload = response.data?.data ?? response.data; // handle ApiResponse wrapper or raw
+        if (payload) {
+          setFormData(prev => ({
+            ...prev,
+            ...payload,
+            achievements: Array.isArray(payload.achievements) ? payload.achievements.join(", ") : (payload.achievements || ""),
+            rating: payload.rating ?? prev.rating,
+            disastersWorked: payload.disastersWorked ?? prev.disastersWorked
+          }));
+        }
       } catch (error) {
         console.error("Error fetching volunteer details:", error);
       }
     };
-  
+
     if (id) {
       fetchVolunteerDetails();
     }
   }, [id, accesstoken]);
-  
+
 
   const [formData, setFormData] = useState({
     name: "",
@@ -48,6 +58,9 @@ const Profile = () => {
     emergencyContact: "",
     skills: "",
     availability: "",
+    rating: 0,
+    disastersWorked: 0,
+    achievements: ""
   });
 
 
@@ -72,9 +85,18 @@ const Profile = () => {
     e.preventDefault();
 
     try {
+      const payload = {
+        userId: id,
+        ...formData,
+        achievements: typeof formData.achievements === "string"
+          ? formData.achievements.split(",").map(s => s.trim()).filter(Boolean)
+          : formData.achievements,
+        accesstoken
+      };
+
       const response = await axios.post(
-        "http://localhost:3000/api/volunteers/", 
-        { userId: id, ...formData, accesstoken },
+        "http://localhost:3000/api/volunteers/",
+        payload,
         {
           headers: {
             Authorization: `Bearer ${accesstoken}`,
@@ -217,15 +239,50 @@ const Profile = () => {
 
         {/* Availability */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
-          <input
-            type="text"
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Availability
+          </label>
+          <select
             name="availability"
             value={formData.availability}
             onChange={handleChange}
+            className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 p-3 bg-white"
+          >
+            <option value="">Select availability</option>
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="On-call">On-call</option>
+          </select>
+        </div>
+
+        {/* Disasters Worked */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Disasters Worked</label>
+          <input
+            type="number"
+            name="disastersWorked"
+            value={formData.disastersWorked}
+            onChange={handleChange}
+            min="0"
+            step="1"
+            readOnly   
             className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 p-3"
           />
         </div>
+
+        {/* Achievements */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Achievements (comma separated)</label>
+          <textarea
+            name="achievements"
+            value={formData.achievements}
+            onChange={handleChange}
+            rows="2"
+            placeholder="e.g. First aid certified, Rescue training"
+            className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 p-3"
+          />
+        </div>
+
 
         {/* Submit Button */}
         <motion.button

@@ -1,21 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Bell, Clock, BookOpen, LogOut, Home } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { 
-  setName, 
-  setEmail, 
-  setRole, 
-  setId, 
-  setToken, 
-  setFcmToken, 
-  setLongitude, 
-  setLattitude 
+import {
+  setName,
+  setEmail,
+  setRole,
+  setId,
+  setToken,
+  setFcmToken,
+  setLongitude,
+  setLattitude
 } from '../Redux/authslice';
 
 const SideBarVolunteer = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) => {
   const name = useSelector((state) => state.auth.name);
+  const userId = useSelector((state) => state.auth.id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -72,6 +73,13 @@ const SideBarVolunteer = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebar
             </div>
             <h2 className="text-lg font-semibold text-gray-800 mb-1">{name || 'Volunteer'}</h2>
             <p className="text-sm text-gray-500 mb-2">Active Volunteer</p>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-medium text-gray-700">Rating:</span>
+              <span class="inline-flex items-center text-xs rounded-md bg-yellow-100 px-2 py-1 font-semibold text-yellow-800">
+                4
+              </span>
+            </div>
+
             <div className="flex items-center space-x-1 text-green-600 bg-green-50 px-3 py-1 rounded-full">
               <Home className="w-3.5 h-3.5" />
               <span className="text-xs font-medium">Online</span>
@@ -86,11 +94,10 @@ const SideBarVolunteer = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebar
           {tabs.map((tab) => (
             <motion.button
               key={tab.id}
-              className={`w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                activeTab === tab.id
+              className={`w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${activeTab === tab.id
                   ? 'bg-green-50 text-green-600 shadow-sm'
                   : 'text-gray-600 hover:bg-gray-50'
-              }`}
+                }`}
               onClick={() => {
                 setActiveTab(tab.id);
                 if (window.innerWidth < 768) {
@@ -100,9 +107,8 @@ const SideBarVolunteer = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebar
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >
-              <tab.icon className={`w-5 h-5 mr-3 ${
-                activeTab === tab.id ? 'text-green-600' : 'text-gray-400'
-              }`} />
+              <tab.icon className={`w-5 h-5 mr-3 ${activeTab === tab.id ? 'text-green-600' : 'text-gray-400'
+                }`} />
               <span className="font-medium">{tab.label}</span>
             </motion.button>
           ))}

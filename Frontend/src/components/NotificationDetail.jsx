@@ -66,14 +66,14 @@ const NotificationDetail = () => {
 
     setIsAccepting(true);
     try {
-      const response = await fetch('http://localhost:3000/api/volunteer/acceptrequest', {
+      const response = await fetch('http://localhost:3000/api/volunteers/acceptrequest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          id: localStorage.getItem('userId'),
+          id: localStorage.getItem('id'),
           disasterId: disasterId
         })
       });
