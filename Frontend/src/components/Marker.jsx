@@ -1,96 +1,110 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+} from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import "leaflet-routing-machine";
 
-const Navigation = ({ longitude, latitude, volunteerLocations }) => {
-  const [map, setMap] = useState(null);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+// Fix marker icons path for React
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-  const destination = {
-    lat: Number.isFinite(parseFloat(latitude)) ? parseFloat(latitude) : 0,
-    lng: Number.isFinite(parseFloat(longitude)) ? parseFloat(longitude) : 0,
-  };
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
+const Routing = ({ start, end }) => {
+  const map = useMap();
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyVdMLfKsY88s5IHijDyH68MEbyEFht-4DW&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = initMap;
-    script.onerror = () => {
-      setError('Failed to load Google Maps API');
-      setIsLoading(false);
-    };
-    document.head.appendChild(script);
+    if (!map || !start || !end) return;
 
-    return () => {
-      if (script.parentNode) {
-        document.head.removeChild(script);
-      }
-    };
-  }, []);
+    const routingControl = L.Routing.control({
+      waypoints: [L.latLng(start.lat, start.lng), L.latLng(end.lat, end.lng)],
+      routeWhileDragging: false,
+      lineOptions: {
+        styles: [{ weight: 4 }],
+      },
+    }).addTo(map);
 
-  const initMap = () => {
-    try {
-      const mapInstance = new window.google.maps.Map(document.getElementById('map'), {
-        center: destination,
-        zoom: 14,
-      });
+    return () => map.removeControl(routingControl);
+  }, [map, start, end]);
 
-      const disasterMarker = new window.google.maps.Marker({
-        position: destination,
-        map: mapInstance,
-        animation: window.google.maps.Animation.DROP,
-        title: `Disaster Location (${destination.lat.toFixed(6)}, ${destination.lng.toFixed(6)})`,
-        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-      });
+  return null;
+};
 
-      // Add markers for volunteer locations
-      volunteerLocations.forEach((location) => {
-        const volunteerMarker = new window.google.maps.Marker({
-          position: { lat: location.lat, lng: location.lng },
-          map: mapInstance,
-          title: `Volunteer Location (${location.lat}, ${location.lng})`,
-          icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        });
-
-        const infoWindow = new window.google.maps.InfoWindow({
-            content: `<div style="width: 80%; text-align: center; font-family: Arial, sans-serif;">
-                        <h3>Destination</h3>
-                        <p>Coordinates: ${destination.lat.toFixed(6)}, ${destination.lng.toFixed(6)}</p>
-                      </div>`,
-          });          
-
-        volunteerMarker.addListener('click', () => {
-          infoWindow.open(mapInstance, volunteerMarker);
-        });
-      });
-
-      setMap(mapInstance);
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Map initialization error:', error);
-      setError('Failed to initialize map');
-      setIsLoading(false);
-    }
+const Navigation = ({ longitude, latitude, volunteerLocations }) => {
+  const destination = {
+    lat: parseFloat(latitude),
+    lng: parseFloat(longitude),
   };
 
+  const [currentPosition, setCurrentPosition] = useState(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCurrentPosition({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        () => console.log("Location permission denied")
+      );
+    }
+  }, []);
+
   return (
-    <div className="w-full relative">
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-      <div className="bg-white shadow-md rounded p-4 mb-4">
-        <p className="font-medium">Disaster and Volunteer Locations</p>
-      </div>
-      <div id="map" style={{ width: '100%', height: '400px' }} />
-      {isLoading && (
-        <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading map...</p>
-        </div>
-      )}
+    <div className="w-full">
+      <MapContainer
+        center={[destination.lat, destination.lng]}
+        zoom={13}
+        scrollWheelZoom
+        style={{ height: "400px", width: "100%" }}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        {/* Disaster Marker */}
+        <Marker position={[destination.lat, destination.lng]}>
+          <Popup>
+            <b>Disaster Location</b>
+            <br />
+            {destination.lat.toFixed(6)}, {destination.lng.toFixed(6)}
+          </Popup>
+        </Marker>
+
+        {/* Volunteer Markers */}
+        {volunteerLocations?.map((v, index) => (
+          <Marker
+            key={index}
+            position={[v.lat, v.lng]}
+            icon={L.icon({
+              iconUrl: "https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png",
+              iconSize: [30, 30],
+            })}
+          >
+            <Popup>
+              <b>Volunteer</b>
+              <br />({v.lat}, {v.lng})
+            </Popup>
+          </Marker>
+        ))}
+
+        {/* Routing from Current Position to Disaster */}
+        {currentPosition && (
+          <Routing start={currentPosition} end={destination} />
+        )}
+      </MapContainer>
     </div>
   );
 };

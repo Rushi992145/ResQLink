@@ -375,81 +375,308 @@ const Admin = () => {
     </div>
   );
 
-  const ReportedDisasters = () => {
-    const [activeSection, setActiveSection] = useState("pending");
+  // ...existing code...
 
-    const sections = [
-      { id: "pending", label: "Pending Reports", icon: "⚠️", color: "yellow" },
-      { id: "active", label: "Active Disasters", icon: "🔴", color: "red" },
-      {
-        id: "resolved",
-        label: "Resolved Disasters",
-        icon: "✅",
-        color: "green",
-      },
-    ];
+const ReportedDisasters = () => {
+  const [activeSection, setActiveSection] = useState("pending");
+  const [selectedDisasterForAI, setSelectedDisasterForAI] = useState(null);
+  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
 
-    // Helper function to format date
-    const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+  const sections = [
+    { id: "pending", label: "Pending Reports", icon: "⚠️", color: "yellow" },
+    { id: "active", label: "Active Disasters", icon: "🔴", color: "red" },
+    {
+      id: "resolved",
+      label: "Resolved Disasters",
+      icon: "✅",
+      color: "green",
+    },
+  ];
+
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // AI Analysis Modal Component
+  const AIAnalysisModal = ({ disaster, onClose }) => {
+    if (!disaster) return null;
+
+    const getSeverityColor = (severity) => {
+      switch (severity) {
+        case "low":
+          return "bg-green-100 text-green-800 border-green-300";
+        case "moderate":
+          return "bg-yellow-100 text-yellow-800 border-yellow-300";
+        case "high":
+          return "bg-orange-100 text-orange-800 border-orange-300";
+        case "critical":
+          return "bg-red-100 text-red-800 border-red-300";
+        default:
+          return "bg-gray-100 text-gray-800 border-gray-300";
+      }
     };
 
-    return (
-      <div className="space-y-6">
-        <div className="flex space-x-4 mb-6">
-          {sections.map((section) => (
-            <motion.button
-              key={section.id}
-              onClick={() => setActiveSection(section.id)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`flex items-center px-4 py-2 rounded-lg font-medium ${
-                activeSection === section.id
-                  ? `bg-${section.color}-100 text-${section.color}-800 border-2 border-${section.color}-500`
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              <span className="mr-2">{section.icon}</span>
-              {section.label}
-            </motion.button>
-          ))}
-        </div>
+    const urgencyPercent = Math.min(
+      100,
+      Math.max(0, ((disaster.urgencyScore || 5) / 10) * 100)
+    );
 
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          {activeSection === "pending" && (
-            <div className="space-y-4">
-              {disasterReports.pending.map((disaster) => (
-                <motion.div
-                  key={disaster._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="border border-yellow-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-yellow-50"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold text-lg text-yellow-700">
-                      {disaster.disasterType}
-                    </h4>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      {disaster.severity}
-                    </span>
+    return (
+      // transparent overlay so page stays visible (no black background)
+      <div
+        className="fixed inset-0 flex items-start justify-center p-6 z-50"
+        aria-modal="true"
+        role="dialog"
+      >
+        {/* click outside to close */}
+        <div
+          onClick={onClose}
+          className="absolute inset-0 bg-transparent backdrop-blur-sm"
+        />
+
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.98 }}
+          transition={{ duration: 0.18 }}
+          className="relative pointer-events-auto max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden border"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-sky-600 to-indigo-600 text-white">
+            <div>
+              <h3 className="text-xl font-semibold">🤖 AI Disaster Analysis</h3>
+              <p className="text-sm opacity-90 mt-1">
+                Contextual assessment — severity, urgency & recommended resources
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityColor(
+                  disaster.severity
+                )}`}
+              >
+                {disaster.severity?.toUpperCase() || "MODERATE"}
+              </span>
+              <button
+                onClick={onClose}
+                aria-label="Close analysis"
+                className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center"
+              >
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none">
+                  <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="p-6 space-y-6">
+            {/* Top row: Info + urgency */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 bg-gray-50 rounded-lg p-4 border">
+                <h4 className="text-sm text-gray-500">Disaster</h4>
+                <div className="flex items-center justify-between mt-2">
+                  <div>
+                    <p className="text-lg font-semibold text-gray-800">
+                      {disaster.disasterType} • {disaster.name || "Anonymous"}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      📍 {disaster.location?.lati}, {disaster.location?.long}
+                    </p>
+                    <p className="mt-3 text-gray-700">{disaster.description}</p>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    📍 {disaster.location?.lati}, {disaster.location?.long}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-4 border flex flex-col justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Urgency</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-sky-600">
+                          {disaster.urgencyScore || 5}
+                        </div>
+                        <div className="text-xs text-gray-500">/10</div>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500"
+                          style={{ width: `${urgencyPercent}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        {urgencyPercent}% urgency — act {disaster.urgencyScore >= 8 ? "immediately" : disaster.urgencyScore >= 6 ? "soon" : "when possible"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 text-right">
+                  <p className="text-xs text-gray-500">Estimated affected</p>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {disaster.estimatedAffectedPeople?.toLocaleString() || 0}
                   </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    👤 Reporter: {disaster.name || "Anonymous"}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-3">
-                    {disaster.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">
-                      Reported: {formatDate(disaster.reportedAt)}
+                </div>
+              </div>
+            </div>
+
+            {/* Resources */}
+            <div className="bg-white rounded-lg p-4 border">
+              <h4 className="text-sm text-gray-500 mb-3">Recommended Resources</h4>
+              <div className="flex flex-wrap gap-2">
+                {disaster.recommendedResources && disaster.recommendedResources.length > 0 ? (
+                  disaster.recommendedResources.map((r, i) => (
+                    <span key={i} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 border text-sm text-slate-700">
+                      <svg className="w-4 h-4 text-sky-500" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                      {r}
                     </span>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No recommendations provided.</p>
+                )}
+              </div>
+            </div>
+
+            {/* AI Reasoning */}
+            {disaster.aiReasoning && (
+              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 border">
+                <h4 className="text-sm text-gray-500 mb-2">AI Reasoning</h4>
+                <p className="text-gray-700 italic leading-relaxed">{disaster.aiReasoning}</p>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 rounded-lg bg-white border text-gray-700 hover:bg-gray-50"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  // existing approve & alert action — navigate or call API as needed
+                  // for now close and navigate to details
+                  onClose();
+                  navigate(`/admin-dashboard/disaster/${disaster._id}`, {
+                    state: { disaster, status: "pending" },
+                  });
+                }}
+                className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                ✓ Approve & Alert Volunteers
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex space-x-4 mb-6">
+        {sections.map((section) => (
+          <motion.button
+            key={section.id}
+            onClick={() => setActiveSection(section.id)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`flex items-center px-4 py-2 rounded-lg font-medium ${
+              activeSection === section.id
+                ? `bg-${section.color}-100 text-${section.color}-800 border-2 border-${section.color}-500`
+                : "bg-white text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <span className="mr-2">{section.icon}</span>
+            {section.label}
+          </motion.button>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        {activeSection === "pending" && (
+          <div className="space-y-4">
+            {disasterReports.pending.map((disaster) => (
+              <motion.div
+                key={disaster._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="border border-yellow-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-yellow-50"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-semibold text-lg text-yellow-700">
+                    {disaster.disasterType}
+                  </h4>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    {disaster.severity}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  📍 {disaster.location?.lati}, {disaster.location?.long}
+                </p>
+                <p className="text-sm text-gray-600 mb-2">
+                  👤 Reporter: {disaster.name || "Anonymous"}
+                </p>
+                <p className="text-sm text-gray-600 mb-3">
+                  {disaster.description}
+                </p>
+
+                {/* AI Analysis Quick Info */}
+                {disaster.urgencyScore && (
+                  <div className="bg-white rounded-lg p-3 mb-3 border-l-4 border-blue-500">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Urgency</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.urgencyScore}/10
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Affected</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.estimatedAffectedPeople?.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Resources</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.recommendedResources?.length || 0}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">
+                    Reported: {formatDate(disaster.reportedAt)}
+                  </span>
+                  <div className="flex gap-2">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setSelectedDisasterForAI(disaster);
+                        setShowAIAnalysis(true);
+                      }}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                    >
+                      <span>🤖</span>
+                      AI Analysis
+                    </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -463,46 +690,88 @@ const Admin = () => {
                       View Details
                     </motion.button>
                   </div>
-                </motion.div>
-              ))}
-              {disasterReports.pending.length === 0 && (
-                <p className="text-center text-gray-500">
-                  No pending disaster reports
-                </p>
-              )}
-            </div>
-          )}
+                </div>
+              </motion.div>
+            ))}
+            {disasterReports.pending.length === 0 && (
+              <p className="text-center text-gray-500">
+                No pending disaster reports
+              </p>
+            )}
+          </div>
+        )}
 
-          {activeSection === "active" && (
-            <div className="space-y-4">
-              {disasterReports.active.map((disaster) => (
-                <motion.div
-                  key={disaster._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="border border-red-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-red-50"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold text-lg text-red-700">
-                      {disaster.disasterType}
-                    </h4>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      {disaster.severity}
-                    </span>
+        {activeSection === "active" && (
+          <div className="space-y-4">
+            {disasterReports.active.map((disaster) => (
+              <motion.div
+                key={disaster._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="border border-red-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-red-50"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-semibold text-lg text-red-700">
+                    {disaster.disasterType}
+                  </h4>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    {disaster.severity}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  📍 {disaster.location?.lati}, {disaster.location?.long}
+                </p>
+                <p className="text-sm text-gray-600 mb-2">
+                  👤 Reporter: {disaster.name || "Anonymous"}
+                </p>
+                <p className="text-sm text-gray-600 mb-3">
+                  {disaster.description}
+                </p>
+
+                {/* AI Analysis Quick Info */}
+                {disaster.urgencyScore && (
+                  <div className="bg-white rounded-lg p-3 mb-3 border-l-4 border-blue-500">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Urgency</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.urgencyScore}/10
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Affected</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.estimatedAffectedPeople?.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Resources</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.recommendedResources?.length || 0}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    📍 {disaster.location?.lati}, {disaster.location?.long}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    👤 Reporter: {disaster.name || "Anonymous"}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-3">
-                    {disaster.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">
-                      Active since: {formatDate(disaster.reportedAt)}
-                    </span>
+                )}
+
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">
+                    Active since: {formatDate(disaster.reportedAt)}
+                  </span>
+                  <div className="flex gap-2">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setSelectedDisasterForAI(disaster);
+                        setShowAIAnalysis(true);
+                      }}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                    >
+                      <span>🤖</span>
+                      AI Analysis
+                    </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -516,44 +785,86 @@ const Admin = () => {
                       View Details
                     </motion.button>
                   </div>
-                </motion.div>
-              ))}
-              {disasterReports.active.length === 0 && (
-                <p className="text-center text-gray-500">No active disasters</p>
-              )}
-            </div>
-          )}
+                </div>
+              </motion.div>
+            ))}
+            {disasterReports.active.length === 0 && (
+              <p className="text-center text-gray-500">No active disasters</p>
+            )}
+          </div>
+        )}
 
-          {activeSection === "resolved" && (
-            <div className="space-y-4">
-              {disasterReports.resolved.map((disaster) => (
-                <motion.div
-                  key={disaster._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="border border-green-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-green-50"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold text-lg text-green-700">
-                      {disaster.disasterType}
-                    </h4>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Resolved
-                    </span>
+        {activeSection === "resolved" && (
+          <div className="space-y-4">
+            {disasterReports.resolved.map((disaster) => (
+              <motion.div
+                key={disaster._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="border border-green-100 rounded-lg p-4 hover:shadow-lg transition-all duration-300 bg-green-50"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-semibold text-lg text-green-700">
+                    {disaster.disasterType}
+                  </h4>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Resolved
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  📍 {disaster.location?.lati}, {disaster.location?.long}
+                </p>
+                <p className="text-sm text-gray-600 mb-2">
+                  👤 Reporter: {disaster.name || "Anonymous"}
+                </p>
+                <p className="text-sm text-gray-600 mb-3">
+                  {disaster.description}
+                </p>
+
+                {/* AI Analysis Quick Info */}
+                {disaster.urgencyScore && (
+                  <div className="bg-white rounded-lg p-3 mb-3 border-l-4 border-blue-500">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Urgency</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.urgencyScore}/10
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Affected</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.estimatedAffectedPeople?.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Resources</p>
+                        <p className="font-bold text-blue-600">
+                          {disaster.recommendedResources?.length || 0}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    📍 {disaster.location?.lati}, {disaster.location?.long}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    👤 Reporter: {disaster.name || "Anonymous"}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-3">
-                    {disaster.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">
-                      Resolved: {formatDate(disaster.resolvedAt)}
-                    </span>
+                )}
+
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">
+                    Resolved: {formatDate(disaster.resolvedAt)}
+                  </span>
+                  <div className="flex gap-2">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setSelectedDisasterForAI(disaster);
+                        setShowAIAnalysis(true);
+                      }}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                    >
+                      <span>🤖</span>
+                      AI Analysis
+                    </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -567,19 +878,33 @@ const Admin = () => {
                       View Details
                     </motion.button>
                   </div>
-                </motion.div>
-              ))}
-              {disasterReports.resolved.length === 0 && (
-                <p className="text-center text-gray-500">
-                  No resolved disasters
-                </p>
-              )}
-            </div>
-          )}
-        </div>
+                </div>
+              </motion.div>
+            ))}
+            {disasterReports.resolved.length === 0 && (
+              <p className="text-center text-gray-500">
+                No resolved disasters
+              </p>
+            )}
+          </div>
+        )}
       </div>
-    );
-  };
+
+      {/* AI Analysis Modal */}
+      {showAIAnalysis && selectedDisasterForAI && (
+        <AIAnalysisModal
+          disaster={selectedDisasterForAI}
+          onClose={() => {
+            setShowAIAnalysis(false);
+            setSelectedDisasterForAI(null);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+// ...rest of the code...
 
   {
     /* Notification Modal */
