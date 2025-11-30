@@ -240,7 +240,7 @@ const DisasterDetailsPage = () => {
   }
 
   return (
-    <div className={`min-h-screen w-full ${styles.bgColor} pt-16`}>
+    <div className={`min-h-screen w-full ${styles.bgColor} pt-24`}>
       <div className="container mx-auto px-6 py-8">
         {/* Navigation */}
         <div className="mb-8">

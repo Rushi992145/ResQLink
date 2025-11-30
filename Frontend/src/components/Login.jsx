@@ -9,6 +9,7 @@ import { setRole } from "../Redux/authslice";
 import { setName } from "../Redux/authslice";
 import { setId } from "../Redux/authslice";
 import { setRating } from "../Redux/authslice";
+import {toast} from 'react-hot-toast'
 
 const Login = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Login = () => {
     // Handle login logic here
 
     console.log(formData,typeof(formData));
-
+    const toastId=toast.loading('Logging')
     const response = await fetch('http://localhost:3000/api/users/login',{
       method : 'POST',
       headers: {
@@ -63,7 +64,7 @@ const Login = () => {
     {
       navigate('/admin-dashboard');
     }
-
+    toast.success("Login successful",{id:toastId})
   };
 
   return (
