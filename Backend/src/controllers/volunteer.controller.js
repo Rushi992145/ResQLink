@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 
 // Register a new volunteer
 const updateVolunteer = asyncHandler(async (req, res) => {
-    const { userId, skills, availability,phone,city, address, bloodGroup, aadharNumber, familyContact, emergencyContact, assignedDisaster, rating=0, disastersWorked=0, achievements } = req.body;
+    const { userId, skills, availability,phone,city, address, bloodGroup, aadharNumber, familyContact, emergencyContact, assignedDisaster, rating=0, achievements } = req.body;
     console.log(req.body);
     // Validate required fields
     if (!userId || !bloodGroup || !aadharNumber || !emergencyContact) {
@@ -27,8 +27,12 @@ const updateVolunteer = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User not found");
     }
 
+    // console.log("User is",user)
+
     // Find the volunteer by userId (since userId is a field, not _id)
-    let volunteer = await Volunteer.findOne({ userId });
+    let volunteer = await Volunteer.findOne({userId: userId});
+
+    // console.log("volunteer is: ",volunteer);
 
     if (volunteer) {
         // Update existing volunteer
@@ -43,9 +47,9 @@ const updateVolunteer = asyncHandler(async (req, res) => {
         volunteer.emergencyContact = emergencyContact;
         volunteer.assignedDisaster = assignedDisaster;
         volunteer.rating = rating;
-        volunteer.disastersWorked = disastersWorked;
         volunteer.achievements = achievements;
 
+        // console.log("volunteer after update is: ",volunteer)
         await volunteer.save();
 
         return res.status(200).json(new ApiResponse(200, volunteer, "Volunteer updated successfully"));
@@ -63,7 +67,7 @@ const updateVolunteer = asyncHandler(async (req, res) => {
             familyContact,
             emergencyContact,
             assignedDisaster,
-            rating:0,
+            rating: Math.floor(Math.random() * 5) + 1,
             disastersWorked:0,
             achievements:achievements
         });
@@ -74,10 +78,10 @@ const updateVolunteer = asyncHandler(async (req, res) => {
 
 const getVolunteerDetails = async (req, res) => {
     try {
-      const { id } = req.body; // Extract volunteer ID from URL params
+      const { userId } = req.body; // Extract volunteer userId from URL params
     
-      console.log(id);
-      const volunteer = await Volunteer.findOne({ userId: id }); // Fetch volunteer details from DB
+      console.log("volunteer userId is: ",userId);
+      const volunteer = await Volunteer.findOne({ userId}); // Fetch volunteer details from DB
       if (!volunteer) {
         return res.status(404).json({ message: "Volunteer not found" });
       }
@@ -131,6 +135,11 @@ const updateVolunteerStatus = asyncHandler(async (req, res) => {
     const volunteer = await Volunteer.findOne({userId: volunteerId});
     if (!volunteer) {
         throw new ApiError(404, "Volunteer not found");
+    }
+
+    if(status=="Available") {
+        const count = volunteer.disastersWorked+1;
+        volunteer.disastersWorked = count 
     }
 
     volunteer.status = status;
@@ -208,12 +217,14 @@ const acceptRequest = async (req, res) => {
     try {
         const { id, disasterId } = req.body;
 
+        console.log(id,disasterId);
+
         const userExist = await Volunteer.findOne({ userId: id });
         
         if (!userExist) {
             return res.status(404).json({
                 success: false,
-                message: "Volunteer not found"
+                message: "Volunteer not found to accept the request"
             });
         }
 
