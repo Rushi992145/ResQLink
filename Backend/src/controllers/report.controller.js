@@ -4,28 +4,154 @@ import User from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import Disaster from "../models/disaster.model.js";
+import Groq from "groq-sdk";
 
-// Create a new disaster request
+const groq = new Groq({
+  apiKey: process.env.VITE_API_KEY_GROQ,
+  timeout: 30000
+});
+
+// AI Function to analyze disaster severity
+const analyzeDisasterSeverity = async (description, disasterType, location) => {
+  try {
+    console.log("🤖 Starting AI Analysis...");
+    console.log("Groq API Key exists:", !!process.env.VITE_API_KEY_GROQ);
+    
+    // Format location for the prompt
+    const locationStr = typeof location === 'object' 
+      ? `${location.lati}, ${location.long}` 
+      : location;
+
+    const prompt = `Analyze this disaster report and return ONLY a valid JSON object with these EXACT fields:
+{
+  "severity": "low" | "moderate" | "high" | "critical",
+  "urgency_score": (number 1-10),
+  "estimated_affected_people": (number),
+  "recommended_resources": ["resource1", "resource2", "resource3"],
+  "reasoning": "brief explanation"
+}
+
+Disaster Type: ${disasterType}
+Location: ${locationStr}
+Description: ${description}
+
+IMPORTANT: Return ONLY the JSON object, no markdown, no code blocks, no extra text.`;
+
+    console.log("📝 Sending prompt to Groq...");
+    
+    const message = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: "llama-3.3-70b-versatile",
+      max_tokens: 500,
+      temperature: 0.3 // Lower temperature for more consistent JSON output
+    });
+
+    console.log("✅ Groq Response received");
+    const response = message.choices[0].message.content;
+    console.log("Raw Response:", response);
+
+    // Clean the response - remove markdown code blocks if present
+    let cleanedResponse = response
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    console.log("Cleaned Response:", cleanedResponse);
+
+    const parsedResponse = JSON.parse(cleanedResponse);
+    console.log("✨ Successfully parsed AI response:", parsedResponse);
+
+    return parsedResponse;
+
+  } catch (error) {
+    console.error("❌ AI Analysis Error:", error);
+    console.error("Error message:", error.message);
+    console.error("Error status:", error.status);
+    
+    // Return null so we can handle it gracefully
+    return null;
+  }
+};
+
+// Fallback analysis when AI fails
+const getFallbackAnalysis = (description, disasterType) => {
+  console.log("⚠️ Using fallback analysis...");
+  
+  const fallbackMap = {
+    earthquake: {
+      severity: "high",
+      urgency_score: 9,
+      estimated_affected_people: 5000,
+      recommended_resources: ["Medical Supplies", "Rescue Equipment", "Shelter", "Food & Water", "Emergency Communication"],
+      reasoning: "Earthquake typically causes structural damage and multiple casualties"
+    },
+    flood: {
+      severity: "high",
+      urgency_score: 8,
+      estimated_affected_people: 3000,
+      recommended_resources: ["Boats & Life Jackets", "Food & Water", "Medical Supplies", "Shelter", "Sanitation Equipment"],
+      reasoning: "Floods require immediate water rescue and disease prevention"
+    },
+    fire: {
+      severity: "high",
+      urgency_score: 9,
+      estimated_affected_people: 2000,
+      recommended_resources: ["Fire Extinguishers", "Medical Supplies", "Evacuation Transport", "Shelter", "Respiratory Equipment"],
+      reasoning: "Fires spread rapidly and pose immediate life threat"
+    },
+    hurricane: {
+      severity: "critical",
+      urgency_score: 10,
+      estimated_affected_people: 10000,
+      recommended_resources: ["Emergency Shelters", "Food & Water", "Medical Supplies", "Generator Fuel", "Sanitation Kits"],
+      reasoning: "Hurricanes cause widespread damage and displacement"
+    },
+    other: {
+      severity: "moderate",
+      urgency_score: 5,
+      estimated_affected_people: 500,
+      recommended_resources: ["Basic Medical Supplies", "Food & Water", "First Aid Kits"],
+      reasoning: "Standard emergency response needed"
+    }
+  };
+
+  return fallbackMap[disasterType] || fallbackMap.other;
+};
+
+// Create a new disaster request with AI analysis
 const createDisasterRequest = asyncHandler(async (req, res) => {
-    console.log("Request Body"); 
-    const { name,contactNumber, disasterType, location, image, description, assistanceRequired, severity } = req.body;
+    console.log("📥 Received Disaster Report Request");
+    const { name, contactNumber, disasterType, location, image, description, assistanceRequired } = req.body;
 
-    console.log("Received Data:", req.body); // Debugging
+    console.log("📋 Request Data:", { name, disasterType, location, description: description?.substring(0, 50) + "..." });
 
     // Validate required fields
-    if (!disasterType || !severity) {
-        throw new ApiError(400, "Missing required fields");
+    if (!disasterType || !description || !location) {
+        throw new ApiError(400, "Missing required fields: disasterType, description, location");
     }
 
     if (!["earthquake", "flood", "fire", "hurricane", "other"].includes(disasterType)) {
         throw new ApiError(400, "Invalid disaster type");
     }
 
-    if (!["low", "moderate", "high", "severe"].includes(severity)) {
-        throw new ApiError(400, "Invalid severity level");
+    // Get AI analysis for severity and resources
+    console.log("🚀 Starting AI analysis...");
+    let aiAnalysis = await analyzeDisasterSeverity(description, disasterType, location);
+    
+    // If AI analysis fails, use fallback
+    if (!aiAnalysis) {
+        console.log("⚠️ AI analysis failed, using fallback");
+        aiAnalysis = getFallbackAnalysis(description, disasterType);
     }
+    
+    console.log("📊 Final AI Analysis:", aiAnalysis);
 
-    // Ensure `userId` is set to `null` for anonymous users
+    // Create disaster request with AI-generated data
     const disasterRequest = await DisasterRequest.create({
         name,
         contactNumber,
@@ -34,13 +160,18 @@ const createDisasterRequest = asyncHandler(async (req, res) => {
         description,
         assistanceRequired,
         image,
-        severity,
+        severity: aiAnalysis?.severity || "moderate",
+        urgencyScore: aiAnalysis?.urgency_score || 5,
+        estimatedAffectedPeople: aiAnalysis?.estimated_affected_people || 0,
+        recommendedResources: aiAnalysis?.recommended_resources || [],
+        aiReasoning: aiAnalysis?.reasoning || "Standard analysis",
+        isAIAnalyzed: !!aiAnalysis // Track if real AI was used
     });
-    console.log("Disaster Request:", disasterRequest); // Debugging
 
-    return res.status(201).json(new ApiResponse(201, disasterRequest, "Disaster request created successfully"));
+    console.log("✅ Disaster Request Created:", disasterRequest._id);
+
+    return res.status(201).json(new ApiResponse(201, disasterRequest, "Disaster request created and analyzed successfully"));
 });
-
 
 // Get all disaster requests
 const getAllDisasterRequests = asyncHandler(async (req, res) => {
@@ -61,10 +192,6 @@ const getDisasterRequestsByStatus = asyncHandler(async (req, res) => {
 
     const disasterRequests = await DisasterRequest.find({ status })
         .sort({ reportedAt: -1 });
-
-    // if (!disasterRequests.length) {
-    //     throw new ApiError(404, "No disaster requests found for this status");
-    // }
 
     return res.status(200).json(new ApiResponse(200, disasterRequests, `Disaster requests with status '${status}' fetched successfully`));
 });
@@ -108,32 +235,21 @@ const deleteDisasterRequest = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {}, "Disaster request deleted successfully"));
 });
 
-const getReportById = async (req,res) => {
-    try 
-    {
-        const id = req.params.id;
+// Get report by ID
+const getReportById = asyncHandler(async (req, res) => {
+    const id = req.params.id;
 
-        console.log(id);
-        const report = await DisasterRequest.find({_id : id});
+    console.log(id);
+    const report = await DisasterRequest.findById(id);
 
-        return res.status(200).json({
-            success : true,
-            message : "disaster fetched successfully",
-            data : report
-    })
-
+    if (!report) {
+        throw new ApiError(404, "Disaster report not found");
     }
-    catch(error)
-    {
-        console.log(error.message);
-        return res.status(500).json({
-            success : false,
-            message : "Internal server error"
-        })
-    }
-}
 
-// Add new resolveDisaster function
+    return res.status(200).json(new ApiResponse(200, report, "Disaster fetched successfully"));
+});
+
+// Resolve disaster
 const resolveDisaster = asyncHandler(async (req, res) => {
     const { requestId } = req.params;
     const { status, resolvedAt } = req.body;
@@ -165,6 +281,6 @@ export {
     updateDisasterRequestStatus,
     deleteDisasterRequest,
     getReportById,
-    resolveDisaster
+    resolveDisaster,
+    analyzeDisasterSeverity
 };
-

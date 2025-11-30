@@ -19,7 +19,25 @@ const DisasterRequestSchema = new mongoose.Schema({
   },
   severity: {
     type: String,
-    enum: ["mild", "moderate", "severe", "critical","high","Mild","Critical","Moderate","Severe"],
+    enum: ["mild", "moderate", "severe", "critical","high","Mild","Critical","Moderate","Severe","low"],
+    default: "moderate"
+  },
+  urgencyScore: {
+      type: Number,
+      min: 1,
+      max: 10,
+      default: 5
+  },
+  estimatedAffectedPeople: {
+      type: Number,
+      default: 0
+  },
+  recommendedResources: [{
+      type: String
+  }],
+  aiReasoning: {
+      type: String,
+      default: "Standard analysis"
   },
   status: {
     type: String,
