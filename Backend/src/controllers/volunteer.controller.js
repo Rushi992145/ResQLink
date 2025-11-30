@@ -5,10 +5,11 @@ import Disaster from "../models/disaster.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import DisasterRequest from "../models/report.model.js"
+import mongoose from "mongoose";
 
 // Register a new volunteer
 const updateVolunteer = asyncHandler(async (req, res) => {
-    const { userId, skills, availability,phone,city, address, bloodGroup, aadharNumber, familyContact, emergencyContact, assignedDisaster } = req.body;
+    const { userId, skills, availability,phone,city, address, bloodGroup, aadharNumber, familyContact, emergencyContact, assignedDisaster, rating=0, disastersWorked=0, achievements } = req.body;
     console.log(req.body);
     // Validate required fields
     if (!userId || !bloodGroup || !aadharNumber || !emergencyContact) {
@@ -41,6 +42,9 @@ const updateVolunteer = asyncHandler(async (req, res) => {
         volunteer.familyContact = familyContact;
         volunteer.emergencyContact = emergencyContact;
         volunteer.assignedDisaster = assignedDisaster;
+        volunteer.rating = rating;
+        volunteer.disastersWorked = disastersWorked;
+        volunteer.achievements = achievements;
 
         await volunteer.save();
 
@@ -58,7 +62,10 @@ const updateVolunteer = asyncHandler(async (req, res) => {
             aadharNumber,
             familyContact,
             emergencyContact,
-            assignedDisaster
+            assignedDisaster,
+            rating:0,
+            disastersWorked:0,
+            achievements:achievements
         });
 
         return res.status(201).json(new ApiResponse(201, volunteer, "Volunteer registered successfully"));
@@ -115,13 +122,13 @@ const getVolunteersByStatus = asyncHandler(async (req, res) => {
 const updateVolunteerStatus = asyncHandler(async (req, res) => {
     const { volunteerId } = req.params;
     const { status } = req.body;
-    console.log(req.body);
+    console.log(volunteerId, req.body, typeof(volunteerId));
 
     if (!["Available", "Assigned", "Inactive"].includes(status)) {
         throw new ApiError(400, "Invalid status");
     }
 
-    const volunteer = await Volunteer.findById(volunteerId);
+    const volunteer = await Volunteer.findOne({userId: volunteerId});
     if (!volunteer) {
         throw new ApiError(404, "Volunteer not found");
     }

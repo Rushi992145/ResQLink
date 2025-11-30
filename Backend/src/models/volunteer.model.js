@@ -20,17 +20,24 @@ const VolunteerSchema = new mongoose.Schema(
     familyContact: { type: String },
     emergencyContact: { type: String },
     assignedDisaster: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Disaster"
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Disaster"
     },
     status: {
       type: String,
       enum: ["Available", "Assigned", "Inactive"],
       default: "Available",
     },
-    disasterAssigned : { type: mongoose.Schema.Types.ObjectId,
+    disasterAssigned: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "DisasterRequest",
       default: null,
+    },
+    rating: Number,
+    disastersWorked: Number,
+    achievements: {
+      type: [String],
+      default: []
     }
   },
   { timestamps: true }

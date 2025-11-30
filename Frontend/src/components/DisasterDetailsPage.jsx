@@ -141,16 +141,22 @@ const DisasterDetailsPage = () => {
       }
 
       // Update volunteer status for this disaster
-      const volunteerResponse = await fetch(`http://localhost:3000/api/volunteer/complete-disaster/${disaster._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const userId = localStorage.getItem('id');
 
-      if (!volunteerResponse.ok) {
-        throw new Error('Failed to update volunteer status');
+      if (userId) {
+        const volunteerResponse = await fetch(`http://localhost:3000/api/volunteers/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({status: "Available"})
+        });
+
+
+        if (!volunteerResponse.ok) {
+          throw new Error('Failed to update volunteer status');
+        }
       }
 
       alert('Disaster marked as resolved successfully');
