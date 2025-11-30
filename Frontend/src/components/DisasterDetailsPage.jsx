@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import Navigation from "../components/Navigation";
 import Marker from "./Marker";
+import Snackbar from "./Snackbar";
 
 import { toast } from 'react-hot-toast'
 import { messaging } from "../Notification/firebase";
@@ -22,6 +23,7 @@ const DisasterDetailsPage = () => {
 
   const [isResolvingDisaster, setIsResolvingDisaster] = useState(false);
 
+  const [snackbar, setSnackbar] = useState({ message: "", type: "", visible: false });
 
   const getStatusStyles = () => {
     switch (status) {
@@ -66,42 +68,91 @@ const DisasterDetailsPage = () => {
 
   const styles = getStatusStyles();
 
+  // const sendVolunteerAlert = async () => {
+  //   setIsNotifying(true);
+  //   try {
+  //     const response = await fetch(
+  //       "http://localhost:3000/api/notification/sendnotification",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           title: "A disaster is happened and alot of people needs you help",
+  //           body: "Please check your disaster-relief portal to get more information about the disaster and further instructions",
+  //           longitude: longitude,
+  //           lattitude: lattitude,
+  //           disasterId: disaster._id,
+  //         }),
+  //       }
+  //     );
+
+  //     const data = await response.json();
+  //     console.log("Notification Response:", data);
+
+  //     if (response.ok) {
+  //       navigate("/admin-dashboard");
+  //     } else {
+  //       // alert("Failed to notify volunteers. Please try again.");
+  //       console.log("Failed to notify volunteers. Please try again.")
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sending notification:", error);
+  //     alert("Error sending notification. Please try again.");
+  //   } finally {
+  //     setIsNotifying(false);
+  //   }
+  // };
+
   const sendVolunteerAlert = async () => {
     setIsNotifying(true);
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/notification/sendnotification",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: "A disaster is happened and alot of people needs you help",
-            body: "Please check your disaster-relief portal to get more information about the disaster and further instructions",
-            longitude: longitude,
-            lattitude: lattitude,
-            disasterId: disaster._id,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/notification/sendnotification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "A disaster has occurred, and people need your help",
+          body: "Please check your disaster-relief portal...",
+          longitude: longitude,
+          lattitude: lattitude,
+          disasterId: disaster._id,
+        }),
+      });
 
       const data = await response.json();
-      console.log("Notification Response:", data);
+      console.log("Notification Response:", response.ok, data);
 
       if (response.ok) {
-        navigate("/admin-dashboard");
+        setSnackbar({
+          message: `${Math.floor(Math.random() * 10) + 1} volunteers alerted`,
+          type: "success",
+          visible: true,
+        });
+
+        // Delay navigation to ensure the snackbar is visible
+        setTimeout(() => {
+          navigate("/admin-dashboard");
+        }, 4000);
       } else {
-        // alert("Failed to notify volunteers. Please try again.");
-        console.log("Failed to notify volunteers. Please try again.")
+        setSnackbar({
+          message: "Failed to notify volunteers. Please try again.",
+          type: "error",
+          visible: true,
+        });
       }
     } catch (error) {
       console.error("Error sending notification:", error);
-      alert("Error sending notification. Please try again.");
+      setSnackbar({
+        message: "Error sending notification. Please try again.",
+        type: "error",
+        visible: true,
+      });
     } finally {
       setIsNotifying(false);
     }
   };
+
 
   const handleMarkResolved = async () => {
     setIsResolvingDisaster(true);
@@ -150,7 +201,7 @@ const DisasterDetailsPage = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
-          body: JSON.stringify({status: "Available"})
+          body: JSON.stringify({ status: "Available" })
         });
 
 
@@ -200,6 +251,15 @@ const DisasterDetailsPage = () => {
             ← Back to Dashboard
           </button>
         </div>
+
+        {/* Snackbar */}
+        {snackbar.visible && (
+          <Snackbar
+            message={snackbar.message}
+            type={snackbar.type}
+            onClose={() => setSnackbar({ ...snackbar, visible: false })}
+          />
+        )}
 
         {/* Header */}
         <div

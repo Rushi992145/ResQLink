@@ -8,7 +8,7 @@ import { setEmail } from "../Redux/authslice";
 import { setRole } from "../Redux/authslice";
 import { setName } from "../Redux/authslice";
 import { setId } from "../Redux/authslice";
-
+import { setRating } from "../Redux/authslice";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,12 +41,14 @@ const Login = () => {
     localStorage.setItem('email',value.data.user.email);
     localStorage.setItem('name',value.data.user.name);
     localStorage.setItem('id',value.data.user._id);
+    localStorage.setItem('rating',value.data.user.rating);
 
     dispatch(setToken(value.data.token));
     dispatch(setName(value.data.user.name));
     dispatch(setEmail(value.data.user.email));
     dispatch(setRole(value.data.user.role));
     dispatch(setId(value.data.user._id));
+    dispatch(setRating(value.data.user.rating ? value.data.user.rating : 0));
 
     if(value.data.user.role=='volunteer')
     {
