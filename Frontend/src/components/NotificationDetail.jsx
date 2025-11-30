@@ -50,7 +50,7 @@ const NotificationDetail = () => {
       const value = await response.json();
 
       console.log("disaster is :",value.data);
-      setNotification(value.data[0]);
+      await setNotification({...value.data});
     }
     catch(error)
     {

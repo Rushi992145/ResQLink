@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
@@ -11,22 +11,24 @@ const Navigation = ({ longitude, lattitude }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Convert incoming props to floating numbers
   const destination = {
     lat: parseFloat(lattitude),
     lng: parseFloat(longitude),
   };
-  console.log("Destination coordinates:", destination);
 
-  // fix leaflet marker icon path
-  delete L.Icon.Default.prototype._getIconUrl;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl:
-      "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+  // Custom Marker Icons
+  const startIcon = new L.Icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+    iconSize: [40, 40],
   });
 
-  // Component to add routing control
+  const endIcon = new L.Icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/535/535239.png",
+    iconSize: [40, 40],
+  });
+
+  // Routing Component
   const Routing = ({ start, end }) => {
     const map = useMap();
 
@@ -35,9 +37,13 @@ const Navigation = ({ longitude, lattitude }) => {
 
       const routingControl = L.Routing.control({
         waypoints: [L.latLng(start.lat, start.lng), L.latLng(end.lat, end.lng)],
+        lineOptions: { styles: [{ color: "blue", weight: 5 }] },
+        addWaypoints: false,
         routeWhileDragging: false,
         showAlternatives: false,
-        lineOptions: { styles: [{ weight: 4 }] },
+        router: L.Routing.osrmv1({
+          serviceUrl: "https://router.project-osrm.org/route/v1/driving/",
+        }),
       })
         .on("routesfound", (e) => {
           const route = e.routes[0];
@@ -45,6 +51,13 @@ const Navigation = ({ longitude, lattitude }) => {
             distance: (route.summary.totalDistance / 1000).toFixed(1) + " km",
             duration: Math.round(route.summary.totalTime / 60) + " mins",
           });
+
+          // Fit map to route bounds
+          const bounds = L.latLngBounds(
+            [start.lat, start.lng],
+            [end.lat, end.lng]
+          );
+          map.fitBounds(bounds);
         })
         .addTo(map);
 
@@ -54,70 +67,62 @@ const Navigation = ({ longitude, lattitude }) => {
     return null;
   };
 
-  // get current location
+  // Get Current Device Location
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCurrentPosition({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-          setIsLoading(false);
-        },
-        () => {
-          setError("Unable to access your location.");
-          setIsLoading(false);
-        }
-      );
-    } else {
-      setError("Geolocation not supported by your device.");
-      setIsLoading(false);
-    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCurrentPosition({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        setIsLoading(false);
+      },
+      () => {
+        setError("Unable to fetch your location");
+        setIsLoading(false);
+      }
+    );
   }, []);
 
   return (
-    <div className="w-full">
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
+    <div className="w-full relative">
+      {error && <div className="bg-red-200 p-3">{error}</div>}
 
-      <div className="bg-white shadow-md rounded p-4 mb-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-500">Destination</p>
-            <p className="font-medium">
-              Lat: {destination.lat.toFixed(4)}, Lng: {destination.lng.toFixed(4)}
-            </p>
-          </div>
-          <div className="text-right">
-            {routeInfo.distance && routeInfo.duration && (
-              <>
-                <p className="text-lg font-bold">{routeInfo.distance}</p>
-                <p className="text-sm text-gray-500">{routeInfo.duration}</p>
-              </>
-            )}
-          </div>
-        </div>
+      <div className="bg-white shadow-md p-4 mb-2 flex justify-between">
+        <p className="font-bold">Navigation to Disaster Location</p>
+        {routeInfo.distance && (
+          <p>
+            {routeInfo.distance} | {routeInfo.duration}
+          </p>
+        )}
       </div>
 
-      <div className="w-full h-64 md:h-96 rounded shadow-md" style={{ height: "400px" }}>
+      <div style={{ height: "420px" }}>
         {currentPosition && (
-          <MapContainer center={[currentPosition.lat, currentPosition.lng]} zoom={13} scrollWheelZoom>
+          <MapContainer
+            center={[currentPosition.lat, currentPosition.lng]}
+            zoom={14}
+            scrollWheelZoom
+            style={{ width: "100%", height: "100%" }}
+          >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+            <Marker position={currentPosition} icon={startIcon}>
+              <Popup>📍 Your Location</Popup>
+            </Marker>
+
+            <Marker position={destination} icon={endIcon}>
+              <Popup>🚨 Disaster Location</Popup>
+            </Marker>
+
             <Routing start={currentPosition} end={destination} />
           </MapContainer>
         )}
       </div>
 
       {isLoading && (
-        <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-75">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading map...</p>
-          </div>
+        <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
       )}
     </div>
