@@ -138,7 +138,7 @@ const updateVolunteerStatus = asyncHandler(async (req, res) => {
     }
 
     if(status=="Available") {
-        const count = volunteer.disastersWorked+1;
+        const count = (volunteer.disastersWorked ? volunteer.disastersWorked+1 : 1);
         volunteer.disastersWorked = count 
     }
 

@@ -104,9 +104,6 @@ const getLattitude = ()=>{
   }
 }
 
-
-
-
 const initialState = {
     token : getToken(),
     role : getRole(),
@@ -115,7 +112,8 @@ const initialState = {
     id : getId(),
     fcm_token : getFcmToken(),
     longitude : getLongitude(),
-    lattitude : getLattitude()
+    lattitude : getLattitude(),
+    rating: 0
 }
 
 
@@ -147,8 +145,11 @@ const authSlice = createSlice({
     setLattitude(state,value){
       state.lattitude = value.payload;
     },
+    setRating(state,rating){
+      state.rating = rating
+    }
    }
 })
 
-export const {setToken,setRole,setEmail,setName,setId,setFcmToken,setLongitude,setLattitude} = authSlice.actions;
+export const {setToken,setRole,setEmail,setName,setId,setFcmToken,setLongitude,setLattitude, setRating} = authSlice.actions;
 export const authReducer = authSlice.reducer;

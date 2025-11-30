@@ -11,7 +11,8 @@ import {
   setToken,
   setFcmToken,
   setLongitude,
-  setLattitude
+  setLattitude,
+  setRating
 } from '../Redux/authslice';
 
 const SideBarVolunteer = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) => {
@@ -36,6 +37,10 @@ const SideBarVolunteer = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebar
       .join("")
       .toUpperCase();
   };
+
+  useEffect(()=>{
+
+  },[])
 
   const handleLogout = () => {
     // Clear Redux state
@@ -76,7 +81,7 @@ const SideBarVolunteer = ({ activeTab, setActiveTab, isSidebarOpen, setIsSidebar
             <div class="flex items-center gap-2 mb-2">
               <span class="text-xs font-medium text-gray-700">Rating:</span>
               <span class="inline-flex items-center text-xs rounded-md bg-yellow-100 px-2 py-1 font-semibold text-yellow-800">
-                4
+                {parseInt(Math.random()*4+1)}
               </span>
             </div>
 
