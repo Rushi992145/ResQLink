@@ -20,29 +20,35 @@ const Login = () => {
     password: "",
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Handle login logic here
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const toastId = toast.loading('Logging in...');
 
-    console.log(formData,typeof(formData));
-    const toastId=toast.loading('Logging')
-    const response = await fetch('http://localhost:3000/api/users/login',{
-      method : 'POST',
+  try {
+    const response = await fetch('http://localhost:3000/api/users/login', {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body : JSON.stringify(formData)
-    })
+      body: JSON.stringify(formData),
+    });
+
+    // If server responds with an error (like 400/401/500)
+    if (!response.ok) {
+      const errorData = await response.json();
+      toast.error(errorData.message || "Login failed", { id: toastId });
+      return;
+    }
 
     const value = await response.json();
-    console.log("value is : ",value.data);
+    console.log("value is:", value.data);
 
-    localStorage.setItem('token',value.data.token);
-    localStorage.setItem('role',value.data.user.role);
-    localStorage.setItem('email',value.data.user.email);
-    localStorage.setItem('name',value.data.user.name);
-    localStorage.setItem('id',value.data.user._id);
-    localStorage.setItem('rating',value.data.user.rating);
+    localStorage.setItem('token', value.data.token);
+    localStorage.setItem('role', value.data.user.role);
+    localStorage.setItem('email', value.data.user.email);
+    localStorage.setItem('name', value.data.user.name);
+    localStorage.setItem('id', value.data.user._id);
+    localStorage.setItem('rating', value.data.user.rating);
 
     dispatch(setToken(value.data.token));
     dispatch(setName(value.data.user.name));
@@ -51,21 +57,23 @@ const Login = () => {
     dispatch(setId(value.data.user._id));
     dispatch(setRating(value.data.user.rating ? value.data.user.rating : 0));
 
-    if(value.data.user.role=='volunteer')
-    {
+    // Redirect based on role
+    if (value.data.user.role === 'volunteer') {
       navigate('/volunteer-dashboard');
-    }
-    else if(value.data.user.role=='ngo')
-    {
-      console.log("role is :",value.data.user.role);
+    } else if (value.data.user.role === 'ngo') {
       navigate('/ngo-dashboard');
-    }
-    else
-    {
+    } else {
       navigate('/admin-dashboard');
     }
-    toast.success("Login successful",{id:toastId})
-  };
+
+    toast.success("Login successful", { id: toastId });
+
+  } catch (error) {
+    console.error("Login error:", error);
+    toast.error("Email or password is wrong.", { id: toastId });
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
