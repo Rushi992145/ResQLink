@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 // import DisasterDetailsPage from "./DisasterDetailsPage";
+import CharBotInterface from "../components/ChatbotInterface"
 import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
@@ -1670,7 +1671,7 @@ const ReportedDisasters = () => {
     );
   };
 
-  // Add this state for the ChatbotModal
+  // Add this state for the CharBotInterface
   const [showChatbot, setShowChatbot] = useState(false);
 
   return (
@@ -1749,8 +1750,8 @@ const ReportedDisasters = () => {
           </motion.button>
         </div>
 
-        {/* Add the ChatbotModal */}
-        {showChatbot && <ChatbotModal onClose={() => setShowChatbot(false)} />}
+        {/* Add the CharBotInterface */}
+        {showChatbot && <CharBotInterface onClose={() => setShowChatbot(false)} />}
       </div>
     </div>
   );
