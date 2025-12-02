@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -34,6 +34,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const location = useLocation();
+  const profileRef = useRef(null);
 
   const token = useSelector((state) => state.auth.token);
   const role = useSelector((state) => state.auth.role);
@@ -48,6 +49,21 @@ const Navbar = () => {
       .join("")
       .toUpperCase();
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [profileRef]);
 
   // Get dashboard route based on role
   const getDashboardRoute = () => {
@@ -78,39 +94,37 @@ const Navbar = () => {
     { path: "/ngolist", label: "NGO", icon: Building },
   ];
 
-  function logoutclickhandler()
-    {
-      
-      dispatch(setName(null));
-      dispatch(setEmail(null));
-      dispatch(setRole(null));
-      dispatch(setId(null));
-      dispatch(setToken(null));
-      dispatch(setFcmToken(null));
-      dispatch(setLongitude(null));
-      dispatch(setLattitude(null));
+  function logoutclickhandler() {
+    setShowProfileMenu(false); 
+    dispatch(setName(null));
+    dispatch(setEmail(null));
+    dispatch(setRole(null));
+    dispatch(setId(null));
+    dispatch(setToken(null));
+    dispatch(setFcmToken(null));
+    dispatch(setLongitude(null));
+    dispatch(setLattitude(null));
 
-      
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      localStorage.removeItem('email');
-      localStorage.removeItem('name');
-      localStorage.removeItem('id');
-      localStorage.removeItem('fcm_token');
-      localStorage.removeItem('longitude');
-      localStorage.removeItem('lattitude');
 
-      navigate('/login');
-    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('email');
+    localStorage.removeItem('name');
+    localStorage.removeItem('id');
+    localStorage.removeItem('fcm_token');
+    localStorage.removeItem('longitude');
+    localStorage.removeItem('lattitude');
 
-    // console.log("token is :",token);
+    navigate('/login');
+  }
+
+  // console.log("token is :",token);
 
   return (
     <div className="fixed w-full top-0 z-50">
       <motion.nav
-        className={`${
-          scrolled ? "bg-white shadow-xl" : "bg-green-700"
-        } transition-all duration-500`}
+        className={`${scrolled ? "bg-white shadow-xl" : "bg-green-700"
+          } transition-all duration-500`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
@@ -127,20 +141,17 @@ const Navbar = () => {
                 whileHover={{ scale: 1.05 }}
               >
                 <div
-                  className={`${
-                    scrolled ? "bg-green-700" : "bg-white"
-                  } p-2 rounded-full transition-colors duration-500`}
+                  className={`${scrolled ? "bg-green-700" : "bg-white"
+                    } p-2 rounded-full transition-colors duration-500`}
                 >
                   <Shield
-                    className={`h-6 w-6 md:h-8 md:w-8 ${
-                      scrolled ? "text-white" : "text-green-700"
-                    }`}
+                    className={`h-6 w-6 md:h-8 md:w-8 ${scrolled ? "text-white" : "text-green-700"
+                      }`}
                   />
                 </div>
                 <span
-                  className={`text-xl md:text-2xl font-extrabold tracking-tight ${
-                    scrolled ? "text-green-700" : "text-white"
-                  }`}
+                  className={`text-xl md:text-2xl font-extrabold tracking-tight ${scrolled ? "text-green-700" : "text-white"
+                    }`}
                 >
                   Res<span className="text-yellow-500">Q</span>Link
                 </span>
@@ -156,12 +167,11 @@ const Navbar = () => {
                     key={item.path}
                     to={item.path}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
-                      ${
-                        location.pathname === item.path
-                          ? scrolled
-                            ? "bg-green-600 text-white shadow-md"
-                            : "bg-white text-green-700 shadow-md"
-                          : scrolled
+                      ${location.pathname === item.path
+                        ? scrolled
+                          ? "bg-green-600 text-white shadow-md"
+                          : "bg-white text-green-700 shadow-md"
+                        : scrolled
                           ? "text-green-700 hover:bg-green-50"
                           : "text-white hover:bg-green-600"
                       }`}
@@ -181,10 +191,9 @@ const Navbar = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className={`px-5 py-2 rounded-full text-sm font-medium transition-colors duration-300 border-2
-                          ${
-                            scrolled
-                              ? "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                              : "border-white text-white hover:bg-white hover:text-green-700"
+                          ${scrolled
+                            ? "border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                            : "border-white text-white hover:bg-white hover:text-green-700"
                           }`}
                       >
                         Login
@@ -195,10 +204,9 @@ const Navbar = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className={`px-5 py-2 rounded-full text-sm font-medium shadow-md transition-colors duration-300
-                          ${
-                            scrolled
-                              ? "bg-green-600 text-white hover:bg-green-700"
-                              : "bg-white text-green-700 hover:bg-green-50"
+                          ${scrolled
+                            ? "bg-green-600 text-white hover:bg-green-700"
+                            : "bg-white text-green-700 hover:bg-green-50"
                           }`}
                       >
                         Register
@@ -206,22 +214,20 @@ const Navbar = () => {
                     </Link>
                   </div>
                 ) : (
-                  <div className="relative">
+                  <div className="relative" ref={profileRef}>
                     <motion.div
                       className="flex items-center space-x-3 cursor-pointer"
                       onClick={() => setShowProfileMenu(!showProfileMenu)}
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center  font-medium ${
-                          scrolled ? "bg-green-600 text-white" : "bg-white text-green-700"
-                        }`}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center  font-medium ${scrolled ? "bg-green-600 text-white" : "bg-white text-green-700"
+                          }`}
                       >
                         {getInitials(name)}
                       </div>
                       <ChevronDown
-                        className={`w-5 h-5 ${
-                          scrolled ? "text-green-700" : "text-white"
-                        }`}
+                        className={`w-5 h-5 ${scrolled ? "text-green-700" : "text-white"
+                          }`}
                       />
                     </motion.div>
 
@@ -261,10 +267,9 @@ const Navbar = () => {
             <div className="md:hidden">
               <motion.button
                 className={`inline-flex items-center justify-center p-2 rounded-full focus:outline-none
-                  ${
-                    scrolled
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "bg-white text-green-700 hover:bg-green-50"
+                  ${scrolled
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-white text-green-700 hover:bg-green-50"
                   }`}
                 onClick={() => setIsOpen(!isOpen)}
                 whileTap={{ scale: 0.95 }}
@@ -279,9 +284,8 @@ const Navbar = () => {
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className={`md:hidden ${
-                scrolled ? "bg-white" : "bg-green-800"
-              } shadow-xl rounded-b-2xl`}
+              className={`md:hidden ${scrolled ? "bg-white" : "bg-green-800"
+                } shadow-xl rounded-b-2xl`}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -301,16 +305,15 @@ const Navbar = () => {
                     <Link
                       to={item.path}
                       className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200
-                                                ${
-                                                  location.pathname ===
-                                                  item.path
-                                                    ? scrolled
-                                                      ? "bg-green-50 text-green-700 border-l-4 border-green-600"
-                                                      : "bg-green-600 text-white border-l-4 border-white"
-                                                    : scrolled
-                                                    ? "text-gray-700 hover:bg-green-50 hover:text-green-700"
-                                                    : "text-white hover:bg-green-600"
-                                                }`}
+                                                ${location.pathname ===
+                          item.path
+                          ? scrolled
+                            ? "bg-green-50 text-green-700 border-l-4 border-green-600"
+                            : "bg-green-600 text-white border-l-4 border-white"
+                          : scrolled
+                            ? "text-gray-700 hover:bg-green-50 hover:text-green-700"
+                            : "text-white hover:bg-green-600"
+                        }`}
                       onClick={() => setIsOpen(false)}
                     >
                       <item.icon className="w-5 h-5" />
@@ -319,18 +322,16 @@ const Navbar = () => {
                   </motion.div>
                 ))}
                 <div
-                  className={`flex flex-col space-y-3 pt-5 pb-3 border-t ${
-                    scrolled ? "border-gray-200" : "border-green-600"
-                  }`}
+                  className={`flex flex-col space-y-3 pt-5 pb-3 border-t ${scrolled ? "border-gray-200" : "border-green-600"
+                    }`}
                 >
                   <Link to="/login" className="w-full">
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       className={`w-full px-4 py-3 text-center rounded-xl text-base font-medium transition-colors duration-300
-                        ${
-                          scrolled
-                            ? "bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                            : "bg-white text-green-700 hover:bg-green-50"
+                        ${scrolled
+                          ? "bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                          : "bg-white text-green-700 hover:bg-green-50"
                         }`}
                     >
                       Login
@@ -340,10 +341,9 @@ const Navbar = () => {
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       className={`w-full px-4 py-3 text-center rounded-xl text-base font-medium shadow-md transition-colors duration-300
-                        ${
-                          scrolled
-                            ? "bg-green-600 text-white hover:bg-green-700"
-                            : "bg-white text-green-700 hover:bg-green-50"
+                        ${scrolled
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "bg-white text-green-700 hover:bg-green-50"
                         }`}
                     >
                       Register

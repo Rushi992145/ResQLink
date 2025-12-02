@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-
+import {toast} from "react-hot-toast"
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle registration logic here
+    const toastId=toast.loading("Registering")
     console.log(formData,typeof(formData));
 
     try 
@@ -29,12 +30,14 @@ const Register = () => {
 
       const value = await response.json();
       console.log("value is : ",value.data.user);
+      toast.success("Registered Succefully",{id:toastId})
     
       navigate('/login')
     }
     catch(error)
     {
       console.log(error.message);
+      toast.error("Fail to register",{id:toastId})
     }
   };
 

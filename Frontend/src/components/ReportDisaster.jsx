@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import toast from "react-hot-toast";
+import {toast} from "react-hot-toast";
 
 const ReportDisaster = () => {
   const [formData, setFormData] = useState({
@@ -44,7 +44,7 @@ const ReportDisaster = () => {
     const toastId = toast.loading("Loading...")
     try {
       const location = await getCurrentLocation(); // Ensure location is updated before submission
-      toast.dismiss(toastId);
+      // toast.dismiss(toastId);
       console.log("Submitting with location:", location);
 
       const response = await fetch("http://localhost:3000/api/report/", {
@@ -59,7 +59,7 @@ const ReportDisaster = () => {
         throw new Error("Network response was not ok");
       }
 
-      toast.success("Disaster report submitted successfully!");
+      toast.success("Disaster report submitted successfully!",{id:toastId});
       console.log("Disaster report submitted successfully!");
 
       // Reset the form
@@ -76,11 +76,12 @@ const ReportDisaster = () => {
       });
     } catch (error) {
       console.error("Error submitting disaster report:", error);
+      toast.error("Failed to submit!", { id: toastId });
     }
   };
 
   return (
-    <div className="min-h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100">
+    <div className="min-h-screen pt-24 bg-gradient-to-b from-green-50 to-green-100">
       <div className="container mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
-
+import {toast} from "react-hot-toast"
 const RequestAssistance = () => {
   const [formData, setFormData] = useState({
     disasterId: "",
@@ -79,10 +79,10 @@ const RequestAssistance = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-    setSuccess(false);
-
+    // setIsSubmitting(true);
+    // setError(null);
+    // setSuccess(false);
+    const toastId=toast.loading("Submitting request")
     try {
       // Create the aid request with all required fields from the schema
       const aidRequestBody = {
@@ -123,7 +123,8 @@ const RequestAssistance = () => {
       console.log("Aid Response:", aidData);
 
       if (aidData.success) {
-        setSuccess(true);
+        // setSuccess(true);
+        toast.success("Submitted Successfully",{id:toastId})
         // Reset form with all fields
         setFormData({
           name: "",
@@ -142,17 +143,18 @@ const RequestAssistance = () => {
       }
     } catch (error) {
       console.error("Error submitting request:", error);
-      setError(
-        error.message ||
-          "Failed to submit request. Please check all required fields and try again."
-      );
+      toast.error("Failed to submit request",{id:toastId})
+      // setError(
+      //   error.message ||
+      //     "Failed to submit request. Please check all required fields and try again."
+      // );
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen pt-16 bg-gradient-to-b from-green-50 to-green-100">
+    <div className="min-h-screen pt-20 pb-10 bg-gradient-to-b from-green-50 to-green-100">
       <div className="container mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
