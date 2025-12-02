@@ -156,6 +156,7 @@ const Admin = () => {
   const [aidRequirements, setAidRequirements] = useState([]);
   const [isAidModalOpen, setIsAidModalOpen] = useState(false);
   const [selectedAid, setSelectedAid] = useState(null);
+  const [allocations, setAllocations] = useState({});
 
   // Add this useEffect to fetch aid requirements
   useEffect(() => {
@@ -171,9 +172,54 @@ const Admin = () => {
 
       if (data.success) {
         setAidRequirements(data.data);
+        // compute allocations after fetching aids
+        computeAllocations(data.data);
       }
     } catch (error) {
       console.error("Failed to fetch aid requirements:", error);
+    }
+  };
+
+  // Compute availableResources automatically (demo) and request allocation from backend
+  const computeAllocations = async (aids) => {
+    try {
+      if (!Array.isArray(aids) || aids.length === 0) return;
+
+      // Build total requested per resource
+      const totals = {};
+      for (const aid of aids) {
+        for (const req of aid.requirements || []) {
+          totals[req.type] = (totals[req.type] || 0) + (req.quantity || 0);
+        }
+      }
+
+      // For demo: simulate limited availability (e.g., 60% of total requested)
+      const availableResources = {};
+      Object.keys(totals).forEach((k) => {
+        availableResources[k] = Math.max(0, Math.floor(totals[k] * 0.6));
+      });
+
+      const resp = await fetch("http://localhost:3000/api/aid/allocate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ aids, availableResources }),
+      });
+
+      const result = await resp.json();
+      if (result.success && Array.isArray(result.allocations)) {
+        // convert allocations array to map for quick access
+        const map = {};
+        for (const a of result.allocations) {
+          map[a.aidId] = a.allocated;
+        }
+        setAllocations(map);
+      } else {
+        console.warn("Allocation endpoint returned no allocations, using empty map");
+        setAllocations({});
+      }
+    } catch (err) {
+      console.error("Allocation error:", err);
+      setAllocations({});
     }
   };
 
@@ -991,89 +1037,186 @@ const ReportedDisasters = () => {
 
     // Memoize the render of each aid requirement
     const renderAidRequirement = React.useCallback(
-      (aid) => (
-        <motion.div
-          key={aid._id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-6"
-        >
-          {/* Header */}
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800">
-                {aid.disasterType}
-              </h3>
-              <p className="text-sm text-gray-600">Requested by: {aid.name}</p>
-              <p className="text-sm text-gray-600">
-                Contact: {aid.contactNumber}
+      (aid) => {
+        // helper to compute totals
+        const totalRequested = (aid.requirements || []).reduce(
+          (s, r) => s + (r.quantity || 0),
+          0
+        );
+
+        const allocatedForAid = allocations[aid._id] || [];
+        const totalAllocated = allocatedForAid.reduce(
+          (s, a) => s + (a.allocated || 0),
+          0
+        );
+
+        const overallPercent = totalRequested > 0 ? Math.round((totalAllocated / totalRequested) * 100) : 0;
+
+        const copyAllocation = (aidId) => {
+          try {
+            const payload = allocations[aidId] || [];
+            navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+            // lightweight feedback
+            // eslint-disable-next-line no-alert
+            alert("Allocation JSON copied to clipboard");
+          } catch (e) {
+            // eslint-disable-next-line no-alert
+            alert("Failed to copy allocation");
+          }
+        };
+
+        const downloadAllocation = (aidId) => {
+          const payload = allocations[aidId] || [];
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `allocation_${aidId}.json`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        };
+
+        return (
+          <motion.div
+            key={aid._id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-lg p-6"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {aid.disasterType}
+                </h3>
+                <p className="text-sm text-gray-600">Requested by: {aid.name}</p>
+                <p className="text-sm text-gray-600">
+                  Contact: {aid.contactNumber}
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  Deadline: {formatDate(aid.deadline)}
+                </span>
+              </div>
+            </div>
+
+            {/* Location and Description */}
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">📍 Location: {aid.location}</p>
+              <p className="text-sm text-gray-600 mt-2">
+                📝 Description: {aid.description}
               </p>
             </div>
-            <div className="text-right">
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                Deadline: {formatDate(aid.deadline)}
-              </span>
+
+            {/* Summary */}
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Requested</p>
+                <p className="text-xl font-bold text-gray-800">{totalRequested}</p>
+              </div>
+
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Total Allocated</p>
+                <p className="text-xl font-bold text-sky-600">{totalAllocated}</p>
+                <p className="text-xs text-gray-500">{overallPercent}% fulfilled</p>
+              </div>
             </div>
-          </div>
 
-          {/* Location and Description */}
-          <div className="mb-4">
-            <p className="text-sm text-gray-600">📍 Location: {aid.location}</p>
-            <p className="text-sm text-gray-600 mt-2">
-              📝 Description: {aid.description}
-            </p>
-          </div>
+            <div className="w-full bg-gray-200 h-2 rounded overflow-hidden mb-4">
+              <div
+                className={`h-full ${
+                  overallPercent >= 90
+                    ? "bg-emerald-500"
+                    : overallPercent >= 60
+                    ? "bg-yellow-400"
+                    : "bg-red-400"
+                }`}
+                style={{ width: `${Math.min(100, overallPercent)}%` }}
+              />
+            </div>
 
-          {/* Requirements */}
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Requirements:</h4>
-            <div className="grid gap-2">
-              {aid.requirements.map((req, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
+            {/* Requirements */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-700">Requirements:</h4>
+              <div className="grid gap-3">
+                {aid.requirements.map((req, index) => {
+                  const matched = allocatedForAid.find((x) => x.type === req.type) || { allocated: 0 };
+                  const allocatedCount = matched.allocated || 0;
+                  const requested = req.quantity || 0;
+                  const percent = requested > 0 ? Math.round((allocatedCount / requested) * 100) : 0;
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-md bg-white border">
+                          <span className="text-lg">🎒</span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-gray-800">{req.type}</div>
+                          <div className="text-xs text-gray-500">Requested: {requested}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="text-sm font-semibold text-sky-600">{allocatedCount}</div>
+                          <div className="text-xs text-gray-500">Allocated</div>
+                        </div>
+                        <div className="w-36">
+                          <div className="w-full bg-gray-200 h-2 rounded overflow-hidden">
+                            <div
+                              className={`h-full ${
+                                percent >= 90 ? "bg-emerald-500" : percent >= 60 ? "bg-yellow-400" : "bg-red-400"
+                              }`}
+                              style={{ width: `${Math.min(100, percent)}%` }}
+                            />
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">{percent}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-6 flex justify-between items-center pt-4 border-t">
+              <span className="text-sm text-gray-500">Created: {formatDate(aid.createdAt)}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => copyAllocation(aid._id)}
+                  className="px-3 py-2 bg-gray-100 rounded-md text-sm text-gray-700 hover:bg-gray-200"
                 >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-gray-800">{req.type}</span>
-                    <span className="text-gray-600">({req.quantity})</span>
-                    {req.urgent && (
-                      <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
-                        Urgent
-                      </span>
-                    )}
-                  </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium bg-${getStatusColor(
-                      req.status
-                    )}-100 text-${getStatusColor(req.status)}-800`}
-                  >
-                    {req.status}
-                  </span>
-                </div>
-              ))}
+                  Copy Allocation
+                </button>
+                <button
+                  onClick={() => downloadAllocation(aid._id)}
+                  className="px-3 py-2 bg-gray-100 rounded-md text-sm text-gray-700 hover:bg-gray-200"
+                >
+                  Download JSON
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedAid(aid);
+                    setIsAidModalOpen(true);
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  View Details
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="mt-6 flex justify-between items-center pt-4 border-t">
-            <span className="text-sm text-gray-500">
-              Created: {formatDate(aid.createdAt)}
-            </span>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => {
-                  setSelectedAid(aid);
-                  setIsAidModalOpen(true);
-                }}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                View Details
-              </button>
-            </div>
-          </div>
-        </motion.div>
-      ),
-      [formatDate, getStatusColor]
+          </motion.div>
+        );
+      },
+      [formatDate, getStatusColor, allocations]
     );
 
     return (

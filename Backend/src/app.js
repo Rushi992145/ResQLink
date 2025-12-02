@@ -27,6 +27,7 @@ import reportRoutes from "./routes/report.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import aidRoutes from "./routes/aidRoutes.js";
 import paymentGatewayRoutes from "./routes/paymentGateway.route.js";
+import allocationRoutes from "./routes/allocation.route.js";
 
 //routes declaration
 app.use("/api/users", userRouter);
@@ -40,6 +41,7 @@ app.use("/api/notification", notificationRouter);
 app.use("/api/payment", paymentGatewayRoutes);
 
 app.use("/api/aid", aidRoutes);
+app.use("/api/aid/allocate", allocationRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "Service is healthy!" });

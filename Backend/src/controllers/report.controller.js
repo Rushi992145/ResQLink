@@ -27,8 +27,8 @@ const analyzeDisasterSeverity = async (description, disasterType, location) => {
   "severity": "low" | "moderate" | "high" | "critical",
   "urgency_score": (number 1-10),
   "estimated_affected_people": (number),
-  "recommended_resources": ["resource1", "resource2", "resource3"],
-  "reasoning": "brief explanation"
+  "recommended_resources": ["resource1", "resource2", "resource3", ...... ],
+  "reasoning": "brief explanation about the disaster"
 }
 
 Disaster Type: ${disasterType}
